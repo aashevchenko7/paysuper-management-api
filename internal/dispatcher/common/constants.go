@@ -146,6 +146,7 @@ const (
 
 	InternalErrorTemplate = "internal error"
 	ServiceErrorTemplate = "service error"
+	BindingErrorTemplate = "bind error"
 )
 
 var (

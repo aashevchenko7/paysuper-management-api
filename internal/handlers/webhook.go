@@ -31,18 +31,25 @@ func (h *WebHookRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(testMerchantWebhook, h.sendWebhookTest)
 }
 
+type SomeReq struct {
+	Type string `json:"type"`
+	TestingCase string `json:"testing_case"`
+}
+
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
 	req := &billing.OrderCreateRequest{}
-
 	if err := ctx.Bind(req); err != nil {
+		h.L().Error(common.BindingErrorTemplate, logger.PairArgs("err", err.Error()))
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
 	if err := h.dispatch.Validate.Struct(req); err != nil {
+		h.L().Error(common.BindingErrorTemplate, logger.PairArgs("err", err.Error()))
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
 	if len(req.TestingCase) == 0 {
+		h.L().Error(common.BindingErrorTemplate, logger.PairArgs("err", "testing case is empty"))
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
