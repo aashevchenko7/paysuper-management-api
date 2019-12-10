@@ -399,15 +399,23 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 }
 
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
-	req := &common.ReportFileRequest{}
+	req := &grpc.ListOrdersRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
-	req.ReportType = reporterPkg.ReportTypeTransactions
+	file := &common.ReportFileRequest{}
+	file.ReportType = reporterPkg.ReportTypeTransactions
+	file.FileType = reporterPkg.OutputExtensionCsv
+	file.Params = map[string]interface{}{
+		reporterPkg.ParamsFieldStatus:        req.Status,
+		reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
+		reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
+		reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
+	}
 
-	return h.dispatch.RequestReportFile(ctx, req)
+	return h.dispatch.RequestReportFile(ctx, file)
 }
 
 func (h *OrderRoute) processCreatePayment(ctx echo.Context) error {

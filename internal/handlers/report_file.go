@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
@@ -8,12 +9,14 @@ import (
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
+	reporterProto "github.com/paysuper/paysuper-reporter/pkg/proto"
 	"net/http"
 	"os"
 	"strings"
 )
 
 const (
+	reportFilePath         = "/report_file"
 	reportFileDownloadPath = "/report_file/download/:file"
 )
 
@@ -35,7 +38,44 @@ func NewReportFileRoute(set common.HandlerSet, awsManager awsWrapper.AwsManagerI
 }
 
 func (h *ReportFileRoute) Route(groups *common.Groups) {
+	groups.AuthUser.POST(reportFilePath, h.create)
 	groups.AuthUser.GET(reportFileDownloadPath, h.download)
+}
+
+func (h *ReportFileRoute) create(ctx echo.Context) error {
+	data := &common.ReportFileRequest{}
+
+	if err := ctx.Bind(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
+	}
+
+	params, err := json.Marshal(data.Params)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorRequestDataInvalid)
+	}
+
+	if err = h.dispatch.Validate.Struct(data); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	req := &reporterProto.ReportFile{
+		UserId:           common.ExtractUserContext(ctx).Id,
+		MerchantId:       data.MerchantId,
+		ReportType:       data.ReportType,
+		FileType:         data.FileType,
+		Template:         data.Template,
+		Params:           params,
+		SendNotification: true,
+	}
+
+	res, err := h.dispatch.Services.Reporter.CreateFile(ctx.Request().Context(), req)
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, reporterPkg.ServiceName, "CreateFile", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorMessageCreateReportFile)
+	}
+
+	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *ReportFileRoute) download(ctx echo.Context) error {

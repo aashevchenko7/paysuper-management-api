@@ -981,23 +981,17 @@ definitions:
       - country
       - rate
 
-  report_file.CreateReportFileParams:
+  CreateReportFileRequest:
     properties:
-      merchant_id:
-        type: string
       file_type:
         type: string
-      report_type:
-        type: string
+        description: pdf, xlsx or csv fyle type
       template:
         type: string
-      params:
-        type: object
+        description: custom template
     type: object
     required:
       - file_type
-      - report_type
-      - params
 
   CreateReportFileResponse:
     properties:
@@ -4290,7 +4284,7 @@ paths:
         - application/json
       description: Download orders list
       parameters:
-        - in: query
+        - in: body
           name: data
           schema:
             $ref: '#/definitions/OrderListRequest'
@@ -8635,7 +8629,7 @@ paths:
             $ref: '#/definitions/model.Error'
 
   "/admin/api/v1/payout_documents/{id}/download":
-    get:
+    post:
       summary: Download payout document by id
       tags:
         - Payouts
@@ -8650,6 +8644,12 @@ paths:
           name: id
           type: string
           required: true
+        - description: create file request
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateReportFileRequest'
       responses:
         200:
           description: OK
@@ -9085,7 +9085,7 @@ paths:
             $ref: '#/definitions/model.Error'
 
   "/admin/api/v1/royalty_reports/{id}/download":
-    get:
+    post:
       summary: Download an royalty reports by it's id
       tags:
         - Royalty reports
@@ -9100,6 +9100,12 @@ paths:
           name: id
           required: true
           type: string
+        - description: create file request
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateReportFileRequest'
       responses:
         200:
           description: OK
@@ -9163,7 +9169,7 @@ paths:
             $ref: '#/definitions/model.Error'
 
   "/admin/api/v1/royalty_reports/{id}/transactions/download":
-    get:
+    post:
       summary: Download a list of transactions, included in royalty report
       tags:
         - Royalty reports
@@ -9178,6 +9184,12 @@ paths:
           name: id
           required: true
           type: string
+        - description: create file request
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateReportFileRequest'
       responses:
         "200":
           description: OK
@@ -9813,7 +9825,7 @@ paths:
             $ref: '#/definitions/model.Error'
 
   "/system/api/v1/vat_reports/country/{country}/download":
-    get:
+    post:
       summary: Download a VAT reports list by country
       tags:
         - VAT Reports
@@ -9828,6 +9840,12 @@ paths:
           name: country
           required: true
           type: string
+        - description: create file request
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateReportFileRequest'
       responses:
         "200":
           description: OK
@@ -9899,7 +9917,7 @@ paths:
             $ref: '#/definitions/model.Error'
 
   "/system/api/v1/vat_reports/details/{id}/download":
-    get:
+    post:
       summary: Download a VAT report transaction
       tags:
         - VAT Reports
@@ -9914,6 +9932,12 @@ paths:
           name: id
           required: true
           type: string
+        - description: create file request
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/CreateReportFileRequest'
       responses:
         "200":
           description: OK

@@ -91,7 +91,7 @@ func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 
 	req.ReportType = reporterPkg.ReportTypePayout
 	req.Params = map[string]interface{}{
-		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterId),
+		reporterPkg.ParamsFieldId: ctx.Param(common.RequestPayoutDocumentId),
 	}
 
 	return h.dispatch.RequestReportFile(ctx, req)
