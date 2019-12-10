@@ -38,9 +38,9 @@ func NewVatReportsRoute(set common.HandlerSet, cfg *common.Config) *VatReportsRo
 func (h *VatReportsRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(vatReportsPath, h.getVatReportsDashboard)
 	groups.SystemUser.GET(vatReportsCountryPath, h.getVatReportsForCountry)
-	groups.SystemUser.GET(vatReportsCountryDownloadPath, h.downloadVatReportsForCountry)
+	groups.SystemUser.POST(vatReportsCountryDownloadPath, h.downloadVatReportsForCountry)
 	groups.SystemUser.GET(vatReportsDetailsPath, h.getVatReportTransactions)
-	groups.SystemUser.GET(vatReportsDetailsDownloadPath, h.downloadVatReportTransactions)
+	groups.SystemUser.POST(vatReportsDetailsDownloadPath, h.downloadVatReportTransactions)
 	groups.SystemUser.POST(vatReportsStatusPath, h.updateVatReportStatus)
 }
 
