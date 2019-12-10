@@ -47,6 +47,11 @@ type CreateOrderJsonProjectResponse struct {
 	PaymentFormData *grpc.PaymentFormJsonData `json:"payment_form_data,omitempty"`
 }
 
+type ListOrdersRequest struct {
+	*grpc.ListOrdersRequest
+	*common.ReportFileRequest
+}
+
 type OrderListRefundsBinder struct {
 	dispatch common.HandlerSet
 	provider.LMT
@@ -397,20 +402,22 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 }
 
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
-	req := &grpc.ListOrdersRequest{}
+	req := &ListOrdersRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
 	}
 
-	file := &common.ReportFileRequest{}
-	file.ReportType = reporterPkg.ReportTypeTransactions
-	file.FileType = reporterPkg.OutputExtensionCsv
-	file.Params = map[string]interface{}{
-		reporterPkg.ParamsFieldStatus:        req.Status,
-		reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
-		reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
-		reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
+	file := &common.ReportFileRequest{
+		ReportType: reporterPkg.ReportTypeTransactions,
+		FileType:   req.FileType,
+		MerchantId: req.MerchantId,
+		Params: map[string]interface{}{
+			reporterPkg.ParamsFieldStatus:        req.Status,
+			reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
+			reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
+			reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
+		},
 	}
 
 	return h.dispatch.RequestReportFile(ctx, file)
