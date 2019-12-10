@@ -273,10 +273,6 @@ func (h *OrderRoute) getPaymentFormData(ctx echo.Context) error {
 		Cookie:  helpers.GetRequestCookie(ctx, common.CustomerTokenCookiesName),
 	}
 
-	h.L().Info("debug", logger.PairArgs("X-Real-IP", ctx.Request().Header.Get(echo.HeaderXRealIP)))
-	h.L().Info("debug", logger.PairArgs("X-Forwarded-For", ctx.Request().Header.Get(echo.HeaderXForwardedFor)))
-	h.L().Info("debug", logger.PairArgs("IP Echo", ctx.RealIP()))
-
 	res, err := h.dispatch.Services.Billing.PaymentFormJsonDataProcess(ctx.Request().Context(), req)
 
 	if err != nil {
@@ -287,7 +283,9 @@ func (h *OrderRoute) getPaymentFormData(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	helpers.SetResponseCookie(ctx, common.CustomerTokenCookiesName, res.Cookie, h.cfg.CookieDomain, time.Now().Add(h.cfg.CustomerTokenCookiesLifetime))
+	expire := time.Now().AddDate(0, 0, 30)
+	h.dispatch.AwareSet.L().Info("Before set cookie", logger.WithPrettyFields(logger.Fields{"lifetime": h.cfg.CustomerTokenCookiesLifetime, "expire": expire}))
+	helpers.SetResponseCookie(ctx, common.CustomerTokenCookiesName, res.Cookie, h.cfg.CookieDomain, expire)
 
 	return ctx.JSON(http.StatusOK, res.Item)
 }
@@ -653,7 +651,9 @@ func (h *OrderRoute) processBillingAddress(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	helpers.SetResponseCookie(ctx, common.CustomerTokenCookiesName, res.Cookie, h.cfg.CookieDomain, time.Now().Add(h.cfg.CustomerTokenCookiesLifetime))
+	expire := time.Now().AddDate(0, 0, 30)
+	h.dispatch.AwareSet.L().Info("Before set cookie", logger.WithPrettyFields(logger.Fields{"lifetime": h.cfg.CustomerTokenCookiesLifetime, "expire": expire}))
+	helpers.SetResponseCookie(ctx, common.CustomerTokenCookiesName, res.Cookie, h.cfg.CookieDomain, expire)
 
 	return ctx.JSON(http.StatusOK, res.Item)
 }
@@ -756,7 +756,7 @@ func (h *OrderRoute) changePlatform(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	return ctx.NoContent(http.StatusOK)
+	return ctx.JSON(http.StatusOK, res.Item)
 }
 func (h *OrderRoute) getReceipt(ctx echo.Context) error {
 	orderId := ctx.Param(common.RequestParameterOrderId)
