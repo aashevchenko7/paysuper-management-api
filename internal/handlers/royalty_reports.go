@@ -102,7 +102,7 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 	req := &common.ReportFileRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
+		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypeRoyalty
@@ -142,7 +142,7 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) erro
 	req := &common.ReportFileRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
+		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypeRoyaltyTransactions

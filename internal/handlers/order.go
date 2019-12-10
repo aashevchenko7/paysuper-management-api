@@ -48,8 +48,16 @@ type CreateOrderJsonProjectResponse struct {
 }
 
 type ListOrdersRequest struct {
-	*grpc.ListOrdersRequest
-	*common.ReportFileRequest
+	MerchantId    string   `json:"merchant_id" validate:"required,hexadecimal,len=24"`
+	FileType      string   `json:"file_type" validate:"required"`
+	Template      string   `json:"template" validate:"omitempty,hexadecimal"`
+	Id            string   `json:"id" validate:"omitempty,uuid"`
+	Project       []string `json:"project" validate:"omitempty,dive,hexadecimal,len=24"`
+	PaymentMethod []string `json:"payment_method" validate:"omitempty,dive,hexadecimal,len=24"`
+	Country       []string `json:"country" validate:"omitempty,dive,alpha,len=2"`
+	Status        []string `json:"status," validate:"omitempty,dive,alpha,oneof=created processed canceled rejected refunded chargeback pending"`
+	PmDateFrom    int64    `json:"pm_date_from" validate:"omitempty,numeric,gt=0"`
+	PmDateTo      int64    `json:"pm_date_to" validate:"omitempty,numeric,gt=0"`
 }
 
 type OrderListRefundsBinder struct {
@@ -405,7 +413,7 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	req := &ListOrdersRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
+		return err
 	}
 
 	file := &common.ReportFileRequest{

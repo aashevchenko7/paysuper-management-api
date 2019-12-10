@@ -86,7 +86,7 @@ func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 	req := &common.ReportFileRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
+		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypePayout

@@ -158,7 +158,7 @@ type AuthUser struct {
 }
 
 type ReportFileRequest struct {
-	MerchantId string                 `json:"merchant_id" validate:"required"`
+	MerchantId string                 `json:"merchant_id" validate:"required,hexadecimal,len=24"`
 	FileType   string                 `json:"file_type" validate:"required"`
 	ReportType string                 `json:"report_type"`
 	Template   string                 `json:"template"`
