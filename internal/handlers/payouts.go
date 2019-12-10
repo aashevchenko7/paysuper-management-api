@@ -36,7 +36,7 @@ func NewPayoutDocumentsRoute(set common.HandlerSet, cfg *common.Config) *PayoutD
 func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(payoutsPath, h.getPayoutDocumentsList)
 	groups.AuthUser.GET(payoutsIdPath, h.getPayoutDocument)
-	groups.AuthUser.GET(payoutsIdDownloadPath, h.downloadPayoutDocument)
+	groups.AuthUser.POST(payoutsIdDownloadPath, h.downloadPayoutDocument)
 	groups.AuthUser.GET(payoutsIdReportsPath, h.getPayoutRoyaltyReports)
 	groups.AuthUser.POST(payoutsPath, h.createPayoutDocument)
 	groups.SystemUser.POST(payoutsIdPath, h.updatePayoutDocument)

@@ -45,9 +45,9 @@ func NewRoyaltyReportsRoute(set common.HandlerSet, cfg *common.Config) *RoyaltyR
 func (h *RoyaltyReportsRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(royaltyReportsPath, h.getRoyaltyReportsList)
 	groups.AuthUser.GET(royaltyReportsIdPath, h.getRoyaltyReport)
-	groups.AuthUser.GET(royaltyReportsIdDownloadPath, h.downloadRoyaltyReport)
+	groups.AuthUser.POST(royaltyReportsIdDownloadPath, h.downloadRoyaltyReport)
 	groups.AuthUser.GET(royaltyReportsTransactionsPath, h.listRoyaltyReportOrders)
-	groups.AuthUser.GET(royaltyReportsTransactionsDownloadPath, h.downloadRoyaltyReportOrders)
+	groups.AuthUser.POST(royaltyReportsTransactionsDownloadPath, h.downloadRoyaltyReportOrders)
 	groups.AuthUser.POST(royaltyReportsAcceptPath, h.merchantReviewRoyaltyReport)
 	groups.AuthUser.POST(royaltyReportsDeclinePath, h.merchantDeclineRoyaltyReport)
 	groups.SystemUser.POST(royaltyReportsChangePath, h.changeRoyaltyReport)
