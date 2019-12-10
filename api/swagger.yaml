@@ -8101,7 +8101,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/admin/api/v1/payment_costs/channel/merchant/{merchant_id}/{cost_id}":
+  "/system/api/v1/payment_costs/channel/merchant/{merchant_id}/{cost_id}":
     put:
       summary: Update merchant costs for payments operations
       tags:
@@ -8154,7 +8154,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/admin/api/v1/payment_costs/money_back/merchant/{merchant_id}/{cost_id}":
+  "/system/api/v1/payment_costs/money_back/merchant/{merchant_id}/{cost_id}":
     put:
       summary: Update merchant costs for money back operations
       tags:
