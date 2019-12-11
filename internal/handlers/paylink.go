@@ -22,6 +22,7 @@ const (
 	paylinksIdStatReferrerPath = "/paylinks/:id/dashboard/referrer"
 	paylinksIdStatDatePath     = "/paylinks/:id/dashboard/date"
 	paylinksIdStatUtmPath      = "/paylinks/:id/dashboard/utm"
+	paylinksIdTransactionsPath = "/paylinks/:id/transactions"
 
 	paylinkUrlMask = "%s://%s/%s"
 )
@@ -53,6 +54,7 @@ func (h *PayLinkRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(paylinksIdStatReferrerPath, h.getPaylinkStatByReferrer)
 	groups.AuthUser.GET(paylinksIdStatDatePath, h.getPaylinkStatByDate)
 	groups.AuthUser.GET(paylinksIdStatUtmPath, h.getPaylinkStatByUtm)
+	groups.AuthUser.GET(paylinksIdTransactionsPath, h.getPaylinkTransactions)
 }
 
 func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
@@ -331,4 +333,29 @@ func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+func (h *PayLinkRoute) getPaylinkTransactions(ctx echo.Context) error {
+	req := &grpc.GetPaylinkTransactionsRequest{}
+
+	if err := ctx.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
+	}
+
+	err := h.dispatch.Validate.Struct(req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.GetPaylinkTransactions(ctx.Request().Context(), req)
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkTransactions", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != http.StatusOK {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Data)
 }

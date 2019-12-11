@@ -9529,6 +9529,43 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
+  "/admin/api/v1/paylinks/{id}/transactions":
+    get:
+      summary: Get a list of transactions, created from paylink
+      tags:
+        - Payment links
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      description:  Get a list of transactions, created from paylink
+      parameters:
+        - description: Payment link identifier
+          in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/order.list.public'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "403":
+          description: Access denied
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Object with error message
+          schema:
+            $ref: '#/definitions/model.Error'
 
 
   "/admin/api/v1/paylinks/{id}/url":

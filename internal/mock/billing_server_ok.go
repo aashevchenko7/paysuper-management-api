@@ -1351,3 +1351,14 @@ func (s *BillingServerOkMock) GetOperatingCompany(ctx context.Context, in *grpc.
 func (s *BillingServerOkMock) GetCountriesListForOrder(ctx context.Context, in *grpc.GetCountriesListForOrderRequest, opts ...client.CallOption) (*grpc.GetCountriesListForOrderResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerOkMock) GetPaylinkTransactions(ctx context.Context, in *grpc.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*grpc.TransactionsResponse, error) {
+	return &grpc.TransactionsResponse{
+		Status:  pkg.ResponseStatusOk,
+		Message: nil,
+		Data: &grpc.TransactionsPaginate{
+			Count: 100,
+			Items: []*billing.OrderViewPublic{},
+		},
+	}, nil
+}
