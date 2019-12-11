@@ -31,13 +31,11 @@ func NewPricingRoute(set common.HandlerSet, cfg *common.Config) *Pricing {
 }
 
 func (h *Pricing) Route(groups *common.Groups) {
-	groups.AuthProject.GET(pricingRecommendedConversionPath, h.getRecommendedByConversion)
-	groups.AuthProject.GET(pricingRecommendedSteamPath, h.getRecommendedBySteam)
-	groups.AuthProject.GET(pricingRecommendedTablePath, h.getRecommendedTable)
+	groups.Common.GET(pricingRecommendedConversionPath, h.getRecommendedByConversion)
+	groups.Common.GET(pricingRecommendedSteamPath, h.getRecommendedBySteam)
+	groups.Common.GET(pricingRecommendedTablePath, h.getRecommendedTable)
 }
 
-// Get recommended prices by currency conversion
-// GET /api/v1/pricing/recommended/conversion
 func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
 	req := &grpc.RecommendedPriceRequest{}
 	err := ctx.Bind(req)
@@ -60,8 +58,6 @@ func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-// Get recommended prices by price groups
-// GET /api/v1/pricing/recommended/steam
 func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
 	req := &grpc.RecommendedPriceRequest{}
 	err := ctx.Bind(req)
@@ -84,8 +80,6 @@ func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-// Get recommended prices
-// GET /api/v1/pricing/recommended/table
 func (h *Pricing) getRecommendedTable(ctx echo.Context) error {
 	req := &grpc.RecommendedPriceTableRequest{}
 	err := ctx.Bind(req)

@@ -55,8 +55,6 @@ func (h *PayLinkRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(paylinksIdStatUtmPath, h.getPaylinkStatByUtm)
 }
 
-// @Description Get list of paylinks for authenticated merchant
-// @Example GET /admin/api/v1/paylinks?offset=0&limit=10
 func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 	req := &grpc.GetPaylinksRequest{}
 	err := ctx.Bind(req)
@@ -64,22 +62,10 @@ func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.MerchantId = merchant.Item.Id
 	req.ProjectId = ""
 
 	if req.Limit == 0 {
-		req.Limit = h.cfg.LimitDefault
+		req.Limit = int64(h.cfg.LimitDefault)
 	}
 
 	err = h.dispatch.Validate.Struct(req)
@@ -99,25 +85,14 @@ func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Data)
 }
 
-// @Description Get paylink, for authenticated merchant
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22
 func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
+	req := &grpc.PaylinkRequest{}
+
+	if err := ctx.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req := &grpc.PaylinkRequest{
-		Id:         ctx.Param(common.RequestParameterId),
-		MerchantId: merchant.Item.Id,
-	}
-	err = h.dispatch.Validate.Struct(req)
+	err := h.dispatch.Validate.Struct(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
@@ -134,8 +109,6 @@ func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description paylink public url
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22/url?utm_source=3wefwe&utm_medium=njytrn&utm_campaign=bdfbh5
 func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 	req := &grpc.GetPaylinkURLRequest{}
 	err := ctx.Bind(req)
@@ -183,26 +156,14 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, url)
 }
 
-// @Description Get paylink, for authenticated merchant
-// @Example DELETE /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22
 func (h *PayLinkRoute) deletePaylink(ctx echo.Context) error {
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
+	req := &grpc.PaylinkRequest{}
+
+	if err := ctx.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req := &grpc.PaylinkRequest{
-		Id:         ctx.Param(common.RequestParameterId),
-		MerchantId: merchant.Item.Id,
-	}
-	err = h.dispatch.Validate.Struct(req)
-	if err != nil {
+	if err := h.dispatch.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
@@ -218,14 +179,10 @@ func (h *PayLinkRoute) deletePaylink(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-// @Description Create paylink, for authenticated merchant
-// @Example POST /admin/api/v1/paylinks
 func (h *PayLinkRoute) createPaylink(ctx echo.Context) error {
 	return h.createOrUpdatePaylink(ctx, "")
 }
 
-// @Description Update paylink, for authenticated merchant
-// @Example PUT /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22
 func (h *PayLinkRoute) updatePaylink(ctx echo.Context) error {
 	return h.createOrUpdatePaylink(ctx, ctx.Param(common.RequestParameterId))
 }
@@ -237,18 +194,6 @@ func (h *PayLinkRoute) createOrUpdatePaylink(ctx echo.Context, paylinkId string)
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.MerchantId = merchant.Item.Id
 	req.Id = paylinkId
 
 	err = h.dispatch.Validate.Struct(req)
@@ -268,28 +213,12 @@ func (h *PayLinkRoute) createOrUpdatePaylink(ctx echo.Context, paylinkId string)
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description paylink stat summary
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22/stat/summary?period_from=1571671243&period_to=1571673643
 func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
-
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.Id = ctx.Param(common.RequestParameterId)
-	req.MerchantId = merchant.Item.Id
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {
@@ -308,28 +237,12 @@ func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description paylink stat by country
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22/stat/by/country?period_from=1571671243&period_to=1571673643
 func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
-
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.Id = ctx.Param(common.RequestParameterId)
-	req.MerchantId = merchant.Item.Id
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {
@@ -348,28 +261,12 @@ func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description paylink stat by referrer
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22/stat/by/referrer?period_from=1571671243&period_to=1571673643
 func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
-
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.Id = ctx.Param(common.RequestParameterId)
-	req.MerchantId = merchant.Item.Id
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {
@@ -388,28 +285,12 @@ func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description paylink stat by date
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22/stat/by/date?period_from=1571671243&period_to=1571673643
 func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
-
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.Id = ctx.Param(common.RequestParameterId)
-	req.MerchantId = merchant.Item.Id
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {
@@ -428,28 +309,12 @@ func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description paylink stat by utm
-// @Example GET /admin/api/v1/paylinks/21784001599a47e5a69ac28f7af2ec22/stat/by/utm?period_from=1571671243&period_to=1571673643
 func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
-
-	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
-	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-	if merchant.Status != http.StatusOK {
-		return echo.NewHTTPError(int(merchant.Status), merchant.Message)
-	}
-
-	req.Id = ctx.Param(common.RequestParameterId)
-	req.MerchantId = merchant.Item.Id
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/paysuper/paysuper-billing-server/pkg"
 	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-management-api/internal/helpers"
 	"net/http"
 )
 
@@ -30,7 +31,7 @@ func NewRecurringRoute(set common.HandlerSet, cfg *common.Config) *RecurringRout
 }
 
 func (h *RecurringRoute) Route(groups *common.Groups) {
-	groups.AuthProject.DELETE(removeSavedCardPath, h.removeSavedCard)
+	groups.Common.DELETE(removeSavedCardPath, h.removeSavedCard)
 }
 
 func (h *RecurringRoute) removeSavedCard(ctx echo.Context) error {
@@ -40,6 +41,8 @@ func (h *RecurringRoute) removeSavedCard(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
+
+	req.Cookie = helpers.GetRequestCookie(ctx, common.CustomerTokenCookiesName)
 
 	err = h.dispatch.Validate.Struct(req)
 

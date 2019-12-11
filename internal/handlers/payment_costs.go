@@ -29,47 +29,45 @@ func NewPaymentCostRoute(set common.HandlerSet, cfg *common.Config) *PaymentCost
 const (
 	paymentCostsChannelSystemPath        = "/payment_costs/channel/system"
 	paymentCostsChannelSystemAllPath     = "/payment_costs/channel/system/all"
-	paymentCostsChannelMerchantPath      = "/payment_costs/channel/merchant/:id"
-	paymentCostsChannelMerchantAllPath   = "/payment_costs/channel/merchant/:id/all"
+	paymentCostsChannelMerchantPath      = "/payment_costs/channel/merchant/:merchant_id"
+	paymentCostsChannelMerchantAllPath   = "/payment_costs/channel/merchant/:merchant_id/all"
 	paymentCostsChannelSystemIdPath      = "/payment_costs/channel/system/:id"
 	paymentCostsChannelMerchantIdsPath   = "/payment_costs/channel/merchant/:merchant_id/:rate_id"
 	paymentCostsMoneyBackAllPath         = "/payment_costs/money_back/system/all"
-	paymentCostsMoneyBackMerchantPath    = "/payment_costs/money_back/merchant/:id"
-	paymentCostsMoneyBackMerchantAllPath = "/payment_costs/money_back/merchant/:id/all"
+	paymentCostsMoneyBackMerchantPath    = "/payment_costs/money_back/merchant/:merchant_id"
+	paymentCostsMoneyBackMerchantAllPath = "/payment_costs/money_back/merchant/:merchant_id/all"
 	paymentCostsMoneyBackSystemPath      = "/payment_costs/money_back/system"
 	paymentCostsMoneyBackSystemIdPath    = "/payment_costs/money_back/system/:id"
+	paymentCostsMoneyBackMerchantIdsPath = "/payment_costs/money_back/merchant/:merchant_id/:rate_id"
 )
 
 func (h *PaymentCostRoute) Route(groups *common.Groups) {
-	groups.AuthUser.GET(paymentCostsChannelSystemAllPath, h.getAllPaymentChannelCostSystem)
-	groups.AuthUser.GET(paymentCostsChannelMerchantAllPath, h.getAllPaymentChannelCostMerchant) //надо править
-	groups.AuthUser.GET(paymentCostsMoneyBackAllPath, h.getAllMoneyBackCostSystem)
-	groups.AuthUser.GET(paymentCostsMoneyBackMerchantAllPath, h.getAllMoneyBackCostMerchant) //надо править
+	groups.SystemUser.GET(paymentCostsChannelSystemAllPath, h.getAllPaymentChannelCostSystem)
+	groups.SystemUser.GET(paymentCostsChannelMerchantAllPath, h.getAllPaymentChannelCostMerchant) //надо править
+	groups.SystemUser.GET(paymentCostsMoneyBackAllPath, h.getAllMoneyBackCostSystem)
+	groups.SystemUser.GET(paymentCostsMoneyBackMerchantAllPath, h.getAllMoneyBackCostMerchant) //надо править
 
-	groups.AuthUser.GET(paymentCostsChannelSystemPath, h.getPaymentChannelCostSystem)
-	groups.AuthUser.GET(paymentCostsChannelMerchantPath, h.getPaymentChannelCostMerchant)
-	groups.AuthUser.GET(paymentCostsMoneyBackSystemPath, h.getMoneyBackCostSystem)
-	groups.AuthUser.GET(paymentCostsMoneyBackMerchantPath, h.getMoneyBackCostMerchant)
+	groups.SystemUser.GET(paymentCostsChannelSystemPath, h.getPaymentChannelCostSystem)
+	groups.SystemUser.GET(paymentCostsChannelMerchantPath, h.getPaymentChannelCostMerchant)
+	groups.SystemUser.GET(paymentCostsMoneyBackSystemPath, h.getMoneyBackCostSystem)
+	groups.SystemUser.GET(paymentCostsMoneyBackMerchantPath, h.getMoneyBackCostMerchant)
 
-	groups.AuthUser.DELETE(paymentCostsChannelSystemIdPath, h.deletePaymentChannelCostSystem)
-	groups.AuthUser.DELETE(paymentCostsChannelMerchantPath, h.deletePaymentChannelCostMerchant)
-	groups.AuthUser.DELETE(paymentCostsMoneyBackSystemIdPath, h.deleteMoneyBackCostSystem)
-	groups.AuthUser.DELETE(paymentCostsMoneyBackMerchantPath, h.deleteMoneyBackCostMerchant)
+	groups.SystemUser.DELETE(paymentCostsChannelSystemIdPath, h.deletePaymentChannelCostSystem)
+	groups.SystemUser.DELETE(paymentCostsChannelMerchantPath, h.deletePaymentChannelCostMerchant)
+	groups.SystemUser.DELETE(paymentCostsMoneyBackSystemIdPath, h.deleteMoneyBackCostSystem)
+	groups.SystemUser.DELETE(paymentCostsMoneyBackMerchantPath, h.deleteMoneyBackCostMerchant)
 
-	groups.AuthUser.POST(paymentCostsChannelSystemPath, h.setPaymentChannelCostSystem)
-	groups.AuthUser.POST(paymentCostsChannelMerchantPath, h.setPaymentChannelCostMerchant)
-	groups.AuthUser.POST(paymentCostsMoneyBackSystemPath, h.setMoneyBackCostSystem)
-	groups.AuthUser.POST(paymentCostsMoneyBackMerchantPath, h.setMoneyBackCostMerchant)
+	groups.SystemUser.POST(paymentCostsChannelSystemPath, h.setPaymentChannelCostSystem)
+	groups.SystemUser.POST(paymentCostsChannelMerchantPath, h.setPaymentChannelCostMerchant)
+	groups.SystemUser.POST(paymentCostsMoneyBackSystemPath, h.setMoneyBackCostSystem)
+	groups.SystemUser.POST(paymentCostsMoneyBackMerchantPath, h.setMoneyBackCostMerchant)
 
-	groups.AuthUser.PUT(paymentCostsChannelSystemIdPath, h.setPaymentChannelCostSystem)
-	groups.AuthUser.PUT(paymentCostsChannelMerchantIdsPath, h.setPaymentChannelCostMerchant)
-	groups.AuthUser.PUT(paymentCostsMoneyBackSystemIdPath, h.setMoneyBackCostSystem)
-	groups.AuthUser.PUT(paymentCostsChannelMerchantIdsPath, h.setMoneyBackCostMerchant)
+	groups.SystemUser.PUT(paymentCostsChannelSystemIdPath, h.setPaymentChannelCostSystem)
+	groups.SystemUser.PUT(paymentCostsChannelMerchantIdsPath, h.setPaymentChannelCostMerchant)
+	groups.SystemUser.PUT(paymentCostsMoneyBackSystemIdPath, h.setMoneyBackCostSystem)
+	groups.SystemUser.PUT(paymentCostsMoneyBackMerchantIdsPath, h.setMoneyBackCostMerchant)
 }
 
-// @Description Get system costs for payments operations
-// @Example curl -X GET -H "Authorization: Bearer %access_token_here%"  \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/channel/system?name=VISA&region=CIS&country=AZ
 func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
 	req := &billing.PaymentChannelCostSystemRequest{}
 	err := ctx.Bind(req)
@@ -99,9 +97,6 @@ func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get merchant costs for payment operations
-// @Example curl -X GET -H "Authorization: Bearer %access_token_here%"  \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/channel/merchant/ffffffffffffffffffffffff?name=VISA&region=CIS&country=AZ&payout_currency=USD&amount=100
 func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error {
 	req := &billing.PaymentChannelCostMerchantRequest{}
 	err := ctx.Bind(req)
@@ -110,7 +105,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req.MerchantId = ctx.Param(common.RequestParameterId)
+	req.MerchantId = ctx.Param(common.RequestParameterMerchantId)
 	err = h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -131,9 +126,6 @@ func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get system costs for money back operations
-// @Example curl -X GET -H "Authorization: Bearer %access_token_here%"  \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/system?name=VISA&region=CIS&country=AZ&payout_currency=USD&days=10&undo_reason=chargeback&payment_stage=1
 func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
 	req := &billing.MoneyBackCostSystemRequest{}
 	err := ctx.Bind(req)
@@ -162,9 +154,6 @@ func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get merchant costs for money back operations
-// @Example curl -X GET -H "Authorization: Bearer %access_token_here%"  \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/merchant/ffffffffffffffffffffffff??name=VISA&region=CIS&country=AZ&payout_currency=USD&days=10&undo_reason=chargeback&payment_stage=1
 func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
 	req := &billing.MoneyBackCostMerchantRequest{}
 	err := ctx.Bind(req)
@@ -173,7 +162,7 @@ func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req.MerchantId = ctx.Param(common.RequestParameterId)
+	req.MerchantId = ctx.Param(common.RequestParameterMerchantId)
 	err = h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -194,9 +183,6 @@ func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Delete system costs for payment operations
-// @Example curl -X DELETE -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/channel/system/ffffffffffffffffffffffff
 func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) error {
 	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
 	err := h.dispatch.Validate.Struct(req)
@@ -219,11 +205,8 @@ func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) erro
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-// @Description Delete merchant costs for payment operations
-// @Example curl -X DELETE -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/channel/merchant/ffffffffffffffffffffffff
 func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
+	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -244,9 +227,6 @@ func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) er
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-// @Description Delete system costs for money back operations
-// @Example curl -X DELETE -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/system/ffffffffffffffffffffffff
 func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
 	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
 	err := h.dispatch.Validate.Struct(req)
@@ -269,11 +249,8 @@ func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-// @Description Delete merchant costs for money back operations
-// @Example curl -X DELETE -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/merchant/ffffffffffffffffffffffff
 func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
+	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -294,16 +271,6 @@ func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-// @Description Create and update system costs for payments operations
-// @Example curl -X POST -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-//      -d '{"name": "VISA", "region": "CIS", "country": "AZ", "percent": 0.01, "fix_amount": 2.34,
-//      "fix_amount_currency": "USD"}' \
-//      https://api.paysuper.online/admin/api/v1/payment_costs/channel/system
-//
-// @Example curl -X PUT -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-//      -d '{"name": "VISA", "region": "CIS", "country": "AZ", "percent": 0.01, "fix_amount": 2.34,
-//      "fix_amount_currency": "USD"}' \
-//      https://api.paysuper.online/admin/api/v1/payment_costs/channel/system/ffffffffffffffffffffffff
 func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 	req := &billing.PaymentChannelCostSystem{}
 	err := ctx.Bind(req)
@@ -336,18 +303,6 @@ func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Create and update merchant costs for payments operations
-//  @Example curl -X POST -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-//      -d '{"name": "VISA", "region": "CIS", "country": "AZ", "min_amount": 0.75, "method_percent": 0.01,
-// 			"method_fix_amount": 2.34, "ps_percent": 0.05, "ps_fixed_fee": 2, "ps_fixed_fee_currency": "EUR",
-// 			"payout_currency": "USD"}' \
-//      https://api.paysuper.online/admin/api/v1/payment_costs/channel/merchant/ffffffffffffffffffffffff
-//
-// @Example curl -X PUT -H "Authorization: Bearer %access_token_here%" -H "Content-Type: application/json" \
-//      -d '{"name": "VISA", "region": "CIS", "country": "AZ", "min_amount": 0.75, "method_percent": 0.01,
-//      "method_fix_amount": 2.34, "ps_percent": 0.05, "ps_fixed_fee": 2, "ps_fixed_fee_currency": "EUR",
-//      "payout_currency": "USD"}' \
-//      https://api.paysuper.online/admin/api/v1/payment_costs/channel/merchant/ffffffffffffffffffffffff/aaaaaaaaaaaaaaaaaaaaaaaa
 func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error {
 	req := &billing.PaymentChannelCostMerchant{}
 	err := ctx.Bind(req)
@@ -356,7 +311,7 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req.MerchantId = ctx.Param(common.RequestParameterId)
+	req.MerchantId = ctx.Param(common.RequestParameterMerchantId)
 
 	if ctx.Request().Method == http.MethodPut {
 		req.Id = ctx.Param(common.RequestParameterRateId)
@@ -382,16 +337,6 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Create and update system costs for money back operations
-// @Example curl -X POST -H 'Authorization: Bearer %access_token_here%' -H "Content-Type: application/json" \
-//		-d '{"name": "VISA", "region": "CIS", "country": "AZ", "percent": 0.01, "fix_amount": 2.34,
-//		"payout_currency": "USD", "undo_reason": "chargeback", "days_from": 0, "payment_stage": 1}' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/system
-//
-// @Example curl -X PUT -H 'Authorization: Bearer %access_token_here%' -H "Content-Type: application/json" \
-//		-d '{"name": "VISA", "region": "CIS", "country": "AZ", "percent": 0.01, "fix_amount": 2.34,
-//		"payout_currency": "USD", "undo_reason": "chargeback", "days_from": 0, "payment_stage": 1}' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/system/ffffffffffffffffffffffff
 func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
 	req := &billing.MoneyBackCostSystem{}
 	err := ctx.Bind(req)
@@ -424,18 +369,6 @@ func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Create and update merchant costs for money back operations
-// @Example curl -X POST -H 'Authorization: Bearer %access_token_here%' -H "Content-Type: application/json" \
-//		-d '{"name": "VISA", "region": "CIS", "country": "AZ", "percent": 0.01, "fix_amount": 2.34,
-//		"payout_currency": "USD", "undo_reason": "chargeback", "days_from": 0, "payment_stage": 1,
-//		"is_paid_by_merchant": true}' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/merchant/ffffffffffffffffffffffff
-//
-// @Example curl -X PUT -H 'Authorization: Bearer %access_token_here%' -H "Content-Type: application/json" \
-//		-d '{"name": "VISA", "region": "CIS", "country": "AZ", "percent": 0.01, "fix_amount": 2.34,
-//		"payout_currency": "USD", "undo_reason": "chargeback", "days_from": 0, "payment_stage": 1,
-//		"is_paid_by_merchant": true}' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/merchant/ffffffffffffffffffffffff/aaaaaaaaaaaaaaaaaaaaaaaa
 func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
 	req := &billing.MoneyBackCostMerchant{}
 	err := ctx.Bind(req)
@@ -444,7 +377,7 @@ func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req.MerchantId = ctx.Param(common.RequestParameterId)
+	req.MerchantId = ctx.Param(common.RequestParameterMerchantId)
 
 	if ctx.Request().Method == http.MethodPut {
 		req.Id = ctx.Param(common.RequestParameterRateId)
@@ -470,9 +403,6 @@ func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get all system costs for payments
-// @Example @Example curl -X GET -H 'Authorization: Bearer %access_token_here%' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/channel/system/all
 func (h *PaymentCostRoute) getAllPaymentChannelCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAllPaymentChannelCostSystem(ctx.Request().Context(), &grpc.EmptyRequest{})
 
@@ -488,11 +418,8 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostSystem(ctx echo.Context) erro
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get all merchant costs for payments operations
-// @Example @Example curl -X GET -H 'Authorization: Bearer %access_token_here%' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/channel/merchant/ffffffffffffffffffffffff/all
 func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentChannelCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterId)}
+	req := &billing.PaymentChannelCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -513,9 +440,6 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) er
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get all system costs for money back operations
-// @Example @Example curl -X GET -H 'Authorization: Bearer %access_token_here%' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/system/all
 func (h *PaymentCostRoute) getAllMoneyBackCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAllMoneyBackCostSystem(ctx.Request().Context(), &grpc.EmptyRequest{})
 
@@ -531,11 +455,8 @@ func (h *PaymentCostRoute) getAllMoneyBackCostSystem(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @Description Get all merchant costs for money back operations
-// @Example @Example curl -X GET -H 'Authorization: Bearer %access_token_here%' \
-// 		https://api.paysuper.online/admin/api/v1/payment_costs/money_back/merchant/ffffffffffffffffffffffff/all
 func (h *PaymentCostRoute) getAllMoneyBackCostMerchant(ctx echo.Context) error {
-	req := &billing.MoneyBackCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterId)}
+	req := &billing.MoneyBackCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {

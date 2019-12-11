@@ -31,9 +31,9 @@ func NewTaxesRoute(set common.HandlerSet, cfg *common.Config) *TaxesRoute {
 }
 
 func (h *TaxesRoute) Route(groups *common.Groups) {
-	groups.AuthUser.GET(taxesPath, h.getTaxes)
-	groups.AuthUser.POST(taxesPath, h.setTax)
-	groups.AuthUser.DELETE(taxesIDPath, h.deleteTax)
+	groups.SystemUser.GET(taxesPath, h.getTaxes)
+	groups.SystemUser.POST(taxesPath, h.setTax)
+	groups.SystemUser.DELETE(taxesIDPath, h.deleteTax)
 }
 
 func (h *TaxesRoute) getTaxes(ctx echo.Context) error {
@@ -74,7 +74,7 @@ func (h *TaxesRoute) bindGetTaxes(ctx echo.Context) *tax_service.GetRatesRequest
 			structure.Limit = int32(i)
 		}
 	} else {
-		structure.Limit = h.cfg.LimitDefault
+		structure.Limit = int32(h.cfg.LimitDefault)
 	}
 
 	if v, ok := params[common.RequestParameterOffset]; ok {
@@ -82,13 +82,17 @@ func (h *TaxesRoute) bindGetTaxes(ctx echo.Context) *tax_service.GetRatesRequest
 			structure.Offset = int32(i)
 		}
 	} else {
-		structure.Offset = h.cfg.OffsetDefault
+		structure.Offset = int32(h.cfg.OffsetDefault)
 	}
 
 	return structure
 }
 
 func (h *TaxesRoute) setTax(ctx echo.Context) error {
+	if ctx.Request().ContentLength == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
+	}
+
 	req := &tax_service.TaxRate{}
 	err := ctx.Bind(req)
 

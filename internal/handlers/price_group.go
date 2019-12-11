@@ -31,13 +31,11 @@ func NewPriceGroupRoute(set common.HandlerSet, cfg *common.Config) *PriceGroup {
 }
 
 func (h *PriceGroup) Route(groups *common.Groups) {
-	groups.AuthProject.GET(priceGroupCountryPath, h.getPriceGroupByCountry)
-	groups.AuthProject.GET(priceGroupCurrenciesPath, h.getCurrencyList)
-	groups.AuthProject.GET(priceGroupRegionPath, h.getCurrencyByRegion)
+	groups.Common.GET(priceGroupCountryPath, h.getPriceGroupByCountry)
+	groups.Common.GET(priceGroupCurrenciesPath, h.getCurrencyList)
+	groups.Common.GET(priceGroupRegionPath, h.getCurrencyByRegion)
 }
 
-// Get currency and region by country code
-// GET /api/v1/price_group/country
 func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
 	req := &grpc.PriceGroupByCountryRequest{}
 	err := ctx.Bind(req)
@@ -60,8 +58,6 @@ func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-// Get a list of currencies with a list of countries and regions for them
-// GET /api/v1/price_group/currencies
 func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
 	req := &grpc.EmptyRequest{}
 	err := ctx.Bind(req)
@@ -84,8 +80,6 @@ func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-// Get currency for a region and a list of countries in it
-// GET /api/v1/price_group/region
 func (h *PriceGroup) getCurrencyByRegion(ctx echo.Context) error {
 	req := &grpc.PriceGroupByRegionRequest{}
 	err := ctx.Bind(req)

@@ -58,7 +58,7 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_GetOperatingCompani
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
-		Path(common.AuthUserGroupPath + operatingCompanyPath).
+		Path(common.SystemUserGroupPath + operatingCompanyPath).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
 
@@ -75,7 +75,7 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_GetOperatingCompany
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
-		Path(common.AuthUserGroupPath+operatingCompanyIdPath).
+		Path(common.SystemUserGroupPath+operatingCompanyIdPath).
 		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
@@ -93,13 +93,13 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_AddOperatingCompany
 
 	body := `{"name" : "Paysuper", "country" : "CY", 
 			  "registration_number" : "some number", "vat_number" : "some vat number", "address" : "Cyprus", 
-			  "registration_date" : "17 April 2019",
+			  "registration_date" : "17 April 2019", "email": "test@test.com",
 			  "vat_address" : "Cyprus", "signatory_name" : "Vassiliy Poupkine", "signatory_position" : "CEO", 
 			  "banking_details" : "bank details including bank, bank address, account number, swift/ bic, intermediary bank"}`
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodPost).
-		Path(common.AuthUserGroupPath + operatingCompanyPath).
+		Path(common.SystemUserGroupPath + operatingCompanyPath).
 		Init(test.ReqInitJSON()).
 		BodyString(body).
 		Exec(suite.T())
@@ -117,13 +117,13 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_UpdateOperatingComp
 
 	body := `{"name" : "Paysuper", "country" : "CY", 
 			  "registration_number" : "some number", "vat_number" : "some vat number", "address" : "Cyprus",
-			  "registration_date" : "17 April 2019",
+			  "registration_date" : "17 April 2019", "email": "test@test.com",
 			  "vat_address" : "Cyprus", "signatory_name" : "Vassiliy Poupkine", "signatory_position" : "CEO", 
 			  "banking_details" : "bank details including bank, bank address, account number, swift/ bic, intermediary bank"}`
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodPost).
-		Path(common.AuthUserGroupPath+operatingCompanyIdPath).
+		Path(common.SystemUserGroupPath+operatingCompanyIdPath).
 		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
 		Init(test.ReqInitJSON()).
 		BodyString(body).

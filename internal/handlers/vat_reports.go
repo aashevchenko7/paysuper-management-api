@@ -6,15 +6,18 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
 	"net/http"
 	"strings"
 )
 
 const (
-	vatReportsPath        = "/vat_reports"
-	vatReportsCountryPath = "/vat_reports/country/:country"
-	vatReportsDetailsPath = "/vat_reports/details/:id"
-	vatReportsStatusPath  = "/vat_reports/status/:id"
+	vatReportsPath                = "/vat_reports"
+	vatReportsCountryPath         = "/vat_reports/country/:country"
+	vatReportsCountryDownloadPath = "/vat_reports/country/:country/download"
+	vatReportsDetailsPath         = "/vat_reports/details/:id"
+	vatReportsDetailsDownloadPath = "/vat_reports/details/:id/download"
+	vatReportsStatusPath          = "/vat_reports/status/:id"
 )
 
 type VatReportsRoute struct {
@@ -33,14 +36,14 @@ func NewVatReportsRoute(set common.HandlerSet, cfg *common.Config) *VatReportsRo
 }
 
 func (h *VatReportsRoute) Route(groups *common.Groups) {
-	groups.AuthUser.GET(vatReportsPath, h.getVatReportsDashboard)
-	groups.AuthUser.GET(vatReportsCountryPath, h.getVatReportsForCountry)
-	groups.AuthUser.GET(vatReportsDetailsPath, h.getVatReportTransactions)
-	groups.AuthUser.POST(vatReportsStatusPath, h.updateVatReportStatus)
+	groups.SystemUser.GET(vatReportsPath, h.getVatReportsDashboard)
+	groups.SystemUser.GET(vatReportsCountryPath, h.getVatReportsForCountry)
+	groups.SystemUser.POST(vatReportsCountryDownloadPath, h.downloadVatReportsForCountry)
+	groups.SystemUser.GET(vatReportsDetailsPath, h.getVatReportTransactions)
+	groups.SystemUser.POST(vatReportsDetailsDownloadPath, h.downloadVatReportTransactions)
+	groups.SystemUser.POST(vatReportsStatusPath, h.updateVatReportStatus)
 }
 
-// Get vat reports dashboard
-// GET /admin/api/v1/vat_reports
 func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetVatReportsDashboard(ctx.Request().Context(), &grpc.EmptyRequest{})
@@ -53,8 +56,6 @@ func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Data)
 }
 
-// Get vat reports for country
-// GET /admin/api/v1/vat_reports/country/ru
 func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 	req := &grpc.VatReportsRequest{}
 	err := ctx.Bind(req)
@@ -80,8 +81,21 @@ func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Data)
 }
 
-// Get transactions for vat report
-// GET /admin/api/v1/vat_reports/details/5ced34d689fce60bf4440829
+func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
+	req := &common.ReportFileRequest{}
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
+	}
+
+	req.ReportType = reporterPkg.ReportTypeVat
+	req.Params = map[string]interface{}{
+		reporterPkg.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
+	}
+
+	return h.dispatch.RequestReportFile(ctx, req)
+}
+
 func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
 	req := &grpc.VatTransactionsRequest{}
 	err := ctx.Bind(req)
@@ -107,15 +121,21 @@ func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Data)
 }
 
-// Manually change status for vat report
-// (only "paid" and "canceled" values are accepted as correct status)
-// POST /admin/api/v1/vat_reports/status/5ced34d689fce60bf4440829
-//
-// @Example curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" \
-//      -H "Authorization: Bearer %access_token_here%" \
-//      -d '{"status": "paid"}' \
-//      https://api.paysuper.online/admin/api/v1/vat_reports/status/5ced34d689fce60bf4440829
-//
+func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error {
+	req := &common.ReportFileRequest{}
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
+	}
+
+	req.ReportType = reporterPkg.ReportTypeVatTransactions
+	req.Params = map[string]interface{}{
+		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterId),
+	}
+
+	return h.dispatch.RequestReportFile(ctx, req)
+}
+
 func (h *VatReportsRoute) updateVatReportStatus(ctx echo.Context) error {
 
 	req := &grpc.UpdateVatReportStatusRequest{}

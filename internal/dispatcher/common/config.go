@@ -33,4 +33,7 @@ type Config struct {
 	CustomerTokenCookiesLifetime time.Duration // CustomerTokenCookiesLifetime = 2592000
 
 	OrderInlineFormUrlMask string `envconfig:"ORDER_INLINE_FORM_URL_MASK" required:"true"`
+
+	CookieDomain string `envconfig:"COOKIE_DOMAIN" required:"true"`
+	AllowOrigin  string `envconfig:"ALLOW_ORIGIN" default:"*"`
 }

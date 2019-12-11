@@ -3,7 +3,6 @@ package mock
 import (
 	"context"
 	"errors"
-	"github.com/globalsign/mgo/bson"
 	"github.com/micro/go-micro/client"
 	"github.com/paysuper/paysuper-billing-server/pkg"
 	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
@@ -13,6 +12,10 @@ import (
 )
 
 type BillingServerSystemErrorMock struct{}
+
+func (s *BillingServerSystemErrorMock) OrderReCreateProcess(ctx context.Context, in *grpc.OrderReCreateProcessRequest, opts ...client.CallOption) (*grpc.OrderCreateProcessResponse, error) {
+	panic("implement me")
+}
 
 func NewBillingServerSystemErrorMock() grpc.BillingService {
 	return &BillingServerSystemErrorMock{}
@@ -268,7 +271,7 @@ func (s *BillingServerSystemErrorMock) GetProject(
 		return &grpc.ChangeProjectResponse{
 			Status: pkg.ResponseStatusOk,
 			Item: &billing.Project{
-				MerchantId:         bson.NewObjectId().Hex(),
+				MerchantId:         "ffffffffffffffffffffffff",
 				Name:               map[string]string{"en": "A", "ru": "А"},
 				CallbackCurrency:   "RUB",
 				CallbackProtocol:   pkg.ProjectCallbackProtocolEmpty,
@@ -595,7 +598,7 @@ func (s *BillingServerSystemErrorMock) ConfirmUserEmail(
 	ctx context.Context,
 	in *grpc.ConfirmUserEmailRequest,
 	opts ...client.CallOption,
-) (*grpc.CheckProjectRequestSignatureResponse, error) {
+) (*grpc.ConfirmUserEmailResponse, error) {
 	return nil, SomeError
 }
 
@@ -609,14 +612,6 @@ func (s *BillingServerSystemErrorMock) CreatePageReview(
 
 func (s *BillingServerSystemErrorMock) MerchantReviewRoyaltyReport(ctx context.Context, in *grpc.MerchantReviewRoyaltyReportRequest, opts ...client.CallOption) (*grpc.ResponseError, error) {
 	panic("implement me")
-}
-
-func (s *BillingServerSystemErrorMock) GetMerchantAgreementSignUrl(
-	ctx context.Context,
-	in *grpc.GetMerchantAgreementSignUrlRequest,
-	opts ...client.CallOption,
-) (*grpc.GetMerchantAgreementSignUrlResponse, error) {
-	return nil, SomeError
 }
 
 func (s *BillingServerSystemErrorMock) GetMerchantOnboardingCompleteData(
@@ -798,7 +793,7 @@ func (s *BillingServerSystemErrorMock) PaymentFormPlatformChanged(
 	ctx context.Context,
 	in *grpc.PaymentFormUserChangePlatformRequest,
 	opts ...client.CallOption,
-) (*grpc.EmptyResponseWithStatus, error) {
+) (*grpc.PaymentFormDataChangeResponse, error) {
 	panic("implement me")
 }
 
@@ -826,11 +821,11 @@ func (s *BillingServerSystemErrorMock) GetPriceGroupByRegion(ctx context.Context
 	panic("implement me")
 }
 
-func (s *BillingServerSystemErrorMock) FindAllOrders(ctx context.Context, in *grpc.ListOrdersRequest, opts ...client.CallOption) (*grpc.ListOrdersResponse, error) {
+func (s *BillingServerSystemErrorMock) GetMerchantUsers(ctx context.Context, in *grpc.GetMerchantUsersRequest, opts ...client.CallOption) (*grpc.GetMerchantUsersResponse, error) {
 	panic("implement me")
 }
 
-func (s *BillingServerSystemErrorMock) ChangeMerchantManualPayouts(ctx context.Context, in *grpc.ChangeMerchantManualPayoutsRequest, opts ...client.CallOption) (*grpc.ChangeMerchantManualPayoutsResponse, error) {
+func (s *BillingServerSystemErrorMock) FindAllOrders(ctx context.Context, in *grpc.ListOrdersRequest, opts ...client.CallOption) (*grpc.ListOrdersResponse, error) {
 	panic("implement me")
 }
 
@@ -902,6 +897,82 @@ func (s *BillingServerSystemErrorMock) AutoCreatePayoutDocuments(ctx context.Con
 	panic("implement me")
 }
 
+func (s *BillingServerSystemErrorMock) GetAdminUsers(ctx context.Context, in *grpc.EmptyRequest, opts ...client.CallOption) (*grpc.GetAdminUsersResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetMerchantsForUser(ctx context.Context, in *grpc.GetMerchantsForUserRequest, opts ...client.CallOption) (*grpc.GetMerchantsForUserResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) InviteUserMerchant(ctx context.Context, in *grpc.InviteUserMerchantRequest, opts ...client.CallOption) (*grpc.InviteUserMerchantResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) InviteUserAdmin(ctx context.Context, in *grpc.InviteUserAdminRequest, opts ...client.CallOption) (*grpc.InviteUserAdminResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) ResendInviteMerchant(ctx context.Context, in *grpc.ResendInviteMerchantRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) ResendInviteAdmin(ctx context.Context, in *grpc.ResendInviteAdminRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetMerchantUser(ctx context.Context, in *grpc.GetMerchantUserRequest, opts ...client.CallOption) (*grpc.GetMerchantUserResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetAdminUser(ctx context.Context, in *grpc.GetAdminUserRequest, opts ...client.CallOption) (*grpc.GetAdminUserResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) AcceptInvite(ctx context.Context, in *grpc.AcceptInviteRequest, opts ...client.CallOption) (*grpc.AcceptInviteResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) CheckInviteToken(ctx context.Context, in *grpc.CheckInviteTokenRequest, opts ...client.CallOption) (*grpc.CheckInviteTokenResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) ChangeRoleForMerchantUser(ctx context.Context, in *grpc.ChangeRoleForMerchantUserRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) ChangeRoleForAdminUser(ctx context.Context, in *grpc.ChangeRoleForAdminUserRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetRoleList(ctx context.Context, in *grpc.GetRoleListRequest, opts ...client.CallOption) (*grpc.GetRoleListResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) ChangeMerchantManualPayouts(ctx context.Context, in *grpc.ChangeMerchantManualPayoutsRequest, opts ...client.CallOption) (*grpc.ChangeMerchantManualPayoutsResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) DeleteMerchantUser(ctx context.Context, in *grpc.MerchantRoleRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) DeleteAdminUser(ctx context.Context, in *grpc.AdminRoleRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetAdminUserRole(ctx context.Context, in *grpc.AdminRoleRequest, opts ...client.CallOption) (*grpc.UserRoleResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetMerchantUserRole(ctx context.Context, in *grpc.MerchantRoleRequest, opts ...client.CallOption) (*grpc.UserRoleResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetCommonUserProfile(ctx context.Context, in *grpc.CommonUserProfileRequest, opts ...client.CallOption) (*grpc.CommonUserProfileResponse, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerSystemErrorMock) DeleteSavedCard(ctx context.Context, in *grpc.DeleteSavedCardRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
@@ -927,6 +998,10 @@ func (s *BillingServerSystemErrorMock) SetPaymentMinLimitSystem(ctx context.Cont
 }
 
 func (s *BillingServerSystemErrorMock) GetOperatingCompany(ctx context.Context, in *grpc.GetOperatingCompanyRequest, opts ...client.CallOption) (*grpc.GetOperatingCompanyResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetCountriesListForOrder(ctx context.Context, in *grpc.GetCountriesListForOrderRequest, opts ...client.CallOption) (*grpc.GetCountriesListForOrderResponse, error) {
 	panic("implement me")
 }
 
