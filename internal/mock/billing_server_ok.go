@@ -1353,7 +1353,11 @@ func (s *BillingServerOkMock) GetCountriesListForOrder(ctx context.Context, in *
 }
 
 func (s *BillingServerOkMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
-	panic("implement me")
+	return &grpc.SendWebhookToMerchantResponse{
+		Status: 200,
+		OrderId: bson.NewObjectId().Hex(),
+		Message: nil,
+	}, nil
 }
 
 func (s *BillingServerOkMock) NotifyWebhookTestResults(ctx context.Context, in *grpc.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
