@@ -12,6 +12,7 @@ import (
 	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/helpers"
+	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
 	"net/http"
 	"time"
 )
@@ -22,6 +23,7 @@ const (
 	orderCreatePath          = "/order/create"
 	orderReCreatePath        = "/order/recreate"
 	orderPath                = "/order"
+	orderDownloadPath        = "/order/download"
 	paymentPath              = "/payment"
 	orderRefundsPath         = "/order/:order_id/refunds"
 	orderRefundsIdsPath      = "/order/:order_id/refunds/:refund_id"
@@ -103,6 +105,7 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 	groups.Common.GET(orderReceiptPath, h.getReceipt)
 
 	groups.AuthUser.GET(orderPath, h.listOrdersPublic)
+	groups.AuthUser.POST(orderDownloadPath, h.downloadOrdersPublic)
 	groups.AuthUser.GET(orderIdPath, h.getOrderPublic) // TODO: Need a test
 
 	groups.AuthUser.GET(orderRefundsPath, h.listRefunds)
@@ -391,6 +394,26 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
+	req := &grpc.ListOrdersRequest{}
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
+	}
+
+	file := &common.ReportFileRequest{}
+	file.ReportType = reporterPkg.ReportTypeTransactions
+	file.FileType = reporterPkg.OutputExtensionCsv
+	file.Params = map[string]interface{}{
+		reporterPkg.ParamsFieldStatus:        req.Status,
+		reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
+		reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
+		reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
+	}
+
+	return h.dispatch.RequestReportFile(ctx, file)
 }
 
 func (h *OrderRoute) processCreatePayment(ctx echo.Context) error {
@@ -733,7 +756,7 @@ func (h *OrderRoute) changePlatform(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	return ctx.NoContent(http.StatusOK)
+	return ctx.JSON(http.StatusOK, res.Item)
 }
 func (h *OrderRoute) getReceipt(ctx echo.Context) error {
 	orderId := ctx.Param(common.RequestParameterOrderId)
