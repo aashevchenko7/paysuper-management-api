@@ -1005,6 +1005,10 @@ func (s *BillingServerSystemErrorMock) GetCountriesListForOrder(ctx context.Cont
 	panic("implement me")
 }
 
+func (s *BillingServerSystemErrorMock) GetPaylinkTransactions(ctx context.Context, in *grpc.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*grpc.TransactionsResponse, error) {
+	panic("implement me")
+}
+
 
 func (s *BillingServerSystemErrorMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
 	panic("implement me")

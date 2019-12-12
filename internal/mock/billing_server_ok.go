@@ -1352,6 +1352,17 @@ func (s *BillingServerOkMock) GetCountriesListForOrder(ctx context.Context, in *
 	panic("implement me")
 }
 
+func (s *BillingServerOkMock) GetPaylinkTransactions(ctx context.Context, in *grpc.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*grpc.TransactionsResponse, error) {
+	return &grpc.TransactionsResponse{
+		Status:  pkg.ResponseStatusOk,
+		Message: nil,
+		Data: &grpc.TransactionsPaginate{
+			Count: 100,
+			Items: []*billing.OrderViewPublic{},
+		},
+	}, nil
+}
+
 func (s *BillingServerOkMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
 	return &grpc.SendWebhookToMerchantResponse{
 		Status: 200,
