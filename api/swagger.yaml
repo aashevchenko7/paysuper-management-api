@@ -8349,7 +8349,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/admin/api/v1/report_file/download/{file}":
+  "/auth/api/v1/report_file/download/{file_id}.{file_type}":
     get:
       summary: Download report file
       tags:
@@ -8362,14 +8362,14 @@ paths:
         - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
       description: Download report file
       parameters:
-        - description: filename
+        - description: identity of report file
           in: path
-          name: file
+          name: file_id
           type: string
           required: true
-        - description: identity of file and file type
-          in: query
-          name: file
+        - description: original report extension
+          in: path
+          name: file_type
           type: string
           required: true
       responses:
