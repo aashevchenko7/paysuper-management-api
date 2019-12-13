@@ -96,7 +96,7 @@ func (suite *ReportFileTestSuite) TestReportFile_download_Error_EmptyId() {
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
-		Path(common.AuthUserGroupPath + reportFileDownloadPath).
+		Path(common.AuthProjectGroupPath + reportFileDownloadPath).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
 
@@ -111,7 +111,7 @@ func (suite *ReportFileTestSuite) TestReportFile_download_Error_ValidationFileEm
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":"+common.RequestParameterFile, " ").
-		Path(common.AuthUserGroupPath + reportFileDownloadPath).
+		Path(common.AuthProjectGroupPath + reportFileDownloadPath).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
 
@@ -126,7 +126,7 @@ func (suite *ReportFileTestSuite) TestReportFile_download_Error_ValidationFileIn
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":"+common.RequestParameterFile, "test").
-		Path(common.AuthUserGroupPath + reportFileDownloadPath).
+		Path(common.AuthProjectGroupPath + reportFileDownloadPath).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
 
@@ -141,7 +141,7 @@ func (suite *ReportFileTestSuite) TestReportFile_download_Ok() {
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":"+common.RequestParameterFile, "string.csv").
-		Path(common.AuthUserGroupPath + reportFileDownloadPath).
+		Path(common.AuthProjectGroupPath + reportFileDownloadPath).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
 

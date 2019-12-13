@@ -40,6 +40,7 @@ func NewReportFileRoute(set common.HandlerSet, awsManager awsWrapper.AwsManagerI
 func (h *ReportFileRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(reportFilePath, h.create)
 	groups.AuthUser.GET(reportFileDownloadPath, h.download)
+	groups.AuthProject.GET(reportFileDownloadPath, h.download)
 }
 
 func (h *ReportFileRoute) create(ctx echo.Context) error {
