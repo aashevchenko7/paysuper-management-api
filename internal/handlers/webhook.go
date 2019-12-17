@@ -19,7 +19,7 @@ type WebHookRoute struct {
 }
 
 func NewWebHookRoute(set common.HandlerSet, cfg *common.Config) *WebHookRoute {
-	set.AwareSet.Logger = set.AwareSet.Logger.WithFields(logger.Fields{"router": "KeyProductRoute"})
+	set.AwareSet.Logger = set.AwareSet.Logger.WithFields(logger.Fields{"router": "WebHookRoute"})
 	return &WebHookRoute{
 		dispatch: set,
 		cfg:      *cfg,
@@ -29,11 +29,6 @@ func NewWebHookRoute(set common.HandlerSet, cfg *common.Config) *WebHookRoute {
 
 func (h *WebHookRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(testMerchantWebhook, h.sendWebhookTest)
-}
-
-type SomeReq struct {
-	Type string `json:"type"`
-	TestingCase string `json:"testing_case"`
 }
 
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
