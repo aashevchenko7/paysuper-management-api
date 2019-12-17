@@ -10,9 +10,6 @@ type Auth1 struct {
 type Config struct {
 	Auth1
 
-	HttpScheme   string `envconfig:"HTTP_SCHEME" default:"https"`
-	WebsocketUrl string `envconfig:"WEBSOCKET_URL" default:"wss://cf.tst.protocol.one/connection/websocket"`
-
 	AwsAccessKeyIdAgreement     string `envconfig:"AWS_ACCESS_KEY_ID_AGREEMENT" required:"true"`
 	AwsSecretAccessKeyAgreement string `envconfig:"AWS_SECRET_ACCESS_KEY_AGREEMENT" required:"true"`
 	AwsRegionAgreement          string `envconfig:"AWS_REGION_AGREEMENT" default:"eu-west-1"`
