@@ -37,8 +37,8 @@ func (suite *ProjectTestSuite) SetupTest() {
 		Billing: mock.NewBillingServerOkMock(),
 	}
 	user := &common.AuthUser{
-		Id:    "ffffffffffffffffffffffff",
-		Email: "test@unit.test",
+		Id:         "ffffffffffffffffffffffff",
+		Email:      "test@unit.test",
 		MerchantId: "ffffffffffffffffffffffff",
 	}
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
@@ -65,6 +65,7 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_Ok() {
 		MinPaymentAmount:   0,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
+		VatPayer:           pkg.VatPayerBuyer,
 	}
 
 	b, err := json.Marshal(&body)
@@ -140,6 +141,7 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerError() {
 		MinPaymentAmount:   100,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
+		VatPayer:           pkg.VatPayerBuyer,
 	}
 
 	b, err := json.Marshal(&body)
@@ -172,6 +174,7 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerResultErro
 		MinPaymentAmount:   100,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
+		VatPayer:           pkg.VatPayerBuyer,
 	}
 
 	b, err := json.Marshal(&body)
@@ -609,7 +612,6 @@ func (suite *ProjectTestSuite) TestProject_UpdateProjectWrongCallback_Error() {
 	assert.NotEmpty(suite.T(), res.Body.String())
 }
 
-
 func (suite *ProjectTestSuite) TestProject_CreateProjectWithoutCallbackProtocol_Error() {
 	body := &billing.Project{
 		MerchantId:         bson.NewObjectId().Hex(),
@@ -619,6 +621,7 @@ func (suite *ProjectTestSuite) TestProject_CreateProjectWithoutCallbackProtocol_
 		MinPaymentAmount:   0,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
+		VatPayer:           pkg.VatPayerBuyer,
 	}
 
 	b, err := json.Marshal(&body)
