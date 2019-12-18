@@ -531,6 +531,7 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 	structure.Localizations = pRsp.Item.Localizations
 	structure.Currencies = pRsp.Item.Currencies
 	structure.VirtualCurrency = pRsp.Item.VirtualCurrency
+	structure.VatPayer = pRsp.Item.VatPayer
 
 	if v, ok := req[RequestParameterName]; ok {
 		tv, ok := v.(map[string]interface{})

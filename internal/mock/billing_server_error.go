@@ -318,6 +318,7 @@ func (s *BillingServerErrorMock) GetProject(
 				MinPaymentAmount:   0,
 				MaxPaymentAmount:   15000,
 				IsProductsCheckout: false,
+				VatPayer:           pkg.VatPayerBuyer,
 			},
 		}, nil
 	}

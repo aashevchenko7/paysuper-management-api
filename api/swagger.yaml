@@ -434,6 +434,9 @@ definitions:
       order_charge:
         $ref: '#/definitions/order.money'
         description: object contain information about amount and currency that was charged from user while payment
+      vat_payer:
+        type: string
+        description: "definition of who pays vat for orders in this project, allowed values are buyer | seller | nobody"
 
   order.parent:
     type: object
@@ -639,6 +642,11 @@ definitions:
             type: boolean
       virtual_currency:
         $ref: '#/definitions/model.VirtualCurrency'
+      vat_payer:
+        description: "definition of who pays vat for orders in this project, allowed values are buyer | seller | nobody"
+        type: object
+        additionalProperties:
+          type: string
     type: object
 
   model.VirtualCurrency:
@@ -1180,6 +1188,9 @@ definitions:
       tariff:
         description: merchant tariff information
         $ref: '#/definitions/onboarding.Merchant.tariffs'
+      dont_charge_vat:
+        description: flag that this merchant does not pay tax anywhere
+        type: boolean
 
   onboarding.Merchant.ChangeStatus:
     properties:
@@ -9856,6 +9867,9 @@ paths:
               operating_company_id:
                 description: id of operation company for which this cost is applicable
                 type: string
+              dont_charge_vat:
+                description: flag that this merchant does not pay tax anywhere
+                type: boolean
       responses:
         "200":
           description: OK
