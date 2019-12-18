@@ -28,4 +28,5 @@ type Config struct {
 	OrderInlineFormUrlMask string `envconfig:"ORDER_INLINE_FORM_URL_MASK" required:"true"`
 
 	AllowOrigin string `envconfig:"ALLOW_ORIGIN" default:"*"`
+	HttpScheme  string `envconfig:"HTTP_SCHEME" default:"https"`
 }
