@@ -7,9 +7,9 @@ All notable changes to this project will be documented in this file.
 - Set up a CORS configuration for restrictions.
 
 ### Changed
-- Update Casbin policy for API methods.
-- Update project's dependencies.
-- Update project's README. 
+- Updated the Casbin policy for API methods.
+- Updated dependencies.
+- Updated README. 
 
 ### Removed
-- Remove unused Onboarding API methods.
+- Removed unused Onboarding API methods.
