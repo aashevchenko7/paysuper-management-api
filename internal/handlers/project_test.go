@@ -65,7 +65,6 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_Ok() {
 		MinPaymentAmount:   0,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
-		VatPayer:           pkg.VatPayerBuyer,
 	}
 
 	b, err := json.Marshal(&body)
@@ -211,6 +210,41 @@ func (suite *ProjectTestSuite) TestProject_UpdateProject_Ok() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
+}
+
+func (suite *ProjectTestSuite) TestProject_UpdateProject_Ok2() {
+	body := `{"min_payment_amount": 10, "vat_payer": "seller"}`
+
+	res, err := suite.caller.Builder().
+		Method(http.MethodPatch).
+		Params(":"+common.RequestParameterProjectId, bson.NewObjectId().Hex()).
+		Path(common.AuthUserGroupPath + projectsIdPath).
+		Init(test.ReqInitJSON()).
+		BodyString(body).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+}
+
+func (suite *ProjectTestSuite) TestProject_UpdateProject_Failed_VatPayerInvalid() {
+	body := `{"min_payment_amount": 10, "vat_payer": "blah-blah-blah"}`
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodPatch).
+		Params(":"+common.RequestParameterProjectId, bson.NewObjectId().Hex()).
+		Path(common.AuthUserGroupPath + projectsIdPath).
+		Init(test.ReqInitJSON()).
+		BodyString(body).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
+	assert.Regexp(suite.T(), common.NewValidationError("VatPayer"), httpErr.Message)
 }
 
 func (suite *ProjectTestSuite) TestProject_UpdateProject_BindError() {
