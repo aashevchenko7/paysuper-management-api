@@ -2279,6 +2279,7 @@ definitions:
       - percent
       - fix_amount_currency
       - mcc_code
+      - payment_stage
 
   onboarding.cost.payment.merchant.all:
     properties:
