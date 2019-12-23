@@ -57,6 +57,9 @@ func (h *ProjectRoute) createProject(ctx echo.Context) error {
 		req.CallbackProtocol = pkg.ProjectCallbackProtocolEmpty
 	}
 
+	// vat payer is seller by default on project creation
+	req.VatPayer = pkg.VatPayerSeller
+
 	if err := h.dispatch.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}

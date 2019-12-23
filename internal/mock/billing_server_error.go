@@ -318,6 +318,7 @@ func (s *BillingServerErrorMock) GetProject(
 				MinPaymentAmount:   0,
 				MaxPaymentAmount:   15000,
 				IsProductsCheckout: false,
+				VatPayer:           pkg.VatPayerBuyer,
 			},
 		}, nil
 	}
@@ -1120,5 +1121,9 @@ func (s *BillingServerErrorMock) GetOperatingCompany(ctx context.Context, in *gr
 }
 
 func (s *BillingServerErrorMock) GetCountriesListForOrder(ctx context.Context, in *grpc.GetCountriesListForOrderRequest, opts ...client.CallOption) (*grpc.GetCountriesListForOrderResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetPaylinkTransactions(ctx context.Context, in *grpc.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*grpc.TransactionsResponse, error) {
 	panic("implement me")
 }

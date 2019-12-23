@@ -40,18 +40,6 @@ definitions:
         description: error code
     type: object
 
-  model.JsonOrderCreateResponse.user.address:
-    properties:
-      country:
-        type: string
-        description: string representing the the user's country. two-letter uppercase country code in ISO 3166-1 alpha-2 format
-      city:
-        type: string
-        description: user's city
-      zip:
-        type: string
-        description: postal code
-
   model.JsonOrderCreateResponse.item:
     properties:
       id:
@@ -98,89 +86,6 @@ definitions:
         description: item platform identifier
         type: string
 
-  model.JsonOrderCreateResponse:
-    properties:
-      id:
-        description: order unique identifier
-        type: string
-      payment_form_url:
-        description: url to payment form
-        type: string
-
-  model.PaymentFormDataResponse:
-    properties:
-      account:
-        description: |
-          user account, may be null
-        type: string
-      has_vat:
-        description: |
-          flag to show VAT commission amount in payment form
-        type: boolean
-      vat:
-        description: VAT amount
-        type: number
-      amount:
-        description: order amount without VAT
-        type: number
-      total_amount:
-        description: total order amount with VAT
-        type: number
-      currency:
-        description: order currency
-        type: string
-      user_address_data_required:
-        description: flag to get information about user real geo position
-        type: boolean
-      id:
-        description: |
-          order unique identifier
-        type: string
-      payment_methods:
-        description: |
-          contain data about payment methods
-        items:
-          $ref: '#/definitions/model.PaymentMethodJsonOrderResponse'
-        type: array
-      project:
-        $ref: '#/definitions/model.ProjectJsonOrderResponse'
-        description: |
-          contain data about project
-        type: object
-      token:
-        description: |
-          access token to websocket private chanel
-        type: string
-      user_ip_data:
-        description: object contain information about user address get by user ip address
-        $ref: '#/definitions/model.JsonOrderCreateResponse.user.address'
-      items:
-        description: list of buyed items in order
-        type: array
-        items:
-          $ref: '#/definitions/model.JsonOrderCreateResponse.item'
-      cookie:
-        description: value to set to cookie for user identification. if user was identified by other data than value can be empty.
-        type: string
-      email:
-        description: user email
-        type: string
-      description:
-        description: order description
-        type: string
-      country_payments_allowed:
-        description: true is payments from user country is allowed
-        type: boolean
-      country_change_allowed:
-        description: true if user can change self country if payments from his country disallow
-        type: boolean
-      platforms:
-        description: list of supported platforms if this payment with type key (for other types this field can be empty)
-        type: array
-        items:
-          type: string
-    type: object
-
   model.Name:
     properties:
       en:
@@ -191,46 +96,6 @@ definitions:
         description: |
           russian name
         type: string
-    type: object
-
-  model.OrderCreatePaymentRequest:
-    properties:
-      address:
-        description: |
-          user wallet address in crypto payment system. required only for crypto payment
-        type: string
-      card_holder:
-        description: |
-          bank card card holder name. required only for bank card payment
-        type: string
-      cvv:
-        description: |
-          bank card cvv code. required only for bank card payment
-        type: integer
-      ewallet:
-        description: |
-          user account in ewallet payment system. required only for ewallet payment
-        type: string
-      month:
-        description: |
-          month of expire date of user bank card. required only for bank card payment
-        type: integer
-      order_id:
-        description: |
-          unique identifier of order on PSP (P1) side
-        type: string
-      pan:
-        description: |
-          user bank card number. required only for bank card payment
-        type: string
-      payment_method_id:
-        description: |
-          unique identifier of payment method by PSP (P1) classifier
-        type: string
-      year:
-        description: |
-          year of expire date of user bank card. required only for bank card payment
-        type: integer
     type: object
 
   OrderListRequest:
@@ -569,6 +434,9 @@ definitions:
       order_charge:
         $ref: '#/definitions/order.money'
         description: object contain information about amount and currency that was charged from user while payment
+      vat_payer:
+        type: string
+        description: "definition of who pays vat for orders in this project, allowed values are buyer | seller | nobody"
 
   order.parent:
     type: object
@@ -651,133 +519,6 @@ definitions:
       referrer_host:
         type: string
         description: 'referrer host'
-
-  order.create.request.user:
-    properties:
-      external_id:
-        description: user identifier on project side
-        type: string
-      name:
-        description: user name
-        type: string
-      email:
-        description: user email
-        type: string
-      email_verified:
-        description: user email was verified by project
-        type: boolean
-      phone:
-        description: user phone
-        type: string
-      phone_verified:
-        description: user phone was verified by project
-        type: boolean
-      ip:
-        description: user ip address
-        type: string
-      locale:
-        description: user's locale. two-letter code in lowercase
-        type: string
-      address:
-        description: user address information
-        $ref: '#/definitions/order.BillingAddress'
-      metadata:
-        description: object can contain any other information about user. object must contain only string values.
-        type: object
-
-  model.OrderScalar:
-    properties:
-      account:
-        description: user unique account in project
-        type: string
-      amount:
-        description: order amount. if payment type is simple this field is required
-        type: number
-      currency:
-        description: amount currency. three-letter ISO 4217 currency code, in uppercase. if payment type is simple this field is required
-        type: string
-      description:
-        description: order description
-        type: string
-      order_id:
-        description: unique order identifier on project side. this field not required, BUT we're recommend send this field always
-        type: string
-      project:
-        description: project unique identifier in PaySuper
-        type: string
-      url_fail:
-        description: url for redirect user after failed payment. this field can be send if it allowed in project admin panel
-        type: string
-      url_success:
-        description: url for redirect user after successfully completed payment. this field can be send if it allowed in project admin panel
-        type: string
-      type:
-        description: "order type. now available next types: simple, product and key"
-        type: string
-        enum:
-          - simple
-          - product
-          - key
-          - virtual_currency
-      products:
-        description: list of products (or key products) of project which customer want to buy. if payment type is product or key this field is required.
-        type: array
-        items:
-          type: string
-      platform_id:
-        description: platform identifier for which customer buy key products. if payment type is key this field is required.
-        type: string
-        enum:
-          - steam
-          - gog
-          - uplay
-          - origin
-          - psn
-          - xbox
-          - nintendo
-          - itch
-          - egs
-      token:
-        description: pre-created customer payment token. if sending pre-created token other request parameters not required.
-        type: string
-      user:
-        description: object may contain information about user. if project send this parameter in request than project must send authorisation header X-API-SIGNATURE
-        $ref: '#/definitions/order.create.request.user'
-      is_buy_for_virtual_currency:
-        description: flag indicates that order should be processed using virtual currency
-        type: boolean
-    required:
-      - project
-      - type
-    type: object
-
-  model.PaymentMethodJsonOrderResponse:
-    properties:
-      account_regexp:
-        description: |
-          regexp mask for check main requisite of payment method
-        type: string
-      group_alias:
-        description: |
-          payment method group alias
-        type: string
-      icon:
-        description: |
-          url to payment method icon
-        type: string
-      id:
-        description: |
-          payment method unique identifier
-        type: string
-      name:
-        description: |
-          payment method name
-        type: string
-      type:
-        description: |
-          payment method type. allowed: bank_card, ewallet, crypto
-        type: string
-    type: object
 
   model.Project:
     properties:
@@ -901,6 +642,11 @@ definitions:
             type: boolean
       virtual_currency:
         $ref: '#/definitions/model.VirtualCurrency'
+      vat_payer:
+        description: "definition of who pays vat for orders in this project, allowed values are buyer | seller | nobody"
+        type: object
+        additionalProperties:
+          type: string
     type: object
 
   model.VirtualCurrency:
@@ -938,30 +684,6 @@ definitions:
         items:
           $ref: '#/definitions/product.Price'
 
-
-  model.ProjectJsonOrderResponse:
-    properties:
-      name:
-        description: |
-          project name
-        type: string
-      url_fail:
-        description: |
-          url to redirect user after failed payment. may be NULL if not set in project settings
-        type: string
-      url_success:
-        description: |
-          url to redirect user after successfully completed payment. may be NULL if not set in project settings
-        type: string
-    type: object
-
-  payment_system.PaymentResponse:
-    properties:
-      error:
-        type: string
-      redirect_url:
-        type: string
-    type: object
   taxes.TaxRate:
     properties:
       id:
@@ -1466,6 +1188,9 @@ definitions:
       tariff:
         description: merchant tariff information
         $ref: '#/definitions/onboarding.Merchant.tariffs'
+      dont_charge_vat:
+        description: flag that this merchant does not pay tax anywhere
+        type: boolean
 
   onboarding.Merchant.ChangeStatus:
     properties:
@@ -3550,19 +3275,6 @@ definitions:
           "$ref": "#/definitions/billingVatReport"
         description: 'reports'
 
-  saved_card.remove.request:
-    type: object
-    properties:
-      id:
-        description: saved card identifier
-        type: string
-      cookie:
-        description: customer cookie value got on payment form data
-        type: string
-    required:
-      - id
-      - cookie
-
   operating_company:
     type: object
     properties:
@@ -3871,128 +3583,6 @@ definitions:
         example: "R&K"
         description: "Merchant name"
 
-  changeCustomerRequest:
-    type: object
-    properties:
-      order_id:
-        type: string
-        description: order uuid
-      method_id:
-        type: string
-        description: payment method id
-      account:
-        type: string
-        description: payment account
-
-  changeCustomerResponse:
-    type: object
-    properties:
-      user_address_data_required:
-        type: boolean
-        description: flag that additional user address data is required
-      user_ip_data:
-        type: object
-        properties:
-          country:
-            type: string
-            description: country
-          city:
-            type: string
-            description: city
-          zip:
-            type: string
-            description: zip
-      string:
-        type: string
-        description: bank card brand (if it is card payment)
-      country_payments_allowed:
-        type: boolean
-        description: flag that paymnets allowed in selected country
-      country_change_allowed:
-        type: boolean
-        description: flag that user country select allowed
-      has_vat:
-        type: boolean
-        description: flag that payment has vat
-      amount:
-        type: number
-        description: order amount before vat
-      total_amount:
-        type: number
-        description: order amount with vat
-      currency:
-        type: string
-        description: order currency
-      charge_currency:
-        type: string
-        description: order charge currency
-      charge_amount:
-        type: number
-        description: order charge amount
-      vat_in_charge_currency:
-        type: number
-        description: order vat in charge currency
-      items:
-        description: list of buyed items in order
-        type: array
-        items:
-          $ref: '#/definitions/model.JsonOrderCreateResponse.item'
-
-  changeBillingAddressRequest:
-    type: object
-    properties:
-      order_id:
-        type: string
-        description: order uuid
-      country:
-        type: string
-        description: country
-      zip:
-        type: string
-        description: zip
-
-  changeBillingAddressResponse:
-    type: object
-    properties:
-      has_vat:
-        type: boolean
-        description: flag that payment has vat
-      amount:
-        type: number
-        description: order amount before vat
-      total_amount:
-        type: number
-        description: order amount with vat
-      currency:
-        type: string
-        description: order currency
-      charge_currency:
-        type: string
-        description: order charge currency
-      charge_amount:
-        type: number
-        description: order charge amount
-      vat_in_charge_currency:
-        type: number
-        description: order vat in charge currency
-      items:
-        description: list of buyed items in order
-        type: array
-        items:
-          $ref: '#/definitions/model.JsonOrderCreateResponse.item'
-
-  CreateFileResponse:
-    type: object
-    properties:
-      id:
-        type: string
-        example: "507f1f77bcf86cd799439011"
-        description: "Merchant identity"
-      name:
-        type: string
-        example: "R&K"
-        description: "Merchant name"
-
 host: p1payapi.tst.protocol.one
 info:
   contact:
@@ -4077,103 +3667,6 @@ paths:
       summary: Get country by numeric ISO 3166-1 code
       tags:
         - Country
-  /api/v1/payment_countries/{order_id}:
-    get:
-      consumes:
-        - application/json
-      description: Get list of countries, that allowed to make payment for passed order
-      parameters:
-        - description: order id
-          in: path
-          name: order_id
-          required: true
-          type: integer
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Country'
-        "400":
-          description: Invalid request data
-          schema:
-            $ref: '#/definitions/model.Error'
-        "404":
-          description: Not found
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Some unknown error
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Get list of countries, that allowed to make payment for passed order
-      tags:
-        - Country
-  /api/v1/order:
-    post:
-      consumes:
-        - application/json
-      description: Create a payment order use POST JSON request
-      parameters:
-        - description: Order create data
-          in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/model.OrderScalar'
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: Object which contain data to render payment form
-          schema:
-            $ref: '#/definitions/model.JsonOrderCreateResponse'
-        "400":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Create order with json request
-      tags:
-        - Payment Order
-  /api/v1/payment:
-    post:
-      consumes:
-        - application/json
-      description: Create payment by order
-      parameters:
-        - description: data to create payment
-          in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/model.OrderCreatePaymentRequest'
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: contain url to redirect user
-          schema:
-            $ref: '#/definitions/payment_system.PaymentResponse'
-        "400":
-          description: contain error description about data validation error
-          schema:
-            $ref: '#/definitions/payment_system.PaymentResponse'
-        "402":
-          description: contain error description about error on payment system side
-          schema:
-            $ref: '#/definitions/payment_system.PaymentResponse'
-        "500":
-          description: contain error description about error on PSP (P1) side
-          schema:
-            $ref: '#/definitions/payment_system.PaymentResponse'
-      summary: Create payment
-      tags:
-        - Payment Order
 
   /admin/api/v1/order:
     get:
@@ -4355,55 +3848,6 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
       summary: Get order data
-      tags:
-        - Order
-  /api/v1/orders/{id}/platform:
-    post:
-      consumes:
-        - application/json
-      description: Change platform for order
-      parameters:
-        - description: Order unique identifier
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: platform change request
-          in: body
-          name: body
-          schema:
-            type: object
-            properties:
-              platform:
-                type: string
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/changeCustomerResponse'
-        "400":
-          description: Invalid request data
-          schema:
-            $ref: '#/definitions/model.Error'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.Error'
-        "403":
-          description: Access denied
-          schema:
-            $ref: '#/definitions/model.Error'
-        "404":
-          description: Not found
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Change platform for order
       tags:
         - Order
 
@@ -4662,244 +4106,6 @@ paths:
       tags:
         - Project
 
-  /api/v1/order/recreate:
-    post:
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      description: Recreate a payment order use order uuid for old order
-      parameters:
-        - description: product method properties
-          in: body
-          name: body
-          schema:
-            type: object
-            properties:
-              order_id:
-                type: string
-      responses:
-        "200":
-          description: Object which contain data to render payment form
-          schema:
-            $ref: '#/definitions/model.JsonOrderCreateResponse'
-        "400":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Create a payment method for payment system
-      tags:
-        - Payment Method
-
-  /api/v1/order/create:
-    get:
-      consumes:
-        - multipart/form-data
-        - application/x-www-form-urlencoded
-      description: Create a payment order use GET or POST HTML form
-      parameters:
-        - description: Project unique identifier in Protocol One payment solution
-          in: query
-          name: PP_PROJECT_ID
-          required: true
-          type: string
-        - description: Order amount
-          in: query
-          name: PP_AMOUNT
-          required: true
-          type: number
-        - description: User unique account in project
-          in: query
-          name: PP_ACCOUNT
-          required: true
-          type: string
-        - description: Unique order identifier in project. This field not required,
-            BUT we're recommend send this field always
-          in: query
-          name: PP_ORDER_ID
-          type: string
-        - description: Payment method identifier in Protocol One payment solution
-          in: query
-          name: PP_PAYMENT_METHOD
-          type: string
-        - description: Order description. If this field not send in request, then we're
-            create standard order description
-          in: query
-          name: PP_DESCRIPTION
-          type: string
-        - description: Order currency by ISO 4217 (3 chars). If this field send, then
-            we're process amount in this currency
-          in: query
-          name: PP_CURRENCY
-          type: string
-        - description: User (payer) region code by ISO 3166-1 (2 chars) for check project
-            packages. If this field not send, then user region will be get from user
-            ip
-          in: query
-          name: PP_REGION
-          type: string
-        - description: User (payer) email
-          in: query
-          name: PP_PAYER_EMAIL
-          type: string
-        - description: User (payer) phone
-          in: query
-          name: PP_PAYER_PHONE
-          type: string
-        - description: URL for payment data verification request to project. This field
-            can be send if it allowed in project admin panel
-          in: query
-          name: PP_URL_VERIFY
-          type: string
-        - description: URL for payment notification request to project. This field can
-            be send if it allowed in project admin panel
-          in: query
-          name: PP_URL_NOTIFY
-          type: string
-        - description: URL for redirect user after successfully completed payment. This
-            field can be send if it allowed in project admin panel
-          in: query
-          name: PP_URL_SUCCESS
-          type: string
-        - description: URL for redirect user after failed payment. This field can be
-            send if it allowed in project admin panel
-          in: query
-          name: PP_URL_FAIL
-          type: string
-        - description: Signature of request to verify that the data has not been changed.
-            This field not required, BUT we're recommend send this field always
-          in: query
-          name: PP_SIGNATURE
-          type: string
-        - description: Any fields on the project side that do not match the names of
-            the reserved fields
-          in: query
-          name: Other
-          type: string
-      produces:
-        - text/html
-      responses:
-        "302":
-          description: Redirect user to form entering payment requisites
-          schema:
-            type: string
-        "400":
-          description: Redirect user to page with error description
-          schema:
-            type: string
-        "500":
-          description: Redirect user to page with error description
-          schema:
-            type: string
-      summary: Create order with HTML form
-      tags:
-        - Payment Order
-    post:
-      consumes:
-        - multipart/form-data
-        - application/x-www-form-urlencoded
-      description: Create a payment order use GET or POST HTML form
-      parameters:
-        - description: Project unique identifier in Protocol One payment solution
-          in: query
-          name: PP_PROJECT_ID
-          required: true
-          type: string
-        - description: Order amount
-          in: query
-          name: PP_AMOUNT
-          required: true
-          type: number
-        - description: User unique account in project
-          in: query
-          name: PP_ACCOUNT
-          required: true
-          type: string
-        - description: Unique order identifier in project. This field not required,
-            BUT we're recommend send this field always
-          in: query
-          name: PP_ORDER_ID
-          type: string
-        - description: Payment method identifier in Protocol One payment solution
-          in: query
-          name: PP_PAYMENT_METHOD
-          type: string
-        - description: Order description. If this field not send in request, then we're
-            create standard order description
-          in: query
-          name: PP_DESCRIPTION
-          type: string
-        - description: Order currency by ISO 4217 (3 chars). If this field send, then
-            we're process amount in this currency
-          in: query
-          name: PP_CURRENCY
-          type: string
-        - description: User (payer) region code by ISO 3166-1 (2 chars) for check project
-            packages. If this field not send, then user region will be get from user
-            ip
-          in: query
-          name: PP_REGION
-          type: string
-        - description: User (payer) email
-          in: query
-          name: PP_PAYER_EMAIL
-          type: string
-        - description: User (payer) phone
-          in: query
-          name: PP_PAYER_PHONE
-          type: string
-        - description: URL for payment data verification request to project. This field
-            can be send if it allowed in project admin panel
-          in: query
-          name: PP_URL_VERIFY
-          type: string
-        - description: URL for payment notification request to project. This field can
-            be send if it allowed in project admin panel
-          in: query
-          name: PP_URL_NOTIFY
-          type: string
-        - description: URL for redirect user after successfully completed payment. This
-            field can be send if it allowed in project admin panel
-          in: query
-          name: PP_URL_SUCCESS
-          type: string
-        - description: URL for redirect user after failed payment. This field can be
-            send if it allowed in project admin panel
-          in: query
-          name: PP_URL_FAIL
-          type: string
-        - description: Signature of request to verify that the data has not been changed.
-            This field not required, BUT we're recommend send this field always
-          in: query
-          name: PP_SIGNATURE
-          type: string
-        - description: Any fields on the project side that do not match the names of
-            the reserved fields
-          in: query
-          name: Other
-          type: string
-      produces:
-        - text/html
-      responses:
-        "302":
-          description: Redirect user to form entering payment requisites
-          schema:
-            type: string
-        "400":
-          description: Redirect user to page with error description
-          schema:
-            type: string
-        "500":
-          description: Redirect user to page with error description
-          schema:
-            type: string
-      summary: Create order with HTML form
-      tags:
-        - Payment Order
   /system/api/v1/payment_method:
     post:
       consumes:
@@ -8102,7 +7308,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/admin/api/v1/payment_costs/channel/merchant/{merchant_id}/{cost_id}":
+  "/system/api/v1/payment_costs/channel/merchant/{merchant_id}/{cost_id}":
     put:
       summary: Update merchant costs for payments operations
       tags:
@@ -8155,7 +7361,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/admin/api/v1/payment_costs/money_back/merchant/{merchant_id}/{cost_id}":
+  "/system/api/v1/payment_costs/money_back/merchant/{merchant_id}/{cost_id}":
     put:
       summary: Update merchant costs for money back operations
       tags:
@@ -8350,7 +7556,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/admin/api/v1/report_file/download/{file}":
+  "/auth/api/v1/report_file/download/{file_id}.{file_type}":
     get:
       summary: Download report file
       tags:
@@ -8363,14 +7569,14 @@ paths:
         - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
       description: Download report file
       parameters:
-        - description: filename
+        - description: identity of report file
           in: path
-          name: file
+          name: file_id
           type: string
           required: true
-        - description: identity of file and file type
-          in: query
-          name: file
+        - description: original report extension
+          in: path
+          name: file_type
           type: string
           required: true
       responses:
@@ -9530,6 +8736,43 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
+  "/admin/api/v1/paylinks/{id}/transactions":
+    get:
+      summary: Get a list of transactions, created from paylink
+      tags:
+        - Payment links
+      consumes:
+        - application/x-www-form-urlencoded
+      produces:
+        - application/json
+      description:  Get a list of transactions, created from paylink
+      parameters:
+        - description: Payment link identifier
+          in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/order.list.public'
+        "400":
+          description: Invalid request data
+          schema:
+            $ref: '#/definitions/model.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "403":
+          description: Access denied
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Object with error message
+          schema:
+            $ref: '#/definitions/model.Error'
 
 
   "/admin/api/v1/paylinks/{id}/url":
@@ -10016,40 +9259,6 @@ paths:
           description: Object with error message
           schema:
             $ref: '#/definitions/model.Error'
-
-  /api/v1/order/{id}:
-    get:
-      consumes:
-        - application/json
-      description: Get data for rendering payment form
-      parameters:
-        - description: Order unique identifier
-          in: path
-          name: id
-          required: true
-          type: string
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.PaymentFormDataResponse'
-        "400":
-          description: Invalid request data
-          schema:
-            $ref: '#/definitions/model.Error'
-        "404":
-          description: Not found
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Get data for rendering payment form
-      tags:
-        - Order
 
   "/system/api/v1/users/invite":
     post:
@@ -10634,39 +9843,6 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
-  "/api/v1/saved_card":
-    delete:
-      summary: Remove customer saved card
-      description: Remove customer saved card
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - description: Remove saved card data
-          in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/saved_card.remove.request'
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Invalid request data
-          schema:
-            $ref: '#/definitions/model.Error'
-        "404":
-          description: Not found
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      tags:
-        - Saved Card
-
   "/system/api/v1/merchants/{id}/set_operating_company":
     post:
       summary: Set merchant operating company
@@ -10692,6 +9868,9 @@ paths:
               operating_company_id:
                 description: id of operation company for which this cost is applicable
                 type: string
+              dont_charge_vat:
+                description: flag that this merchant does not pay tax anywhere
+                type: boolean
       responses:
         "200":
           description: OK
@@ -10958,97 +10137,3 @@ paths:
           description: Object with error message
           schema:
             $ref: '#/definitions/model.Error'
-
-  "/api/v1/orders/{id}/billing_address":
-    post:
-      consumes:
-        - application/json
-      description: Change billing address for order
-      parameters:
-        - description: Order unique identifier
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: Change billing address for order request
-          in: body
-          name: body
-          schema:
-            $ref: '#/definitions/changeBillingAddressRequest'
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/changeBillingAddressResponse'
-        "400":
-          description: Invalid request data
-          schema:
-            $ref: '#/definitions/model.Error'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.Error'
-        "403":
-          description: Access denied
-          schema:
-            $ref: '#/definitions/model.Error'
-        "404":
-          description: Not found
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Change billing address for order
-      tags:
-        - Order
-
-  "/api/v1/orders/{id}/customer":
-    post:
-      consumes:
-        - application/json
-      description: Change customer for order
-      parameters:
-        - description: Order unique identifier
-          in: path
-          name: id
-          required: true
-          type: string
-        - description: customer change request
-          in: body
-          name: body
-          schema:
-            $ref: '#/definitions/changeCustomerRequest'
-      produces:
-        - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/changeCustomerResponse'
-        "400":
-          description: Invalid request data
-          schema:
-            $ref: '#/definitions/model.Error'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.Error'
-        "403":
-          description: Access denied
-          schema:
-            $ref: '#/definitions/model.Error'
-        "404":
-          description: Not found
-          schema:
-            $ref: '#/definitions/model.Error'
-        "500":
-          description: Object with error message
-          schema:
-            $ref: '#/definitions/model.Error'
-      summary: Change customer for order
-      tags:
-        - Order

@@ -1061,3 +1061,7 @@ func (s *BillingServerOkTemporaryMock) GetOperatingCompany(ctx context.Context, 
 func (s *BillingServerOkTemporaryMock) GetCountriesListForOrder(ctx context.Context, in *grpc.GetCountriesListForOrderRequest, opts ...client.CallOption) (*grpc.GetCountriesListForOrderResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerOkTemporaryMock) GetPaylinkTransactions(ctx context.Context, in *grpc.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*grpc.TransactionsResponse, error) {
+	panic("implement me")
+}
