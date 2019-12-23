@@ -18,6 +18,7 @@ const (
 
 	RequestParameterId                       = "id"
 	RequestParameterName                     = "name"
+	RequestParameterVatPayer                 = "vat_payer"
 	RequestParameterSku                      = "sku"
 	RequestParameterIsSigned                 = "is_signed"
 	RequestParameterMerchantId               = "merchant_id"

@@ -759,5 +759,9 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 		structure.VirtualCurrency = projectReq.VirtualCurrency
 	}
 
+	if _, ok := req[RequestParameterVatPayer]; ok {
+		structure.VatPayer = projectReq.VatPayer
+	}
+
 	return nil
 }
