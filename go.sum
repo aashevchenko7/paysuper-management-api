@@ -845,6 +845,8 @@ github.com/paysuper/paysuper-billing-server v1.1.1-0.20191225165128-842136ef7d03
 github.com/paysuper/paysuper-billing-server v1.1.1-0.20191225165128-842136ef7d03/go.mod h1:qgB2nFotJAO7sY4w/7iecR+Yvt7PQsi01Mky9m9p6hk=
 github.com/paysuper/paysuper-billing-server v1.1.1-0.20191225170536-027c0f3198e2 h1:f00eI+fA6KN+Upn5YmhyFHuFqJOshMJuwp76pbzfLso=
 github.com/paysuper/paysuper-billing-server v1.1.1-0.20191225170536-027c0f3198e2/go.mod h1:qgB2nFotJAO7sY4w/7iecR+Yvt7PQsi01Mky9m9p6hk=
+github.com/paysuper/paysuper-billing-server v1.1.1-0.20200114093553-b325132774d7 h1:iNNtUMxFv3PQYWVORvbUqeYf3pqsa6q4Yibn9oShAN4=
+github.com/paysuper/paysuper-billing-server v1.1.1-0.20200114093553-b325132774d7/go.mod h1:h9m48t50TqYgWpgpxygQcIpYPARKM2uvRuDLDESEtHM=
 github.com/paysuper/paysuper-billing-server v1.2.0 h1:0WGYT7cOQUD5FA/v1EX+S2kYd1vOyQU6vVFClMlnkk4=
 github.com/paysuper/paysuper-billing-server v1.2.0/go.mod h1:+/zUYPqKgrnrmUKWHgjfTdOhkStm9Xsx1YGAtmKv8Ik=
 github.com/paysuper/paysuper-currencies v0.0.0-20190903083641-668b8b2b997d h1:hoMkfdq4qEGOONvxajsZO0Mf6np++pGnrKVxegvplaw=
@@ -1329,6 +1331,8 @@ gopkg.in/mgo.v2 v2.0.0-20180705113604-9856a29383ce/go.mod h1:yeKp02qBN3iKW1OzL3M
 gopkg.in/ory-am/dockertest.v3 v3.3.4/go.mod h1:s9mmoLkaGeAh97qygnNj4xWkiN7e1SKekYC6CovU+ek=
 gopkg.in/paysuper/paysuper-database-mongo.v1 v1.0.0-20191120092306-dc35c6f924f1 h1:BKYXjm3RgTLHxCXDazxCjeVUw474smkaFprC5XQXqko=
 gopkg.in/paysuper/paysuper-database-mongo.v1 v1.0.0-20191120092306-dc35c6f924f1/go.mod h1:WFbzWkt8QIIRcF20tcFCzV/5H9nJrIM1uUp90AMT6eM=
+gopkg.in/paysuper/paysuper-database-mongo.v2 v2.0.0-20191225152512-d3a7cace0401 h1:mFOIFlfP3E45um60sZ2KyPQnU9W1gH0yAAlpR5jZWoM=
+gopkg.in/paysuper/paysuper-database-mongo.v2 v2.0.0-20191225152512-d3a7cace0401/go.mod h1:UI620jLphsePlvorsfeRd4+bVHpblyBD+3AS8MR65dI=
 gopkg.in/redis.v3 v3.6.4/go.mod h1:6XeGv/CrsUFDU9aVbUdNykN7k1zVmoeg83KC9RbQfiU=
 gopkg.in/resty.v1 v1.12.0/go.mod h1:mDo4pnntr5jdWRML875a/NmxYqAlA73dVijT2AXvQQo=
 gopkg.in/square/go-jose.v2 v2.3.1/go.mod h1:M9dMgbHiYLoDGQrXy7OpJDJWiKiU//h+vD76mk0e1AI=
