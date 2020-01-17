@@ -6,7 +6,6 @@ require (
 	github.com/ProtocolONE/go-core/v2 v2.1.0
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/alexeyco/simpletable v0.0.0-20190222165044-2eb48bcee7cf
-	github.com/alicebob/gopher-json v0.0.0-20180125190556-5a6b3ba71ee6 // indirect
 	github.com/aws/aws-sdk-go v1.23.16
 	github.com/fatih/color v1.7.0
 	github.com/forestgiant/sliceutil v0.0.0-20160425183142-94783f95db6c
