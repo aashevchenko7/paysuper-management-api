@@ -65,6 +65,10 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_Ok() {
 		MinPaymentAmount:   0,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
+		RedirectSettings: &billing.ProjectRedirectSettings{
+			Mode:  pkg.ProjectRedirectModeAny,
+			Usage: pkg.ProjectRedirectUsageAny,
+		},
 	}
 
 	b, err := json.Marshal(&body)
@@ -110,6 +114,10 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_ValidationError() {
 		MinPaymentAmount:   -100,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
+		RedirectSettings: &billing.ProjectRedirectSettings{
+			Mode:  pkg.ProjectRedirectModeAny,
+			Usage: pkg.ProjectRedirectUsageAny,
+		},
 	}
 
 	b, err := json.Marshal(&body)
@@ -141,6 +149,10 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerError() {
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
 		VatPayer:           pkg.VatPayerBuyer,
+		RedirectSettings: &billing.ProjectRedirectSettings{
+			Mode:  pkg.ProjectRedirectModeAny,
+			Usage: pkg.ProjectRedirectUsageAny,
+		},
 	}
 
 	b, err := json.Marshal(&body)
@@ -174,6 +186,10 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerResultErro
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
 		VatPayer:           pkg.VatPayerBuyer,
+		RedirectSettings: &billing.ProjectRedirectSettings{
+			Mode:  pkg.ProjectRedirectModeAny,
+			Usage: pkg.ProjectRedirectUsageAny,
+		},
 	}
 
 	b, err := json.Marshal(&body)
@@ -328,7 +344,6 @@ func (suite *ProjectTestSuite) TestProject_UpdateProject_BillingServerResultErro
 }
 
 func (suite *ProjectTestSuite) TestProject_GetProject_Ok() {
-
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":"+common.RequestParameterProjectId, bson.NewObjectId().Hex()).
@@ -342,7 +357,6 @@ func (suite *ProjectTestSuite) TestProject_GetProject_Ok() {
 }
 
 func (suite *ProjectTestSuite) TestProject_GetProject_ValidationError() {
-
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Path(common.AuthUserGroupPath + projectsIdPath).
@@ -358,7 +372,6 @@ func (suite *ProjectTestSuite) TestProject_GetProject_ValidationError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_GetProject_BillingServerError() {
-
 	suite.router.dispatch.Services.Billing = mock.NewBillingServerSystemErrorMock()
 
 	_, err := suite.caller.Builder().
@@ -377,7 +390,6 @@ func (suite *ProjectTestSuite) TestProject_GetProject_BillingServerError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_GetProject_BillingServerResultError() {
-
 	suite.router.dispatch.Services.Billing = mock.NewBillingServerErrorMock()
 
 	_, err := suite.caller.Builder().
@@ -396,7 +408,6 @@ func (suite *ProjectTestSuite) TestProject_GetProject_BillingServerResultError()
 }
 
 func (suite *ProjectTestSuite) TestProject_ListProjects_Ok() {
-
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		SetQueryParam(common.RequestParameterLimit, "-100").
@@ -410,7 +421,6 @@ func (suite *ProjectTestSuite) TestProject_ListProjects_Ok() {
 }
 
 func (suite *ProjectTestSuite) TestProject_ListProjects_BindError() {
-
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		SetQueryParam(common.RequestParameterLimit, "qwerty").
@@ -427,7 +437,6 @@ func (suite *ProjectTestSuite) TestProject_ListProjects_BindError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_ListProjects_ValidationError() {
-
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		SetQueryParam(common.RequestParameterOffset, "-100").
@@ -444,7 +453,6 @@ func (suite *ProjectTestSuite) TestProject_ListProjects_ValidationError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_ListProjects_BillingServerError() {
-
 	suite.router.dispatch.Services.Billing = mock.NewBillingServerSystemErrorMock()
 
 	_, err := suite.caller.Builder().
@@ -463,7 +471,6 @@ func (suite *ProjectTestSuite) TestProject_ListProjects_BillingServerError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_DeleteProject_Ok() {
-
 	res, err := suite.caller.Builder().
 		Method(http.MethodDelete).
 		Params(":"+common.RequestParameterProjectId, bson.NewObjectId().Hex()).
@@ -477,7 +484,6 @@ func (suite *ProjectTestSuite) TestProject_DeleteProject_Ok() {
 }
 
 func (suite *ProjectTestSuite) TestProject_DeleteProject_ValidateError() {
-
 	_, err := suite.caller.Builder().
 		Method(http.MethodDelete).
 		Path(common.AuthUserGroupPath + projectsIdPath).
@@ -493,7 +499,6 @@ func (suite *ProjectTestSuite) TestProject_DeleteProject_ValidateError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_DeleteProject_BillingServerError() {
-
 	suite.router.dispatch.Services.Billing = mock.NewBillingServerSystemErrorMock()
 
 	_, err := suite.caller.Builder().
@@ -512,7 +517,6 @@ func (suite *ProjectTestSuite) TestProject_DeleteProject_BillingServerError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_DeleteProject_BillingServerResultError() {
-
 	suite.router.dispatch.Services.Billing = mock.NewBillingServerErrorMock()
 
 	_, err := suite.caller.Builder().
@@ -656,6 +660,10 @@ func (suite *ProjectTestSuite) TestProject_CreateProjectWithoutCallbackProtocol_
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
 		VatPayer:           pkg.VatPayerBuyer,
+		RedirectSettings: &billing.ProjectRedirectSettings{
+			Mode:  pkg.ProjectRedirectModeAny,
+			Usage: pkg.ProjectRedirectUsageAny,
+		},
 	}
 
 	b, err := json.Marshal(&body)

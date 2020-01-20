@@ -48,6 +48,8 @@ const (
 	ErrorNamespaceGetDashboardMainRequestMerchantId       = "GetDashboardMainRequest.MerchantId"
 	ErrorNamespaceGetDashboardBaseReportRequestPeriod     = "GetDashboardBaseReportRequest.Period"
 	ErrorNamespaceGetDashboardBaseReportRequestMerchantId = "GetDashboardBaseReportRequest.MerchantId"
+	ErrorNamespaceProjectRequestRedirectSettingsMode      = "Project.RedirectSettings.Mode"
+	ErrorNamespaceProjectRequestRedirectSettingsUsage     = "Project.RedirectSettings.Usage"
 )
 
 var (
@@ -134,32 +136,34 @@ var (
 	ErrorMessageKeyProductIdInvalid                   = NewManagementApiResponseError("ma000082", "key product id is invalid")
 	ErrorMessagePlatformIdInvalid                     = NewManagementApiResponseError("ma000083", "platform id is invalid")
 
-	ErrorMessageIncorrectAlternativeName          = NewManagementApiResponseError("ma000084", "incorrect brand")
-	ErrorMessageIncorrectState                    = NewManagementApiResponseError("ma000085", "incorrect state")
-	ErrorMessageIncorrectCity                     = NewManagementApiResponseError("ma000086", "incorrect city")
-	ErrorMessageIncorrectAddress                  = NewManagementApiResponseError("ma000087", "incorrect address")
-	ErrorMessageRequiredContactAuthorized         = NewManagementApiResponseError("ma000088", "company authorized contact information is required")
-	ErrorMessageRequiredContactTechnical          = NewManagementApiResponseError("ma000089", "company technical contact information is required")
-	ErrorMessageIncorrectName                     = NewManagementApiResponseError("ma000090", "incorrect name")
-	ErrorMessageIncorrectPhone                    = NewManagementApiResponseError("ma000091", "incorrect phone")
-	ErrorMessageIncorrectBankName                 = NewManagementApiResponseError("ma000092", "incorrect bank name")
-	ErrorMessageIncorrectBankAddress              = NewManagementApiResponseError("ma000093", "incorrect bank address")
-	ErrorMessageIncorrectBankAccountNumber        = NewManagementApiResponseError("ma000094", "incorrect bank accounting number")
-	ErrorMessageIncorrectBankSwift                = NewManagementApiResponseError("ma000095", "incorrect bank swift code")
-	ErrorMessageIncorrectBankCorrespondentAccount = NewManagementApiResponseError("ma000096", "incorrect bank correspondent account")
-	ErrorMessageFileNotFound                      = NewManagementApiResponseError("ma000097", "file with key was not specified")
-	ErrorMessageCantReadFile                      = NewManagementApiResponseError("ma000098", "file can not be read")
-	ErrorIncorrectPeriod                          = NewManagementApiResponseError("ma000099", "incorrect period")
-	ErrorMessageMerchantNotFound                  = NewManagementApiResponseError("ma000100", "merchant not found")
-	ErrorMessageCreateReportFile                  = NewManagementApiResponseError("ma000101", "unable to create report file")
-	ErrorMessageDownloadReportFile                = NewManagementApiResponseError("ma000102", "unable to download report file")
-	ErrorMessageLocalizedFieldIncorrectType       = NewManagementApiResponseError("ma000103", "localized field has invalid type")
-	ErrorMessageCoverFieldIncorrectType           = NewManagementApiResponseError("ma000104", "cover field has invalid type")
-	ErrorMessageUnableToSendInvite                = NewManagementApiResponseError("ma000105", "unable to send invite")
-	ErrorMessageUnableToAcceptInvite              = NewManagementApiResponseError("ma000106", "unable to accept invite")
-	ErrorMessageUnableToCheckInviteToken          = NewManagementApiResponseError("ma000107", "unable to check invite token")
-	ErrorMessageInvalidRoleType                   = NewManagementApiResponseError("ma000108", "invalid role type")
-	ErrorMessageUnableToDeleteUser                = NewManagementApiResponseError("ma000109", "unable to delete user")
+	ErrorMessageIncorrectAlternativeName                     = NewManagementApiResponseError("ma000084", "incorrect brand")
+	ErrorMessageIncorrectState                               = NewManagementApiResponseError("ma000085", "incorrect state")
+	ErrorMessageIncorrectCity                                = NewManagementApiResponseError("ma000086", "incorrect city")
+	ErrorMessageIncorrectAddress                             = NewManagementApiResponseError("ma000087", "incorrect address")
+	ErrorMessageRequiredContactAuthorized                    = NewManagementApiResponseError("ma000088", "company authorized contact information is required")
+	ErrorMessageRequiredContactTechnical                     = NewManagementApiResponseError("ma000089", "company technical contact information is required")
+	ErrorMessageIncorrectName                                = NewManagementApiResponseError("ma000090", "incorrect name")
+	ErrorMessageIncorrectPhone                               = NewManagementApiResponseError("ma000091", "incorrect phone")
+	ErrorMessageIncorrectBankName                            = NewManagementApiResponseError("ma000092", "incorrect bank name")
+	ErrorMessageIncorrectBankAddress                         = NewManagementApiResponseError("ma000093", "incorrect bank address")
+	ErrorMessageIncorrectBankAccountNumber                   = NewManagementApiResponseError("ma000094", "incorrect bank accounting number")
+	ErrorMessageIncorrectBankSwift                           = NewManagementApiResponseError("ma000095", "incorrect bank swift code")
+	ErrorMessageIncorrectBankCorrespondentAccount            = NewManagementApiResponseError("ma000096", "incorrect bank correspondent account")
+	ErrorMessageFileNotFound                                 = NewManagementApiResponseError("ma000097", "file with key was not specified")
+	ErrorMessageCantReadFile                                 = NewManagementApiResponseError("ma000098", "file can not be read")
+	ErrorIncorrectPeriod                                     = NewManagementApiResponseError("ma000099", "incorrect period")
+	ErrorMessageMerchantNotFound                             = NewManagementApiResponseError("ma000100", "merchant not found")
+	ErrorMessageCreateReportFile                             = NewManagementApiResponseError("ma000101", "unable to create report file")
+	ErrorMessageDownloadReportFile                           = NewManagementApiResponseError("ma000102", "unable to download report file")
+	ErrorMessageLocalizedFieldIncorrectType                  = NewManagementApiResponseError("ma000103", "localized field has invalid type")
+	ErrorMessageCoverFieldIncorrectType                      = NewManagementApiResponseError("ma000104", "cover field has invalid type")
+	ErrorMessageUnableToSendInvite                           = NewManagementApiResponseError("ma000105", "unable to send invite")
+	ErrorMessageUnableToAcceptInvite                         = NewManagementApiResponseError("ma000106", "unable to accept invite")
+	ErrorMessageUnableToCheckInviteToken                     = NewManagementApiResponseError("ma000107", "unable to check invite token")
+	ErrorMessageInvalidRoleType                              = NewManagementApiResponseError("ma000108", "invalid role type")
+	ErrorMessageUnableToDeleteUser                           = NewManagementApiResponseError("ma000109", "unable to delete user")
+	ErrorMessageNamespaceProjectRequestRedirectSettingsMode  = NewManagementApiResponseError("ma000110", "redirect mode is incorrect")
+	ErrorMessageNamespaceProjectRequestRedirectSettingsUsage = NewManagementApiResponseError("pr000111", "type of redirect usage is incorrect")
 
 	ValidationErrors = map[string]*grpc.ResponseErrorMessage{
 		UserProfileFieldNumberOfEmployees: ErrorMessageIncorrectNumberOfEmployees,
@@ -202,5 +206,7 @@ var (
 		ErrorNamespaceGetDashboardMainRequestPeriod:           ErrorIncorrectPeriod,
 		ErrorNamespaceGetDashboardBaseReportRequestPeriod:     ErrorIncorrectPeriod,
 		ErrorNamespaceGetDashboardBaseReportRequestMerchantId: ErrorIncorrectMerchantId,
+		ErrorNamespaceProjectRequestRedirectSettingsMode:      ErrorMessageNamespaceProjectRequestRedirectSettingsMode,
+		ErrorNamespaceProjectRequestRedirectSettingsUsage:     ErrorMessageNamespaceProjectRequestRedirectSettingsUsage,
 	}
 )
