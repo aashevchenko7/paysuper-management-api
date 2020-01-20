@@ -124,6 +124,18 @@ func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Confirm the customer email
+// @desc Confirm the customer email by the token
+// @id userProfileConfirmEmailPathConfirmEmail
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @body grpc.ConfirmUserEmailRequest
+// @success 200 {string} Returns an empty response body if the confirmation request was successful
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /api/v1/user/confirm_email [put]
 func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
 	req := &grpc.ConfirmUserEmailRequest{}
 

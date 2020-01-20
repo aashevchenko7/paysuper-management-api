@@ -20,6 +20,13 @@ type TokenRoute struct {
 	provider.LMT
 }
 
+type TokenCreationResponse struct {
+	// The secure string which contains encrypted information about your customer and sales option data.
+	Token string `json:"token"`
+	// The PaySuper-hosted URL of a payment form.
+	PaymentFormUrl string `json:"payment_form_url"`
+}
+
 func NewTokenRoute(set common.HandlerSet, cfg *common.Config) *TokenRoute {
 	set.AwareSet.Logger = set.AwareSet.Logger.WithFields(logger.Fields{"router": "TokenRoute"})
 	return &TokenRoute{
@@ -33,6 +40,18 @@ func (h *TokenRoute) Route(groups *common.Groups) {
 	groups.Common.POST(tokenPath, h.createToken)
 }
 
+// @summary Create a token
+// @desc Create a token that encrypts details of your customer, the game and purchase parameters.
+// @id tokenPathCreateToken
+// @tag Token
+// @accept application/json
+// @produce application/json
+// @body grpc.TokenRequest
+// @success 200 {object} TokenCreationResponse Returns the token string and the PaySuper-hosted URL for a payment form
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /api/v1/tokens [post]
 func (h *TokenRoute) createToken(ctx echo.Context) error {
 	req := &grpc.TokenRequest{}
 	err := ctx.Bind(req)
