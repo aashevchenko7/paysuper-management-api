@@ -40,14 +40,14 @@ func (h *TokenRoute) Route(groups *common.Groups) {
 	groups.Common.POST(tokenPath, h.createToken)
 }
 
-// @summary Create a token
-// @desc Create a token that encrypts details of your customer, the game and purchase parameters.
+// @summary Create a payment token
+// @desc Create a payment token that encrypts details of your customer, the game and purchase parameters.
 // @id tokenPathCreateToken
 // @tag Token
 // @accept application/json
 // @produce application/json
 // @body grpc.TokenRequest
-// @success 200 {object} TokenCreationResponse Returns the token string and the PaySuper-hosted URL for a payment form
+// @success 200 {object} TokenCreationResponse Returns the payment token string and the PaySuper-hosted URL for a payment form
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 404 {object} grpc.ResponseErrorMessage Not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
