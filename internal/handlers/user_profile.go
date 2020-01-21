@@ -124,14 +124,14 @@ func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
-// @summary Confirm the customer email
-// @desc Confirm the customer email by the token
+// @summary Confirm the user's email
+// @desc Confirm the user's email using the user token
 // @id userProfileConfirmEmailPathConfirmEmail
 // @tag User Profile
 // @accept application/json
 // @produce application/json
 // @body grpc.ConfirmUserEmailRequest
-// @success 200 {string} Returns an empty response body if the confirmation request was successful
+// @success 200 {string} Returns an empty response body if the user's email address has been successfully confirmed
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 404 {object} grpc.ResponseErrorMessage Not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error

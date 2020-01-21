@@ -7,24 +7,6 @@ servers:
     description: Production API
 components:
   schemas:
-    PriceGroup:
-      type: object
-      required:
-      - id
-      - currency
-      properties:
-        id:
-          description: "The unique identifier for the price group."
-          type: string
-        currency:
-          description: "Three-letter Currency Code ISO 4217, in uppercase."
-          type: string
-        region:
-          description: "The region's name."
-          type: string
-        is_active:
-          description: "Has a true value if the price group is active."
-          type: boolean
     PriceGroupCurrenciesResponse:
       type: object
       properties:
@@ -47,6 +29,238 @@ components:
                       type: array
                       items:
                         type: string
+    RecommendedPriceResponse:
+      type: object
+      properties:
+        recommended_price:
+          type: array
+          items:
+            properties:
+              region:
+                description: "The region's name."
+                type: string
+              currency:
+                description: "Three-letter currency code in ISO 4217, in uppercase."
+                type: string
+              amount:
+                description: "The recommended currency conversion price."
+                type: number
+    RecommendedPriceTableResponse:
+      type: object
+      properties:
+        ranges:
+          type: array
+          items:
+            properties:
+              position:
+                description: "The order number in a pricing table."
+                type: integer
+              from:
+                description: "The lower boundary value of the range."
+                type: number
+              to:
+                description: "The upper boundary value of the range."
+                type: number
+    TokenCreationResponse:
+      type: object
+      properties:
+        token:
+          description: "The secure string which contains encrypted information about your customer and sales option data."
+          type: string
+        payment_form_url:
+          description: "The PaySuper-hosted URL of a payment form."
+          type: string
+    FindByZipCodeResponse:
+      type: object
+      properties:
+        count:
+          description: "The number of cities."
+          type: integer
+        items:
+          type: array
+          items:
+            properties:
+              zip:
+                description: "The postal code."
+                type: string
+              country:
+                description: "The country's name."
+                type: string
+              city:
+                description: "The city's name."
+                type: string
+              state:
+                type: object
+                properties:
+                  code:
+                    description: "The state's postal code."
+                    type: string
+                  name:
+                    description: "The state's name."
+                    type: string
+              created_at:
+                type: object
+                properties:
+                  seconds:
+                    description: "9999-12-31T23:59:59Z inclusive."
+                    type: integer
+                  nanos:
+                    description: "inclusive."
+                    type: integer
+    ResponseErrorMessage:
+      type: object
+      properties:
+        code:
+          description: "The error code."
+          type: string
+        message:
+          description: "The error short description."
+          type: string
+        details:
+          description: "The error details."
+          type: string
+    Country:
+      type: object
+      properties:
+        iso_code_a2:
+          description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
+          type: string
+        region:
+          description: "A PaySuper system's relative geographical area for this country."
+          type: string
+        currency:
+          description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
+          type: string
+        payments_allowed:
+          description: "Has a true value if a payment is allowed from this country."
+          type: boolean
+        change_allowed:
+          description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
+          type: boolean
+        vat_enabled:
+          description: "Has a true value if VAT is calculated and paid for this country."
+          type: boolean
+        vat_currency:
+          description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
+          type: string
+        price_group_id:
+          description: "The unique identifier for the price group this country belongs to."
+          type: string
+        vat_threshold:
+          type: object
+          properties:
+            year:
+              description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
+              type: number
+            world:
+              description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
+              type: number
+        vat_period_month:
+          description: "The length of the taxation period in months."
+          type: integer
+        vat_deadline_days:
+          description: "The number of days after the taxation period end to pay VAT."
+          type: integer
+        vat_store_years:
+          description: "The number of years to store the VAT payment history for this country."
+          type: integer
+        vat_currency_rates_policy:
+          description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
+          type: string
+        vat_currency_rates_source:
+          description: "The source of currency rates to calculate the tax amount."
+          type: string
+        payer_tariff_region:
+          description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
+          type: string
+        high_risk_payments_allowed:
+          description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
+          type: boolean
+        high_risk_change_allowed:
+          description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
+          type: boolean
+    PriceGroup:
+      type: object
+      required:
+      - id
+      - currency
+      properties:
+        id:
+          description: "The unique identifier for the price group."
+          type: string
+        currency:
+          description: "Three-letter Currency Code ISO 4217, in uppercase."
+          type: string
+        region:
+          description: "The region's name."
+          type: string
+        is_active:
+          description: "Has a true value if the price group is active."
+          type: boolean
+    CountriesList:
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            properties:
+              iso_code_a2:
+                description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
+                type: string
+              region:
+                description: "A PaySuper system's relative geographical area for this country."
+                type: string
+              currency:
+                description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
+                type: string
+              payments_allowed:
+                description: "Has a true value if a payment is allowed from this country."
+                type: boolean
+              change_allowed:
+                description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
+                type: boolean
+              vat_enabled:
+                description: "Has a true value if VAT is calculated and paid for this country."
+                type: boolean
+              vat_currency:
+                description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
+                type: string
+              price_group_id:
+                description: "The unique identifier for the price group this country belongs to."
+                type: string
+              vat_threshold:
+                type: object
+                properties:
+                  year:
+                    description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
+                    type: number
+                  world:
+                    description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
+                    type: number
+              vat_period_month:
+                description: "The length of the taxation period in months."
+                type: integer
+              vat_deadline_days:
+                description: "The number of days after the taxation period end to pay VAT."
+                type: integer
+              vat_store_years:
+                description: "The number of years to store the VAT payment history for this country."
+                type: integer
+              vat_currency_rates_policy:
+                description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
+                type: string
+              vat_currency_rates_source:
+                description: "The source of currency rates to calculate the tax amount."
+                type: string
+              payer_tariff_region:
+                description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
+                type: string
+              high_risk_payments_allowed:
+                description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
+                type: boolean
+              high_risk_change_allowed:
+                description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
+                type: boolean
     TokenRequest:
       type: object
       properties:
@@ -150,228 +364,14 @@ components:
             is_buy_for_virtual_currency:
               description: "Has a true value if an order must be processed using a virtual currency."
               type: boolean
-    CountriesList:
-      type: object
-      properties:
-        countries:
-          type: array
-          items:
-            properties:
-              iso_code_a2:
-                description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
-                type: string
-              region:
-                description: "A PaySuper system's relative geographical area for this country."
-                type: string
-              currency:
-                description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
-                type: string
-              payments_allowed:
-                description: "Has a true value if a payment is allowed from this country."
-                type: boolean
-              change_allowed:
-                description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
-                type: boolean
-              vat_enabled:
-                description: "Has a true value if VAT is calculated and paid for this country."
-                type: boolean
-              vat_currency:
-                description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
-                type: string
-              price_group_id:
-                description: "The unique identifier for the price group this country belongs to."
-                type: string
-              vat_threshold:
-                type: object
-                properties:
-                  year:
-                    description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
-                    type: number
-                  world:
-                    description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
-                    type: number
-              vat_period_month:
-                description: "The length of the taxation period in months."
-                type: integer
-              vat_deadline_days:
-                description: "The number of days after the taxation period end to pay VAT."
-                type: integer
-              vat_store_years:
-                description: "The number of years to store the VAT payment history for this country."
-                type: integer
-              vat_currency_rates_policy:
-                description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
-                type: string
-              vat_currency_rates_source:
-                description: "The source of currency rates to calculate the tax amount."
-                type: string
-              payer_tariff_region:
-                description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
-                type: string
-              high_risk_payments_allowed:
-                description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
-                type: boolean
-              high_risk_change_allowed:
-                description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
-                type: boolean
-    ResponseErrorMessage:
-      type: object
-      properties:
-        code:
-          description: "The error code."
-          type: string
-        message:
-          description: "The error short description."
-          type: string
-        details:
-          description: "The error details."
-          type: string
-    RecommendedPriceTableResponse:
-      type: object
-      properties:
-        ranges:
-          type: array
-          items:
-            properties:
-              position:
-                description: "The order number in a pricing table."
-                type: integer
-              from:
-                description: "The lower boundary value of the range."
-                type: number
-              to:
-                description: "The upper boundary value of the range."
-                type: number
-    TokenCreationResponse:
-      type: object
-      properties:
-        token:
-          description: "The secure string which contains encrypted information about your customer and sales option data."
-          type: string
-        payment_form_url:
-          description: "The PaySuper-hosted URL of a payment form."
-          type: string
     ConfirmUserEmailRequest:
       type: object
       required:
       - token
       properties:
         token:
-          description: "An encrypted string that represents information about your customer (such as the customer ID, email and others), a game and purchase parameters."
+          description: "An encripted string to confirm the user registration."
           type: string
-    FindByZipCodeResponse:
-      type: object
-      properties:
-        count:
-          description: "The number of cities."
-          type: integer
-        items:
-          type: array
-          items:
-            properties:
-              zip:
-                description: "The postal code."
-                type: string
-              country:
-                description: "The country's name."
-                type: string
-              city:
-                description: "The city's name."
-                type: string
-              state:
-                type: object
-                properties:
-                  code:
-                    description: "The state's postal code."
-                    type: string
-                  name:
-                    description: "The state's name."
-                    type: string
-              created_at:
-                type: object
-                properties:
-                  seconds:
-                    description: "9999-12-31T23:59:59Z inclusive."
-                    type: integer
-                  nanos:
-                    description: "inclusive."
-                    type: integer
-    Country:
-      type: object
-      properties:
-        iso_code_a2:
-          description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
-          type: string
-        region:
-          description: "A PaySuper system's relative geographical area for this country."
-          type: string
-        currency:
-          description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
-          type: string
-        payments_allowed:
-          description: "Has a true value if a payment is allowed from this country."
-          type: boolean
-        change_allowed:
-          description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
-          type: boolean
-        vat_enabled:
-          description: "Has a true value if VAT is calculated and paid for this country."
-          type: boolean
-        vat_currency:
-          description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
-          type: string
-        price_group_id:
-          description: "The unique identifier for the price group this country belongs to."
-          type: string
-        vat_threshold:
-          type: object
-          properties:
-            year:
-              description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
-              type: number
-            world:
-              description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
-              type: number
-        vat_period_month:
-          description: "The length of the taxation period in months."
-          type: integer
-        vat_deadline_days:
-          description: "The number of days after the taxation period end to pay VAT."
-          type: integer
-        vat_store_years:
-          description: "The number of years to store the VAT payment history for this country."
-          type: integer
-        vat_currency_rates_policy:
-          description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
-          type: string
-        vat_currency_rates_source:
-          description: "The source of currency rates to calculate the tax amount."
-          type: string
-        payer_tariff_region:
-          description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
-          type: string
-        high_risk_payments_allowed:
-          description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
-          type: boolean
-        high_risk_change_allowed:
-          description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
-          type: boolean
-    RecommendedPriceResponse:
-      type: object
-      properties:
-        recommended_price:
-          type: array
-          items:
-            properties:
-              region:
-                description: "The region's name."
-                type: string
-              currency:
-                description: "Three-letter currency code in ISO 4217, in uppercase."
-                type: string
-              amount:
-                description: "The recommended currency conversion price."
-                type: number
 paths:
   /api/v1/country:
     get:
@@ -712,9 +712,9 @@ paths:
                 $ref: "#/components/schemas/ResponseErrorMessage"
   /api/v1/user/confirm_email:
     put:
-      summary: Confirm the customer email
+      summary: "Confirm the user's email"
       operationId: userProfileConfirmEmailPathConfirmEmail
-      description: Confirm the customer email by the token
+      description: "Confirm the user's email using the user token"
       tags:
       - User Profile
       requestBody:
@@ -724,7 +724,7 @@ paths:
               $ref: "#/components/schemas/ConfirmUserEmailRequest"
       responses:
         "200":
-          description: Returns an empty response body if the confirmation request was successful
+          description: "Returns an empty response body if the user's email address has been successfully confirmed"
           content:
             text/plain:
               schema:
