@@ -75,7 +75,7 @@ func (h *ProjectRoute) createProject(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	return ctx.JSON(http.StatusCreated, res)
+	return ctx.JSON(http.StatusCreated, res.Item)
 }
 
 func (h *ProjectRoute) updateProject(ctx echo.Context) error {

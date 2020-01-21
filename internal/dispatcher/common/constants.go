@@ -82,6 +82,7 @@ const (
 	RequestProductId                         = "product_id"
 	RequestRoleId                            = "role_id"
 	RequestPayoutDocumentId                  = "payout_document_id"
+	RequestParameterRedirectSettings         = "redirect_settings"
 
 	ImageCollectionImagesField  = "images"
 	ImageCollectionUseOneForAll = "use_one_for_all"
