@@ -5,7 +5,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	"github.com/paysuper/paysuper-tax-service/proto"
+	"github.com/paysuper/paysuper-proto/go/taxpb"
 	"net/http"
 	"strconv"
 )
@@ -48,8 +48,8 @@ func (h *TaxesRoute) getTaxes(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Rates)
 }
 
-func (h *TaxesRoute) bindGetTaxes(ctx echo.Context) *tax_service.GetRatesRequest {
-	structure := &tax_service.GetRatesRequest{}
+func (h *TaxesRoute) bindGetTaxes(ctx echo.Context) *taxpb.GetRatesRequest {
+	structure := &taxpb.GetRatesRequest{}
 
 	params := ctx.QueryParams()
 
@@ -93,7 +93,7 @@ func (h *TaxesRoute) setTax(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	req := &tax_service.TaxRate{}
+	req := &taxpb.TaxRate{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -120,7 +120,7 @@ func (h *TaxesRoute) deleteTax(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	res, err := h.dispatch.Services.Tax.DeleteRateById(ctx.Request().Context(), &tax_service.DeleteRateRequest{Id: uint32(value)})
+	res, err := h.dispatch.Services.Tax.DeleteRateById(ctx.Request().Context(), &taxpb.DeleteRateRequest{Id: uint32(value)})
 	if err != nil {
 		h.L().Error(common.InternalErrorTemplate, logger.WithFields(logger.Fields{"err": err.Error()}))
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)

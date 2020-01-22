@@ -4,10 +4,10 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
+	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
 
@@ -54,7 +54,7 @@ func (h *RoyaltyReportsRoute) Route(groups *common.Groups) {
 }
 
 func (h *RoyaltyReportsRoute) getRoyaltyReportsList(ctx echo.Context) error {
-	req := &grpc.ListRoyaltyReportsRequest{}
+	req := &billingpb.ListRoyaltyReportsRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
@@ -67,7 +67,7 @@ func (h *RoyaltyReportsRoute) getRoyaltyReportsList(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ListRoyaltyReports(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ListRoyaltyReports", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ListRoyaltyReports", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
@@ -79,7 +79,7 @@ func (h *RoyaltyReportsRoute) getRoyaltyReportsList(ctx echo.Context) error {
 }
 
 func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
-	req := &grpc.GetRoyaltyReportRequest{}
+	req := &billingpb.GetRoyaltyReportRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -88,7 +88,7 @@ func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetRoyaltyReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetRoyaltyReport")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetRoyaltyReport")
 	}
 
 	if res.Status != http.StatusOK {
@@ -114,7 +114,7 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 }
 
 func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
-	req := &grpc.ListRoyaltyReportOrdersRequest{}
+	req := &billingpb.ListRoyaltyReportOrdersRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
@@ -127,7 +127,7 @@ func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ListRoyaltyReportOrders(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ListRoyaltyReportOrders", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ListRoyaltyReportOrders", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
@@ -154,7 +154,7 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) erro
 }
 
 func (h *RoyaltyReportsRoute) merchantReviewRoyaltyReport(ctx echo.Context) error {
-	req := &grpc.MerchantReviewRoyaltyReportRequest{}
+	req := &billingpb.MerchantReviewRoyaltyReportRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
@@ -166,7 +166,7 @@ func (h *RoyaltyReportsRoute) merchantReviewRoyaltyReport(ctx echo.Context) erro
 	res, err := h.dispatch.Services.Billing.MerchantReviewRoyaltyReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "MerchantReviewRoyaltyReport")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "MerchantReviewRoyaltyReport")
 	}
 
 	if res.Status != http.StatusOK {
@@ -177,7 +177,7 @@ func (h *RoyaltyReportsRoute) merchantReviewRoyaltyReport(ctx echo.Context) erro
 }
 
 func (h *RoyaltyReportsRoute) merchantDeclineRoyaltyReport(ctx echo.Context) error {
-	req := &grpc.MerchantReviewRoyaltyReportRequest{}
+	req := &billingpb.MerchantReviewRoyaltyReportRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
@@ -189,7 +189,7 @@ func (h *RoyaltyReportsRoute) merchantDeclineRoyaltyReport(ctx echo.Context) err
 	res, err := h.dispatch.Services.Billing.MerchantReviewRoyaltyReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "MerchantReviewRoyaltyReport")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "MerchantReviewRoyaltyReport")
 	}
 
 	if res.Status != http.StatusOK {
@@ -200,7 +200,7 @@ func (h *RoyaltyReportsRoute) merchantDeclineRoyaltyReport(ctx echo.Context) err
 }
 
 func (h *RoyaltyReportsRoute) changeRoyaltyReport(ctx echo.Context) error {
-	req := &grpc.ChangeRoyaltyReportRequest{}
+	req := &billingpb.ChangeRoyaltyReportRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.NewValidationError(err.Error()))
@@ -211,7 +211,7 @@ func (h *RoyaltyReportsRoute) changeRoyaltyReport(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeRoyaltyReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeRoyaltyReport")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeRoyaltyReport")
 	}
 
 	if res.Status != http.StatusOK {

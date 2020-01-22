@@ -1,22 +1,22 @@
 package common
 
 import (
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 )
 
 // NewManagementApiResponseError
-func NewManagementApiResponseError(code, msg string, details ...string) *grpc.ResponseErrorMessage {
+func NewManagementApiResponseError(code, msg string, details ...string) *billingpb.ResponseErrorMessage {
 	var det string
 	if len(details) > 0 && details[0] != "" {
 		det = details[0]
 	} else {
 		det = ""
 	}
-	return &grpc.ResponseErrorMessage{Code: code, Message: msg, Details: det}
+	return &billingpb.ResponseErrorMessage{Code: code, Message: msg, Details: det}
 }
 
 // NewValidationError
-func NewValidationError(details string) *grpc.ResponseErrorMessage {
+func NewValidationError(details string) *billingpb.ResponseErrorMessage {
 	return NewManagementApiResponseError(ErrorValidationFailed.Code, ErrorValidationFailed.Message, details)
 }
 
@@ -165,7 +165,7 @@ var (
 	ErrorMessageNamespaceProjectRequestRedirectSettingsMode  = NewManagementApiResponseError("ma000110", "redirect mode is incorrect")
 	ErrorMessageNamespaceProjectRequestRedirectSettingsUsage = NewManagementApiResponseError("pr000111", "type of redirect usage is incorrect")
 
-	ValidationErrors = map[string]*grpc.ResponseErrorMessage{
+	ValidationErrors = map[string]*billingpb.ResponseErrorMessage{
 		UserProfileFieldNumberOfEmployees: ErrorMessageIncorrectNumberOfEmployees,
 		UserProfileFieldAnnualIncome:      ErrorMessageIncorrectAnnualIncome,
 		UserProfileFieldCompanyName:       ErrorMessageIncorrectCompanyName,
@@ -178,7 +178,7 @@ var (
 		UserProfileFieldPageId:            ErrorMessageIncorrectPageId,
 	}
 
-	ValidationNamespaceErrors = map[string]*grpc.ResponseErrorMessage{
+	ValidationNamespaceErrors = map[string]*billingpb.ResponseErrorMessage{
 		ErrorNamespaceMerchantCompanyInfoName:                 ErrorMessageIncorrectCompanyName,
 		ErrorNamespaceMerchantCompanyInfoAlternativeName:      ErrorMessageIncorrectAlternativeName,
 		ErrorNamespaceMerchantCompanyInfoWebsite:              ErrorMessageIncorrectWebsite,

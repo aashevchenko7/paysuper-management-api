@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -74,7 +74,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_GetUserProfile_ValidationErro
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "ProfileId", msg.Details)
 }
@@ -174,7 +174,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_SetUserProfile_ValidationErro
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	err1, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	err1, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 
 	assert.Regexp(suite.T(), "UserId", err1.Details)
@@ -196,7 +196,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_SetUserProfile_ValidationUser
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	err1, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	err1, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectFirstName, err1)
 	assert.Regexp(suite.T(), "Name", err1.Details)
@@ -218,7 +218,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_SetUserProfile_ValidationUser
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	err1, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	err1, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPosition, err1)
 	assert.Regexp(suite.T(), "Position", err1.Details)
@@ -247,7 +247,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_SetUserProfile_ValidationAnnu
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	err1, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	err1, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectAnnualIncome, err1)
 	assert.Regexp(suite.T(), "AnnualIncome", err1.Details)
@@ -276,7 +276,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_SetUserProfile_ValidationNumb
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	err1, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	err1, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectNumberOfEmployees, err1)
 	assert.Regexp(suite.T(), "NumberOfEmployees", err1.Details)
@@ -305,7 +305,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_SetUserProfile_ValidationComp
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	err1, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	err1, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectCompanyName, err1)
 	assert.Regexp(suite.T(), "CompanyName", err1.Details)
@@ -431,7 +431,7 @@ func (suite *UserProfileTestSuite) TestUserProfile_ConfirmEmail_BillingServerRet
 
 	httpErr, ok := err.(*echo.HTTPError)
 	assert.True(suite.T(), ok)
-	assert.Equal(suite.T(), int(pkg.ResponseStatusBadData), httpErr.Code)
+	assert.Equal(suite.T(), int(billingpb.ResponseStatusBadData), httpErr.Code)
 	assert.Equal(suite.T(), mock.SomeError, httpErr.Message)
 }
 

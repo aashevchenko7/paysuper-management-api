@@ -3,8 +3,8 @@ package handlers
 import (
 	"errors"
 	"github.com/labstack/echo/v4"
-	billingMocks "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -60,7 +60,7 @@ func (suite *PricingTestSuite) TestPricing_getRecommendedPrice_BindError_Require
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "field validation for 'Amount' failed on the 'required' tag", msg.Details)
 }
@@ -89,7 +89,7 @@ func (suite *PricingTestSuite) TestPricing_getRecommendedPrice_Ok() {
 	data := `{"amount": 1, "currency": "USD"}`
 
 	billingService := &billingMocks.BillingService{}
-	billingService.On("GetRecommendedPriceByPriceGroup", mock2.Anything, mock2.Anything).Return(&grpc.RecommendedPriceResponse{}, nil)
+	billingService.On("GetRecommendedPriceByPriceGroup", mock2.Anything, mock2.Anything).Return(&billingpb.RecommendedPriceResponse{}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().

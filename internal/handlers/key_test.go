@@ -4,9 +4,9 @@ import (
 	"errors"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -49,9 +49,9 @@ func (suite *KeyTestSuite) TearDownTest() {}
 func (suite *KeyTestSuite) TestGetKeyById_Ok() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyByID", mock2.Anything, mock2.Anything).Return(&grpc.GetKeyForOrderRequestResponse{
+	billingService.On("GetKeyByID", mock2.Anything, mock2.Anything).Return(&billingpb.GetKeyForOrderRequestResponse{
 		Status: 200,
-		Key: &billing.Key{
+		Key: &billingpb.Key{
 			Id:   bson.NewObjectId().Hex(),
 			Code: "XXXX-YYYY-ZZZZ",
 		},
@@ -93,7 +93,7 @@ func (suite *KeyTestSuite) TestGetKeyById_InternalError() {
 func (suite *KeyTestSuite) TestGetKeyById_ServiceError() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyByID", mock2.Anything, mock2.Anything).Return(&grpc.GetKeyForOrderRequestResponse{
+	billingService.On("GetKeyByID", mock2.Anything, mock2.Anything).Return(&billingpb.GetKeyForOrderRequestResponse{
 		Status: 404,
 	}, nil)
 
@@ -114,9 +114,9 @@ func (suite *KeyTestSuite) TestGetKeyById_ServiceError() {
 func (suite *KeyTestSuite) TestGetKeyById_ValidationError() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyByID", mock2.Anything, mock2.Anything).Return(&grpc.GetKeyForOrderRequestResponse{
+	billingService.On("GetKeyByID", mock2.Anything, mock2.Anything).Return(&billingpb.GetKeyForOrderRequestResponse{
 		Status: 200,
-		Key: &billing.Key{
+		Key: &billingpb.Key{
 			Id:   bson.NewObjectId().Hex(),
 			Code: "XXXX-YYYY-ZZZZ",
 		},

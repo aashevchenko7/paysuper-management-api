@@ -4,7 +4,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -48,7 +48,7 @@ func (h *ZipCodeRoute) Route(groups *common.Groups) {
 // @param offset query {string} false The ranking number of the first item on the page.
 // @router /api/v1/zip [get]
 func (h *ZipCodeRoute) checkZip(ctx echo.Context) error {
-	req := &grpc.FindByZipCodeRequest{}
+	req := &billingpb.FindByZipCodeRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)

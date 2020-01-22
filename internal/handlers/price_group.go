@@ -4,7 +4,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -48,7 +48,7 @@ func (h *PriceGroup) Route(groups *common.Groups) {
 // @param country query {string} true The country's name.
 // @router /api/v1/price_group/country [get]
 func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
-	req := &grpc.PriceGroupByCountryRequest{}
+	req := &billingpb.PriceGroupByCountryRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -85,7 +85,7 @@ func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
 // @param offset query {string} false The ranking number of the first item on the page.
 // @router /api/v1/price_group/currencies [get]
 func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
-	req := &grpc.EmptyRequest{}
+	req := &billingpb.EmptyRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -118,7 +118,7 @@ func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
 // @param region query {string} true The country region's name.
 // @router /api/v1/price_group/region [get]
 func (h *PriceGroup) getCurrencyByRegion(ctx echo.Context) error {
-	req := &grpc.PriceGroupByRegionRequest{}
+	req := &billingpb.PriceGroupByRegionRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
