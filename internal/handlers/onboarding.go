@@ -9,9 +9,8 @@ import (
 	"github.com/micro/go-micro/client"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 
-
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -45,7 +44,6 @@ const (
 )
 
 const (
-	agreementFileMask        = "agreement_%s.pdf"
 	agreementContentType     = "application/pdf"
 	agreementExtension       = "pdf"
 	merchantAgreementUrlMask = "%s://%s/admin/api/v1/merchants/agreement/document"
@@ -72,7 +70,7 @@ type OnboardingRoute struct {
 	provider.LMT
 }
 
-func NewOnboardingRoute(set common.HandlerSet, initial config.Initial, awsManager awsWrapper.AwsManagerInterface, globalCfg *common.Config) *OnboardingRoute {
+func NewOnboardingRoute(set common.HandlerSet, _ config.Initial, awsManager awsWrapper.AwsManagerInterface, globalCfg *common.Config) *OnboardingRoute {
 	set.AwareSet.Logger = set.AwareSet.Logger.WithFields(logger.Fields{"router": "OnboardingRoute"})
 	return &OnboardingRoute{
 		dispatch:   set,
@@ -347,7 +345,7 @@ func (h *OnboardingRoute) getAgreementDocument(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorAgreementFileNotExist)
 	}
 
-	return ctx.File(filePath)
+	return ctx.Inline(filePath, res.Item.S3AgreementName)
 }
 
 func (h *OnboardingRoute) getAgreementStructure(
