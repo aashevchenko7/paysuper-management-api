@@ -39,7 +39,7 @@ func (h *CountryApiV1) Route(groups *common.Groups) {
 // @success 200 {object} billing.CountriesList Returns the list of currencies
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-// @param name query {string} false A name or two-letter country code by ISO 3166-1
+// @param name query {string} false The country's name or two-letter country code by ISO 3166-1.
 // @router /api/v1/country [get]
 func (h *CountryApiV1) get(ctx echo.Context) error {
 

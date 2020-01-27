@@ -7,6 +7,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
+	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
 	reporterProto "github.com/paysuper/paysuper-reporter/pkg/proto"
@@ -25,6 +26,10 @@ type ReportFileRoute struct {
 	awsManager awsWrapper.AwsManagerInterface
 	cfg        common.Config
 	provider.LMT
+}
+
+type FileResponse struct {
+	file string
 }
 
 func NewReportFileRoute(set common.HandlerSet, awsManager awsWrapper.AwsManagerInterface, cfg *common.Config) *ReportFileRoute {
@@ -79,6 +84,21 @@ func (h *ReportFileRoute) create(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Export the report file
+// @desc Export the report file into a PDF, CSV, XLSX
+// @id reportFileDownloadPathDownload
+// @tag Report file
+// @accept application/json
+// @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @success 200 {string} Returns the report file
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data (unable to find the file, the file string is incorrect)
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} grpc.ResponseErrorMessage Access denied
+// @failure 404 {object} grpc.ResponseErrorMessage The file not found
+// @failure 500 {object} grpc.ResponseErrorMessage Unable to download the file because of the internal server error
+// @param file_id path {string} true The unique identifier for the report file.
+// @param file_type path {string} true The supported file format (PDF, CSV, XLSX).
+// @router /auth/api/v1/report_file/download/{file_id}.{file_type} [get]
 func (h *ReportFileRoute) download(ctx echo.Context) error {
 	file := ctx.Param("file")
 

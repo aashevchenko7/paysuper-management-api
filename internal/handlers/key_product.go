@@ -272,6 +272,20 @@ func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Get the list of platforms and prices for the key-activated product
+// @desc Get the list of platforms and prices for the key-activated product. This list can be filtered by country, language or currency.
+// @id keyProductsIdPathGetKeyProduct
+// @tag Product
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.KeyProductInfo Returns the product data (platforms, prices and others)
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param key_product_id path {string} true The unique identifier for the key-activated product.
+// @param country query {string} false The country's name to calculate the price for.
+// @param language query {string} false The language.
+// @param currency query {string} false The price currency.
+// @router /auth/api/v1/key-products/{key_product_id} [get]
 func (h *KeyProductRoute) getKeyProduct(ctx echo.Context) error {
 	req := &grpc.GetKeyProductInfoRequest{}
 
@@ -366,7 +380,6 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, res)
 }
-
 
 func (h *KeyProductRoute) getCountOfKeys(ctx echo.Context) error {
 	req := &grpc.GetPlatformKeyCountRequest{}

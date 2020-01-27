@@ -43,6 +43,33 @@ func (h *UserProfileRoute) Route(groups *common.Groups) {
 	groups.Common.PUT(userProfileConfirmEmailPath, h.confirmEmail)
 }
 
+// @summary Get the user profile
+// @desc Get the user profile
+// @id userProfilePathGetUserProfile
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.UserProfile Returns the user's personal and company data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} grpc.ResponseErrorMessage Access denied
+// @failure 404 {object} grpc.ResponseErrorMessage The user not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/profile [get]
+
+// @summary Get the user profile
+// @desc Get the user profile
+// @id userProfilePathIdGetUserProfile
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.UserProfile Returns the user's personal and company data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} grpc.ResponseErrorMessage Access denied
+// @failure 404 {object} grpc.ResponseErrorMessage The user not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /system/api/v1/user/profile [get]
 func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &grpc.GetUserProfileRequest{
@@ -69,6 +96,19 @@ func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the common user profile
+// @desc Get the user's main profile data, role, permissions
+// @id userCommonProfilePathGetUserCommonProfile
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.CommonUserProfile Returns the user's main profile data, role and permissions
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} grpc.ResponseErrorMessage Access denied
+// @failure 404 {object} grpc.ResponseErrorMessage The user not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/profile/common [get]
 func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &grpc.CommonUserProfileRequest{UserId: authUser.Id}
@@ -90,6 +130,20 @@ func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Profile)
 }
 
+// @summary Create or update the user profile
+// @desc Create or update the user profile
+// @id userProfilePathSetUserProfile
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @body grpc.UserProfile
+// @success 200 {object} grpc.UserProfile Returns the user's personal and company data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} grpc.ResponseErrorMessage Access denied
+// @failure 404 {object} grpc.ResponseErrorMessage The user not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/profile [patch]
 func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &grpc.UserProfile{}
@@ -179,6 +233,18 @@ func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusOK)
 }
 
+// @summary Send the feedback
+// @desc Create and send the feedback using the page URL
+// @id userProfilePathFeedbackCreateFeedback
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @body grpc.CreatePageReviewRequest
+// @success 200 {string} Returns an empty response body if the feedback was successfully sent
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/feedback [post]
 func (h *UserProfileRoute) createFeedback(ctx echo.Context) error {
 
 	authUser := common.ExtractUserContext(ctx)

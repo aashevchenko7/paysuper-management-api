@@ -7,259 +7,6 @@ servers:
     description: Production API
 components:
   schemas:
-    ResponseErrorMessage:
-      type: object
-      properties:
-        code:
-          description: "The error code."
-          type: string
-        message:
-          description: "The error short description."
-          type: string
-        details:
-          description: "The error details."
-          type: string
-    PriceGroup:
-      type: object
-      required:
-      - id
-      - currency
-      properties:
-        id:
-          description: "The unique identifier for the price group."
-          type: string
-        currency:
-          description: "Three-letter Currency Code ISO 4217, in uppercase."
-          type: string
-        region:
-          description: "The region's name."
-          type: string
-        is_active:
-          description: "Has a true value if the price group is active."
-          type: boolean
-    PriceGroupCurrenciesResponse:
-      type: object
-      properties:
-        regions:
-          type: array
-          items:
-            properties:
-              currency:
-                description: "The region's currency."
-                type: string
-              regions:
-                type: array
-                items:
-                  properties:
-                    region:
-                      description: "The region's name."
-                      type: string
-                    country:
-                      description: "The country's name."
-                      type: array
-                      items:
-                        type: string
-    RecommendedPriceResponse:
-      type: object
-      properties:
-        recommended_price:
-          type: array
-          items:
-            properties:
-              region:
-                description: "The region's name."
-                type: string
-              currency:
-                description: "Three-letter currency code in ISO 4217, in uppercase."
-                type: string
-              amount:
-                description: "The recommended currency conversion price."
-                type: number
-    ConfirmUserEmailRequest:
-      type: object
-      required:
-      - token
-      properties:
-        token:
-          description: "An encripted string to confirm the user registration."
-          type: string
-    FindByZipCodeResponse:
-      type: object
-      properties:
-        count:
-          description: "The number of cities."
-          type: integer
-        items:
-          type: array
-          items:
-            properties:
-              zip:
-                description: "The postal code."
-                type: string
-              country:
-                description: "The country's name."
-                type: string
-              city:
-                description: "The city's name."
-                type: string
-              state:
-                type: object
-                properties:
-                  code:
-                    description: "The state's postal code."
-                    type: string
-                  name:
-                    description: "The state's name."
-                    type: string
-              created_at:
-                type: object
-                properties:
-                  seconds:
-                    description: "9999-12-31T23:59:59Z inclusive."
-                    type: integer
-                  nanos:
-                    description: "inclusive."
-                    type: integer
-    CountriesList:
-      type: object
-      properties:
-        countries:
-          type: array
-          items:
-            properties:
-              iso_code_a2:
-                description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
-                type: string
-              region:
-                description: "A PaySuper system's relative geographical area for this country."
-                type: string
-              currency:
-                description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
-                type: string
-              payments_allowed:
-                description: "Has a true value if a payment is allowed from this country."
-                type: boolean
-              change_allowed:
-                description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
-                type: boolean
-              vat_enabled:
-                description: "Has a true value if VAT is calculated and paid for this country."
-                type: boolean
-              vat_currency:
-                description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
-                type: string
-              price_group_id:
-                description: "The unique identifier for the price group this country belongs to."
-                type: string
-              vat_threshold:
-                type: object
-                properties:
-                  year:
-                    description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
-                    type: number
-                  world:
-                    description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
-                    type: number
-              vat_period_month:
-                description: "The length of the taxation period in months."
-                type: integer
-              vat_deadline_days:
-                description: "The number of days after the taxation period end to pay VAT."
-                type: integer
-              vat_store_years:
-                description: "The number of years to store the VAT payment history for this country."
-                type: integer
-              vat_currency_rates_policy:
-                description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
-                type: string
-              vat_currency_rates_source:
-                description: "The source of currency rates to calculate the tax amount."
-                type: string
-              payer_tariff_region:
-                description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
-                type: string
-              high_risk_payments_allowed:
-                description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
-                type: boolean
-              high_risk_change_allowed:
-                description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
-                type: boolean
-    Country:
-      type: object
-      properties:
-        iso_code_a2:
-          description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
-          type: string
-        region:
-          description: "A PaySuper system's relative geographical area for this country."
-          type: string
-        currency:
-          description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
-          type: string
-        payments_allowed:
-          description: "Has a true value if a payment is allowed from this country."
-          type: boolean
-        change_allowed:
-          description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
-          type: boolean
-        vat_enabled:
-          description: "Has a true value if VAT is calculated and paid for this country."
-          type: boolean
-        vat_currency:
-          description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
-          type: string
-        price_group_id:
-          description: "The unique identifier for the price group this country belongs to."
-          type: string
-        vat_threshold:
-          type: object
-          properties:
-            year:
-              description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
-              type: number
-            world:
-              description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
-              type: number
-        vat_period_month:
-          description: "The length of the taxation period in months."
-          type: integer
-        vat_deadline_days:
-          description: "The number of days after the taxation period end to pay VAT."
-          type: integer
-        vat_store_years:
-          description: "The number of years to store the VAT payment history for this country."
-          type: integer
-        vat_currency_rates_policy:
-          description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
-          type: string
-        vat_currency_rates_source:
-          description: "The source of currency rates to calculate the tax amount."
-          type: string
-        payer_tariff_region:
-          description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
-          type: string
-        high_risk_payments_allowed:
-          description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
-          type: boolean
-        high_risk_change_allowed:
-          description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
-          type: boolean
-    RecommendedPriceTableResponse:
-      type: object
-      properties:
-        ranges:
-          type: array
-          items:
-            properties:
-              position:
-                description: "The order number in a pricing table."
-                type: integer
-              from:
-                description: "The lower boundary value of the range."
-                type: number
-              to:
-                description: "The upper boundary value of the range."
-                type: number
     TokenRequest:
       type: object
       properties:
@@ -363,6 +110,358 @@ components:
             is_buy_for_virtual_currency:
               description: "Has a true value if an order must be processed using a virtual currency."
               type: boolean
+            button_caption:
+              description: "The redirect button messages after the successful or failed payment. If it has an empty value the redirect message will be set at OK."
+              type: string
+    AcceptInviteRequest:
+      type: object
+      properties:
+        token:
+          description: "@inject_tag: validate\" require\""
+          type: string
+        user_id:
+          description: "@inject_tag: validate\" required,hexadecimal,len=2\""
+          type: string
+        email:
+          description: "@inject_tag: validate\" required,emai\""
+          type: string
+    GetMerchantsForUserResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: object
+          properties:
+            code:
+              description: "The error code."
+              type: string
+            message:
+              description: "The error short description."
+              type: string
+            details:
+              description: "The error details."
+              type: string
+        merchants:
+          type: array
+          items:
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              role:
+                type: string
+    FindByZipCodeResponse:
+      type: object
+      properties:
+        count:
+          description: "The number of cities."
+          type: integer
+        items:
+          type: array
+          items:
+            properties:
+              zip:
+                description: "The postal code."
+                type: string
+              country:
+                description: "The country's name."
+                type: string
+              city:
+                description: "The city's name."
+                type: string
+              state:
+                type: object
+                properties:
+                  code:
+                    description: "The state's postal code."
+                    type: string
+                  name:
+                    description: "The state's name."
+                    type: string
+              created_at:
+                type: object
+                properties:
+                  seconds:
+                    description: "9999-12-31T23:59:59Z inclusive."
+                    type: integer
+                  nanos:
+                    description: "inclusive."
+                    type: integer
+    CountriesList:
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            properties:
+              iso_code_a2:
+                description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
+                type: string
+              region:
+                description: "A PaySuper system's relative geographical area for this country."
+                type: string
+              currency:
+                description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
+                type: string
+              payments_allowed:
+                description: "Has a true value if a payment is allowed from this country."
+                type: boolean
+              change_allowed:
+                description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
+                type: boolean
+              vat_enabled:
+                description: "Has a true value if VAT is calculated and paid for this country."
+                type: boolean
+              vat_currency:
+                description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
+                type: string
+              price_group_id:
+                description: "The unique identifier for the price group this country belongs to."
+                type: string
+              vat_threshold:
+                type: object
+                properties:
+                  year:
+                    description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
+                    type: number
+                  world:
+                    description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
+                    type: number
+              vat_period_month:
+                description: "The length of the taxation period in months."
+                type: integer
+              vat_deadline_days:
+                description: "The number of days after the taxation period end to pay VAT."
+                type: integer
+              vat_store_years:
+                description: "The number of years to store the VAT payment history for this country."
+                type: integer
+              vat_currency_rates_policy:
+                description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
+                type: string
+              vat_currency_rates_source:
+                description: "The source of currency rates to calculate the tax amount."
+                type: string
+              payer_tariff_region:
+                description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
+                type: string
+              high_risk_payments_allowed:
+                description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
+                type: boolean
+              high_risk_change_allowed:
+                description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
+                type: boolean
+    PriceGroup:
+      type: object
+      required:
+      - id
+      - currency
+      properties:
+        id:
+          description: "The unique identifier for the price group."
+          type: string
+        currency:
+          description: "Three-letter Currency Code ISO 4217, in uppercase."
+          type: string
+        region:
+          description: "The region's name."
+          type: string
+        is_active:
+          description: "Has a true value if the price group is active."
+          type: boolean
+    ListProductsResponse:
+      type: object
+      properties:
+        limit:
+          description: "@inject_tag: json\" limi\""
+          type: integer
+        offset:
+          description: "@inject_tag: json\" offse\""
+          type: integer
+        count:
+          description: "@inject_tag: json\" coun\""
+          type: integer
+        items:
+          type: array
+          items:
+            properties:
+              id:
+                description: "@inject_tag: validate\" omitempty,hexadecimal,len=2\" json\"i\" bson\"_i\""
+                type: string
+              project_id:
+                description: "@inject_tag: validate\" required,hexadecimal,len=2\" json\"project_i\" bson\"project_i\""
+                type: string
+              object:
+                description: "@inject_tag: validate\" require\" json\"objec\""
+                type: string
+              type:
+                description: "@inject_tag: validate\" require\" json\"typ\""
+                type: string
+              sku:
+                description: "@inject_tag: validate\" require\" json\"sk\" bson\"sk\""
+                type: string
+              default_currency:
+                description: "@inject_tag: validate\" required,alpha,len=\" json\"default_currenc\""
+                type: string
+              enabled:
+                description: "@inject_tag: json\" enable\""
+                type: boolean
+              prices:
+                type: array
+                items:
+                  properties:
+                    amount:
+                      description: "@inject_tag: json\" amoun\" validate\"required,numeric,gt=\""
+                      type: number
+                    currency:
+                      description: "@inject_tag: json\" currenc\" validate\"omitempty,alpha,len=\""
+                      type: string
+                    region:
+                      description: "@inject_tag: json\" regio\" validate\"omitempty,region_pric\""
+                      type: string
+                    is_virtual_currency:
+                      description: "@inject_tag: json\" is_virtual_currenc\" bson\"is_virtual_currenc\""
+                      type: boolean
+              created_at:
+                type: object
+                properties:
+                  seconds:
+                    description: "9999-12-31T23:59:59Z inclusive."
+                    type: integer
+                  nanos:
+                    description: "inclusive."
+                    type: integer
+              updated_at:
+                type: object
+                properties:
+                  seconds:
+                    description: "9999-12-31T23:59:59Z inclusive."
+                    type: integer
+                  nanos:
+                    description: "inclusive."
+                    type: integer
+              images:
+                description: "@inject_tag: validate\" dive,omitempty,ur\" json\"image\""
+                type: array
+                items:
+                  type: string
+              url:
+                description: "@inject_tag: validate\" omitempty,ur\" json\"ur\""
+                type: string
+              pricing:
+                description: "@inject_tag: json\" pricin\" validate\"required,oneof=currency manual steam defaul\""
+                type: string
+              billing_type:
+                description: "@inject_tag: json\" billing_typ\" validate\"required,oneof=real virtua\""
+                type: string
+    ProductPricesResponse:
+      type: object
+      properties:
+        product_price:
+          type: array
+          items:
+            properties:
+              amount:
+                description: "@inject_tag: json\" amoun\" validate\"required,numeric,gt=\""
+                type: number
+              currency:
+                description: "@inject_tag: json\" currenc\" validate\"omitempty,alpha,len=\""
+                type: string
+              region:
+                description: "@inject_tag: json\" regio\" validate\"omitempty,region_pric\""
+                type: string
+              is_virtual_currency:
+                description: "@inject_tag: json\" is_virtual_currenc\" bson\"is_virtual_currenc\""
+                type: boolean
+    Product:
+      type: object
+      properties:
+        id:
+          description: "@inject_tag: validate\" omitempty,hexadecimal,len=2\" json\"i\" bson\"_i\""
+          type: string
+        project_id:
+          description: "@inject_tag: validate\" required,hexadecimal,len=2\" json\"project_i\" bson\"project_i\""
+          type: string
+        object:
+          description: "@inject_tag: validate\" require\" json\"objec\""
+          type: string
+        type:
+          description: "@inject_tag: validate\" require\" json\"typ\""
+          type: string
+        sku:
+          description: "@inject_tag: validate\" require\" json\"sk\" bson\"sk\""
+          type: string
+        default_currency:
+          description: "@inject_tag: validate\" required,alpha,len=\" json\"default_currenc\""
+          type: string
+        enabled:
+          description: "@inject_tag: json\" enable\""
+          type: boolean
+        prices:
+          type: array
+          items:
+            properties:
+              amount:
+                description: "@inject_tag: json\" amoun\" validate\"required,numeric,gt=\""
+                type: number
+              currency:
+                description: "@inject_tag: json\" currenc\" validate\"omitempty,alpha,len=\""
+                type: string
+              region:
+                description: "@inject_tag: json\" regio\" validate\"omitempty,region_pric\""
+                type: string
+              is_virtual_currency:
+                description: "@inject_tag: json\" is_virtual_currenc\" bson\"is_virtual_currenc\""
+                type: boolean
+        created_at:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+        updated_at:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+        images:
+          description: "@inject_tag: validate\" dive,omitempty,ur\" json\"image\""
+          type: array
+          items:
+            type: string
+        url:
+          description: "@inject_tag: validate\" omitempty,ur\" json\"ur\""
+          type: string
+        pricing:
+          description: "@inject_tag: json\" pricin\" validate\"required,oneof=currency manual steam defaul\""
+          type: string
+        billing_type:
+          description: "@inject_tag: json\" billing_typ\" validate\"required,oneof=real virtua\""
+          type: string
+    ProductPrice:
+      type: object
+      properties:
+        amount:
+          description: "@inject_tag: json\" amoun\" validate\"required,numeric,gt=\""
+          type: number
+        currency:
+          description: "@inject_tag: json\" currenc\" validate\"omitempty,alpha,len=\""
+          type: string
+        region:
+          description: "@inject_tag: json\" regio\" validate\"omitempty,region_pric\""
+          type: string
+        is_virtual_currency:
+          description: "@inject_tag: json\" is_virtual_currenc\" bson\"is_virtual_currenc\""
+          type: boolean
     TokenCreationResponse:
       type: object
       properties:
@@ -371,6 +470,1015 @@ components:
           type: string
         payment_form_url:
           description: "The PaySuper-hosted URL of a payment form."
+          type: string
+    AcceptInviteResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: object
+          properties:
+            code:
+              description: "The error code."
+              type: string
+            message:
+              description: "The error short description."
+              type: string
+            details:
+              description: "The error details."
+              type: string
+        role:
+          type: object
+          properties:
+            id:
+              description: "@inject_tag: json\" i\" validate\"required,hexadecimal,len=2\""
+              type: string
+            merchant_id:
+              description: "@inject_tag: json\" merchant_i\" validate\"required,hexadecimal,len=2\""
+              type: string
+            role:
+              description: "@inject_tag: json\" rol\" validate\"require\""
+              type: string
+            status:
+              description: "@inject_tag: json\" statu\" bson\"statu\" validate\"oneof=invited accepte\""
+              type: string
+            user_id:
+              description: "@inject_tag: json\" user_i\" bson\"user_i\" validate\"required,hexadecimal,len=2\""
+              type: string
+            first_name:
+              description: "@inject_tag: json\" first_nam\" bson\"first_nam\" validate\"require\""
+              type: string
+            last_name:
+              description: "@inject_tag: json\" last_nam\" bson\"last_nam\" validate\"require\""
+              type: string
+            email:
+              description: "@inject_tag: json\" emai\" bson\"emai\" validate\"required,emai\""
+              type: string
+            created_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            updated_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+    Country:
+      type: object
+      properties:
+        iso_code_a2:
+          description: "Two-letter country code in ISO 3166, in uppercase (for instance US)."
+          type: string
+        region:
+          description: "A PaySuper system's relative geographical area for this country."
+          type: string
+        currency:
+          description: "The currency of the country. Three-letter Currency Code ISO 4217, in uppercase."
+          type: string
+        payments_allowed:
+          description: "Has a true value if a payment is allowed from this country."
+          type: boolean
+        change_allowed:
+          description: "Has a true value if the customer can select another country in case of the payments are disallowed for this country."
+          type: boolean
+        vat_enabled:
+          description: "Has a true value if VAT is calculated and paid for this country."
+          type: boolean
+        vat_currency:
+          description: "VAT currency. It can differ from the country currency. Three-letter Currency Code ISO 4217, in uppercase."
+          type: string
+        price_group_id:
+          description: "The unique identifier for the price group this country belongs to."
+          type: string
+        vat_threshold:
+          type: object
+          properties:
+            year:
+              description: "The maximum value of the PaySuper's revenue (since the beginning of the year) from this country which subjects to VAT."
+              type: number
+            world:
+              description: "The maximum value of the PaySuper's worldwide revenue (since the beginning of the year) which subjects to VAT."
+              type: number
+        vat_period_month:
+          description: "The length of the taxation period in months."
+          type: integer
+        vat_deadline_days:
+          description: "The number of days after the taxation period end to pay VAT."
+          type: integer
+        vat_store_years:
+          description: "The number of years to store the VAT payment history for this country."
+          type: integer
+        vat_currency_rates_policy:
+          description: "The VAT calculation policy with a currency that differs from this country's VAT currency. Available values: on-day (the conversion rate on the day of payment), last-day (the conversion rate on the last day of a tax period), mid-month (the system reserved option of a conversion rate calculation. This option is disabled.)."
+          type: string
+        vat_currency_rates_source:
+          description: "The source of currency rates to calculate the tax amount."
+          type: string
+        payer_tariff_region:
+          description: "A PaySuper system's relative geographical area for this country. Available values: asia, europe, latin_america, russia_and_cis, worldwide."
+          type: string
+        high_risk_payments_allowed:
+          description: "Has a true value if payments from this country are allowed. Has a false value for a high-risk merchant."
+          type: boolean
+        high_risk_change_allowed:
+          description: "Has a true value if the customer can select another country while the payments are disallowed for a country determined by their IP address."
+          type: boolean
+    KeyProductInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        project_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        long_description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+        platforms:
+          type: array
+          items:
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              price:
+                type: object
+                properties:
+                  amount:
+                    type: number
+                  currency:
+                    type: string
+                  region:
+                    type: string
+                  is_fallback:
+                    type: boolean
+    RecommendedPriceTableResponse:
+      type: object
+      properties:
+        ranges:
+          type: array
+          items:
+            properties:
+              position:
+                description: "The order number in a pricing table."
+                type: integer
+              from:
+                description: "The lower boundary value of the range."
+                type: number
+              to:
+                description: "The upper boundary value of the range."
+                type: number
+    GetProductResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: object
+          properties:
+            code:
+              description: "The error code."
+              type: string
+            message:
+              description: "The error short description."
+              type: string
+            details:
+              description: "The error details."
+              type: string
+        item:
+          type: object
+          properties:
+            id:
+              description: "@inject_tag: validate\" omitempty,hexadecimal,len=2\" json\"i\" bson\"_i\""
+              type: string
+            project_id:
+              description: "@inject_tag: validate\" required,hexadecimal,len=2\" json\"project_i\" bson\"project_i\""
+              type: string
+            object:
+              description: "@inject_tag: validate\" require\" json\"objec\""
+              type: string
+            type:
+              description: "@inject_tag: validate\" require\" json\"typ\""
+              type: string
+            sku:
+              description: "@inject_tag: validate\" require\" json\"sk\" bson\"sk\""
+              type: string
+            default_currency:
+              description: "@inject_tag: validate\" required,alpha,len=\" json\"default_currenc\""
+              type: string
+            enabled:
+              description: "@inject_tag: json\" enable\""
+              type: boolean
+            prices:
+              type: array
+              items:
+                properties:
+                  amount:
+                    description: "@inject_tag: json\" amoun\" validate\"required,numeric,gt=\""
+                    type: number
+                  currency:
+                    description: "@inject_tag: json\" currenc\" validate\"omitempty,alpha,len=\""
+                    type: string
+                  region:
+                    description: "@inject_tag: json\" regio\" validate\"omitempty,region_pric\""
+                    type: string
+                  is_virtual_currency:
+                    description: "@inject_tag: json\" is_virtual_currenc\" bson\"is_virtual_currenc\""
+                    type: boolean
+            created_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            updated_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            images:
+              description: "@inject_tag: validate\" dive,omitempty,ur\" json\"image\""
+              type: array
+              items:
+                type: string
+            url:
+              description: "@inject_tag: validate\" omitempty,ur\" json\"ur\""
+              type: string
+            pricing:
+              description: "@inject_tag: json\" pricin\" validate\"required,oneof=currency manual steam defaul\""
+              type: string
+            billing_type:
+              description: "@inject_tag: json\" billing_typ\" validate\"required,oneof=real virtua\""
+              type: string
+    ConfirmUserEmailRequest:
+      type: object
+      required:
+      - token
+      properties:
+        token:
+          description: "An encripted string to confirm the user registration."
+          type: string
+    PriceGroupCurrenciesResponse:
+      type: object
+      properties:
+        regions:
+          type: array
+          items:
+            properties:
+              currency:
+                description: "The region's currency."
+                type: string
+              regions:
+                type: array
+                items:
+                  properties:
+                    region:
+                      description: "The region's name."
+                      type: string
+                    country:
+                      description: "The country's name."
+                      type: array
+                      items:
+                        type: string
+    RecommendedPriceResponse:
+      type: object
+      properties:
+        recommended_price:
+          type: array
+          items:
+            properties:
+              region:
+                description: "The region's name."
+                type: string
+              currency:
+                description: "Three-letter currency code in ISO 4217, in uppercase."
+                type: string
+              amount:
+                description: "The recommended currency conversion price."
+                type: number
+    UserProfile:
+      type: object
+      properties:
+        id:
+          description: "@inject_tag: json\" i\""
+          type: string
+        email:
+          type: object
+          properties:
+            email:
+              description: "@inject_tag: json\" emai\" validate\"required,emai\""
+              type: string
+            confirmed:
+              description: "@inject_tag: json\" confirme\""
+              type: boolean
+            confirmed_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+        personal:
+          type: object
+          properties:
+            first_name:
+              description: "@inject_tag: json\" first_nam\" bson\"first_nam\" validate\"required,name,max=3\""
+              type: string
+            last_name:
+              description: "@inject_tag: json\" last_nam\" bson\"last_nam\" validate\"required,name,max=3\""
+              type: string
+            position:
+              description: "@inject_tag: json\" positio\" bson\"positio\" validate\"required,positio\""
+              type: string
+        help:
+          type: object
+          properties:
+            product_promotion_and_development:
+              description: "@inject_tag: json\" product_promotion_and_developmen\" bson\"product_promotion_and_developmen\""
+              type: boolean
+            released_game_promotion:
+              description: "@inject_tag: json\" released_game_promotio\" bson\"released_game_promotio\""
+              type: boolean
+            international_sales:
+              description: "@inject_tag: json\" international_sale\" bson\"international_sale\""
+              type: boolean
+            other:
+              description: "@inject_tag: json\" othe\" bson\"othe\""
+              type: boolean
+        company:
+          type: object
+          properties:
+            company_name:
+              description: "@inject_tag: json\" company_nam\" bson\"company_nam\" validate\"required,company_name,max=6\""
+              type: string
+            website:
+              description: "@inject_tag: json\" websit\" validate\"required,ur\" bson\"websit\""
+              type: string
+            annual_income:
+              type: object
+              properties:
+                from:
+                  description: "@inject_tag: json\" fro\""
+                  type: integer
+                to:
+                  description: "@inject_tag: json\" t\""
+                  type: integer
+            number_of_employees:
+              type: object
+              properties:
+                from:
+                  description: "@inject_tag: json\" fro\""
+                  type: integer
+                to:
+                  description: "@inject_tag: json\" t\""
+                  type: integer
+            kind_of_activity:
+              description: "@inject_tag: json\" kind_of_activit\" validate\"omitempty,oneof=develop_and_publish_your_games publish_games_of_other_companies publish_your_games_through_other_publishers othe\" bson\"kind_of_activit\""
+              type: string
+            monetization:
+              type: object
+              properties:
+                paid_subscription:
+                  description: "@inject_tag: json\" paid_subscriptio\" bson\"paid_subscriptio\""
+                  type: boolean
+                in_game_advertising:
+                  description: "@inject_tag: json\" in_game_advertisin\" bson\"in_game_advertisin\""
+                  type: boolean
+                in_game_purchases:
+                  description: "@inject_tag: json\" in_game_purchase\" bson\"in_game_purchase\""
+                  type: boolean
+                premium_access:
+                  description: "@inject_tag: json\" premium_acces\" bson\"premium_acces\""
+                  type: boolean
+                other:
+                  description: "@inject_tag: json\" othe\" bson\"othe\""
+                  type: boolean
+            platforms:
+              type: object
+              properties:
+                pc_mac:
+                  description: "@inject_tag: json\" pc_ma\" bson\"pc_ma\""
+                  type: boolean
+                game_console:
+                  description: "@inject_tag: json\" game_consol\" bson\"game_consol\""
+                  type: boolean
+                mobile_device:
+                  description: "@inject_tag: json\" mobile_devic\" bson\"mobile_devic\""
+                  type: boolean
+                web_browser:
+                  description: "@inject_tag: json\" web_browse\" bson\"web_browse\""
+                  type: boolean
+                other:
+                  description: "@inject_tag: json\" othe\" bson\"othe\""
+                  type: boolean
+        last_step:
+          description: "@inject_tag: json\" last_ste\" bson\"last_ste\""
+          type: string
+        centrifugo_token:
+          description: "@inject_tag: json\" centrifugo_toke\" bson\"centrifugo_toke\""
+          type: string
+        created_at:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+        updated_at:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+    CommonUserProfile:
+      type: object
+      properties:
+        profile:
+          type: object
+          properties:
+            id:
+              description: "@inject_tag: json\" i\""
+              type: string
+            email:
+              type: object
+              properties:
+                email:
+                  description: "@inject_tag: json\" emai\" validate\"required,emai\""
+                  type: string
+                confirmed:
+                  description: "@inject_tag: json\" confirme\""
+                  type: boolean
+                confirmed_at:
+                  type: object
+                  properties:
+                    seconds:
+                      description: "9999-12-31T23:59:59Z inclusive."
+                      type: integer
+                    nanos:
+                      description: "inclusive."
+                      type: integer
+            personal:
+              type: object
+              properties:
+                first_name:
+                  description: "@inject_tag: json\" first_nam\" bson\"first_nam\" validate\"required,name,max=3\""
+                  type: string
+                last_name:
+                  description: "@inject_tag: json\" last_nam\" bson\"last_nam\" validate\"required,name,max=3\""
+                  type: string
+                position:
+                  description: "@inject_tag: json\" positio\" bson\"positio\" validate\"required,positio\""
+                  type: string
+            help:
+              type: object
+              properties:
+                product_promotion_and_development:
+                  description: "@inject_tag: json\" product_promotion_and_developmen\" bson\"product_promotion_and_developmen\""
+                  type: boolean
+                released_game_promotion:
+                  description: "@inject_tag: json\" released_game_promotio\" bson\"released_game_promotio\""
+                  type: boolean
+                international_sales:
+                  description: "@inject_tag: json\" international_sale\" bson\"international_sale\""
+                  type: boolean
+                other:
+                  description: "@inject_tag: json\" othe\" bson\"othe\""
+                  type: boolean
+            company:
+              type: object
+              properties:
+                company_name:
+                  description: "@inject_tag: json\" company_nam\" bson\"company_nam\" validate\"required,company_name,max=6\""
+                  type: string
+                website:
+                  description: "@inject_tag: json\" websit\" validate\"required,ur\" bson\"websit\""
+                  type: string
+                annual_income:
+                  type: object
+                  properties:
+                    from:
+                      description: "@inject_tag: json\" fro\""
+                      type: integer
+                    to:
+                      description: "@inject_tag: json\" t\""
+                      type: integer
+                number_of_employees:
+                  type: object
+                  properties:
+                    from:
+                      description: "@inject_tag: json\" fro\""
+                      type: integer
+                    to:
+                      description: "@inject_tag: json\" t\""
+                      type: integer
+                kind_of_activity:
+                  description: "@inject_tag: json\" kind_of_activit\" validate\"omitempty,oneof=develop_and_publish_your_games publish_games_of_other_companies publish_your_games_through_other_publishers othe\" bson\"kind_of_activit\""
+                  type: string
+                monetization:
+                  type: object
+                  properties:
+                    paid_subscription:
+                      description: "@inject_tag: json\" paid_subscriptio\" bson\"paid_subscriptio\""
+                      type: boolean
+                    in_game_advertising:
+                      description: "@inject_tag: json\" in_game_advertisin\" bson\"in_game_advertisin\""
+                      type: boolean
+                    in_game_purchases:
+                      description: "@inject_tag: json\" in_game_purchase\" bson\"in_game_purchase\""
+                      type: boolean
+                    premium_access:
+                      description: "@inject_tag: json\" premium_acces\" bson\"premium_acces\""
+                      type: boolean
+                    other:
+                      description: "@inject_tag: json\" othe\" bson\"othe\""
+                      type: boolean
+                platforms:
+                  type: object
+                  properties:
+                    pc_mac:
+                      description: "@inject_tag: json\" pc_ma\" bson\"pc_ma\""
+                      type: boolean
+                    game_console:
+                      description: "@inject_tag: json\" game_consol\" bson\"game_consol\""
+                      type: boolean
+                    mobile_device:
+                      description: "@inject_tag: json\" mobile_devic\" bson\"mobile_devic\""
+                      type: boolean
+                    web_browser:
+                      description: "@inject_tag: json\" web_browse\" bson\"web_browse\""
+                      type: boolean
+                    other:
+                      description: "@inject_tag: json\" othe\" bson\"othe\""
+                      type: boolean
+            last_step:
+              description: "@inject_tag: json\" last_ste\" bson\"last_ste\""
+              type: string
+            centrifugo_token:
+              description: "@inject_tag: json\" centrifugo_toke\" bson\"centrifugo_toke\""
+              type: string
+            created_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            updated_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+        role:
+          type: object
+          properties:
+            id:
+              description: "@inject_tag: json\" i\" validate\"required,hexadecimal,len=2\""
+              type: string
+            merchant_id:
+              description: "@inject_tag: json\" merchant_i\" validate\"required,hexadecimal,len=2\""
+              type: string
+            role:
+              description: "@inject_tag: json\" rol\" validate\"require\""
+              type: string
+            status:
+              description: "@inject_tag: json\" statu\" bson\"statu\" validate\"oneof=invited accepte\""
+              type: string
+            user_id:
+              description: "@inject_tag: json\" user_i\" bson\"user_i\" validate\"required,hexadecimal,len=2\""
+              type: string
+            first_name:
+              description: "@inject_tag: json\" first_nam\" bson\"first_nam\" validate\"require\""
+              type: string
+            last_name:
+              description: "@inject_tag: json\" last_nam\" bson\"last_nam\" validate\"require\""
+              type: string
+            email:
+              description: "@inject_tag: json\" emai\" bson\"emai\" validate\"required,emai\""
+              type: string
+            created_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            updated_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+        permissions:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+              access:
+                type: string
+        merchant:
+          type: object
+          properties:
+            id:
+              description: "@inject_tag: bson\" _i\""
+              type: string
+            user:
+              type: object
+              properties:
+                id:
+                  description: "@inject_tag: json\" i\" validate\"require\""
+                  type: string
+                email:
+                  description: "@inject_tag: json\" emai\" validate\"required,emai\""
+                  type: string
+                first_name:
+                  description: "@inject_tag: json\" first_nam\""
+                  type: string
+                last_name:
+                  description: "@inject_tag: json\" last_nam\""
+                  type: string
+                profile_id:
+                  description: "@inject_tag: json\" profile_i\""
+                  type: string
+                registration_date:
+                  type: object
+                  properties:
+                    seconds:
+                      description: "9999-12-31T23:59:59Z inclusive."
+                      type: integer
+                    nanos:
+                      description: "inclusive."
+                      type: integer
+            company:
+              type: object
+              properties:
+                name:
+                  description: "@inject_tag: json\" nam\" validate\"required,company_name,max=6\""
+                  type: string
+                alternative_name:
+                  description: "@inject_tag: json\" alternative_nam\" bson\"alternative_nam\" validate\"required,company_name,max=6\""
+                  type: string
+                website:
+                  description: "@inject_tag: json\" websit\" validate\"required,ur\""
+                  type: string
+                country:
+                  description: "@inject_tag: json\" countr\" validate\"required,alpha,len=\""
+                  type: string
+                state:
+                  description: "@inject_tag: json\" stat\""
+                  type: string
+                zip:
+                  description: "@inject_tag: json\" zi\" validate\"required,max=3\""
+                  type: string
+                city:
+                  description: "@inject_tag: json\" cit\" validate\"required,city,max=6\""
+                  type: string
+                address:
+                  description: "@inject_tag: json\" addres\" validate\"required,max=10\""
+                  type: string
+                address_additional:
+                  description: "@inject_tag: json\" address_additiona\" bson\"address_additiona\" validate\"omitempty,max=10\""
+                  type: string
+                registration_number:
+                  description: "@inject_tag: json\" registration_numbe\" bson\"registration_numbe\" validate\"required,max=10\""
+                  type: string
+                tax_id:
+                  description: "@inject_tag: json\" tax_i\" bson\"tax_i\""
+                  type: string
+            contacts:
+              type: object
+              properties:
+                authorized:
+                  type: object
+                  properties:
+                    name:
+                      description: "@inject_tag: json\" nam\" validate\"required,company_name,max=6\""
+                      type: string
+                    email:
+                      description: "@inject_tag: json\" emai\" validate\"required,email,max=10\""
+                      type: string
+                    phone:
+                      description: "@inject_tag: json\" phon\" validate\"required,numeric,max=2\""
+                      type: string
+                    position:
+                      description: "@inject_tag: json\" positio\" validate\"required,company_name,max=3\""
+                      type: string
+                technical:
+                  type: object
+                  properties:
+                    name:
+                      description: "@inject_tag: json\" nam\" validate\"required,company_name,max=6\""
+                      type: string
+                    email:
+                      description: "@inject_tag: json\" emai\" validate\"required,email,max=10\""
+                      type: string
+                    phone:
+                      description: "@inject_tag: json\" phon\" validate\"required,numeric,max=2\""
+                      type: string
+            banking:
+              type: object
+              properties:
+                currency:
+                  description: "@inject_tag: json\" currenc\" validate\"required,alpha,len=\""
+                  type: string
+                name:
+                  description: "@inject_tag: json\" nam\" validate\"required,city,max=6\""
+                  type: string
+                address:
+                  description: "@inject_tag: json\" addres\" validate\"required,max=6\""
+                  type: string
+                account_number:
+                  description: "@inject_tag: json\" account_numbe\" bson\"account_numbe\" validate\"required,iba\""
+                  type: string
+                swift:
+                  description: "@inject_tag: json\" swif\" validate\"required,swif\""
+                  type: string
+                details:
+                  description: "@inject_tag: json\" detail\""
+                  type: string
+                correspondent_account:
+                  description: "@inject_tag: json\" correspondent_accoun\" bson\"correspondent_accoun\" validate\"omitempty,numeric,max=3\""
+                  type: string
+            status:
+              description: "@inject_tag: json\" statu\""
+              type: integer
+            created_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            updated_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            first_payment_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            has_merchant_signature:
+              description: "@inject_tag: json\" has_merchant_signatur\""
+              type: boolean
+            has_psp_signature:
+              description: "@inject_tag: json\" has_psp_signatur\""
+              type: boolean
+            last_payout:
+              type: object
+              properties:
+                date:
+                  type: object
+                  properties:
+                    seconds:
+                      description: "9999-12-31T23:59:59Z inclusive."
+                      type: integer
+                    nanos:
+                      description: "inclusive."
+                      type: integer
+                amount:
+                  description: "@inject_tag: json\" amoun\""
+                  type: number
+            is_signed:
+              description: "@inject_tag: json\" is_signe\""
+              type: boolean
+            agreement_type:
+              description: "@inject_tag: json\" agreement_typ\""
+              type: integer
+            agreement_sent_via_mail:
+              description: "@inject_tag: json\" agreement_sent_via_mai\""
+              type: boolean
+            mail_tracking_link:
+              description: "@inject_tag: json\" mail_tracking_lin\""
+              type: string
+            payout_cost_amount:
+              description: "@inject_tag: json\" payout_cost_amoun\" bson\"payout_cost_amoun\" validate\"numeric,gte=\""
+              type: number
+            payout_cost_currency:
+              description: "@inject_tag: json\" payout_cost_currenc\" bson\"payout_cost_currenc\" validate\"required,alpha,len=\""
+              type: string
+            min_payout_amount:
+              description: "@inject_tag: json\" min_payout_amoun\" bson\"min_payout_amoun\" validate\"numeric,gte=\""
+              type: number
+            rolling_reserve_amount:
+              description: "@inject_tag: json\" rolling_reserve_amoun\" bson\"rolling_reserve_amoun\" validate\"numeric,gte=0,lte=10\""
+              type: number
+            rolling_reserve_days:
+              description: "@inject_tag: json\" rolling_reserve_day\" bson\"rolling_reserve_day\" validate\"numeric,gte=\""
+              type: integer
+            rolling_reserve_chargeback_transactions_threshold:
+              description: "@inject_tag: json\" rolling_reserve_chargeback_transactions_threshol\" bson\"rolling_reserve_chargeback_transactions_threshol\" validate\"numeric,gte=0,lte=10\""
+              type: number
+            item_min_cost_amount:
+              description: "@inject_tag: json\" item_min_cost_amoun\" bson\"item_min_cost_amoun\" validate\"numeric,gte=\""
+              type: number
+            item_min_cost_currency:
+              description: "@inject_tag: json\" item_min_cost_currenc\" bson\"item_min_cost_currenc\" validate\"required,alpha,len=\""
+              type: string
+            centrifugo_token:
+              type: string
+            agreement_template:
+              description: "@inject_tag: json\" agreement_templat\""
+              type: string
+            received_date:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            status_last_updated_at:
+              type: object
+              properties:
+                seconds:
+                  description: "9999-12-31T23:59:59Z inclusive."
+                  type: integer
+                nanos:
+                  description: "inclusive."
+                  type: integer
+            has_projects:
+              description: "@inject_tag: json\" has_project\""
+              type: boolean
+            agreement_number:
+              description: "@inject_tag: json\" agreement_numbe\""
+              type: string
+            minimal_payout_limit:
+              description: "@inject_tag: json\" minimal_payout_limi\""
+              type: number
+            tariff:
+              type: object
+              properties:
+                home_region:
+                  description: "@inject_tag: json\" home_regio\""
+                  type: string
+            manual_payouts_enabled:
+              description: "@inject_tag: json\" manual_payouts_enable\""
+              type: boolean
+            mcc_code:
+              description: "@inject_tag: json\" mcc_cod\""
+              type: string
+            operating_company_id:
+              description: "@inject_tag: json\" operating_company_i\""
+              type: string
+            merchant_operations_type:
+              description: "@inject_tag: json\" merchant_operations_typ\" validate\"oneof=high-risk low-ris\""
+              type: string
+            dont_charge_vat:
+              description: "@inject_tag: json\" dont_charge_va\""
+              type: boolean
+    CreatePageReviewRequest:
+      type: object
+      properties:
+        user_id:
+          description: "@inject_tag: validate\" required,hexadecimal,len=2\""
+          type: string
+        review:
+          description: "@inject_tag: validate\" required,max=50\""
+          type: string
+        url:
+          description: "@inject_tag: validate\" require\""
+          type: string
+    ResponseErrorMessage:
+      type: object
+      properties:
+        code:
+          description: "The error code."
+          type: string
+        message:
+          description: "The error short description."
+          type: string
+        details:
+          description: "The error details."
+          type: string
+    Key:
+      type: object
+      properties:
+        id:
+          description: "@inject_tag: json\" i\" bson\"_i\""
+          type: string
+        code:
+          description: "@inject_tag: json\" cod\" validate\"required,max=5\""
+          type: string
+        key_product_id:
+          description: "@inject_tag: validate\" required,hexadecimal,len=2\""
+          type: string
+        platform_id:
+          description: "@inject_tag: validate\" required,max=25\""
+          type: string
+        order_id:
+          description: "@inject_tag: validate\" omitempty,hexadecimal,len=2\""
+          type: string
+        created_at:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+        reserved_to:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+        redeemed_at:
+          type: object
+          properties:
+            seconds:
+              description: "9999-12-31T23:59:59Z inclusive."
+              type: integer
+            nanos:
+              description: "inclusive."
+              type: integer
+    CheckInviteTokenRequest:
+      type: object
+      properties:
+        token:
+          description: "@inject_tag: validate\" require\""
+          type: string
+        email:
+          description: "@inject_tag: validate\" required,emai\""
+          type: string
+    CheckInviteTokenResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: object
+          properties:
+            code:
+              description: "The error code."
+              type: string
+            message:
+              description: "The error short description."
+              type: string
+            details:
+              description: "The error details."
+              type: string
+        role_id:
+          type: string
+        role_type:
           type: string
 paths:
   /api/v1/country:
@@ -382,7 +1490,7 @@ paths:
       - Country
       parameters:
       - name: name
-        description: "A name or two-letter country code by ISO 3166-1"
+        description: "The country's name or two-letter country code by ISO 3166-1."
         in: query
         required: false
         schema:
@@ -427,6 +1535,91 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Country"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /admin/api/v1/keys/{key_id}:
+    get:
+      summary: "Get the key's data"
+      operationId: keysIdPathGetKeyInfo
+      description: "Get the key's data"
+      tags:
+      - Key
+      - Onboarding
+      parameters:
+      - name: key_id
+        description: The unique identifier for the key.
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns the key's data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Key"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/key-products/{key_product_id}:
+    get:
+      summary: "Get the list of platforms and prices for the key-activated product"
+      operationId: keyProductsIdPathGetKeyProduct
+      description: "Get the list of platforms and prices for the key-activated product. This list can be filtered by country, language or currency."
+      tags:
+      - Product
+      parameters:
+      - name: key_product_id
+        description: "The unique identifier for the key-activated product."
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: country
+        description: "The country's name to calculate the price for."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: language
+        description: The language.
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: currency
+        description: The price currency.
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns the product data (platforms, prices and others)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyProductInfo"
         "400":
           description: Invalid request data
           content:
@@ -673,6 +1866,447 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseErrorMessage"
+  /admin/api/v1/products:
+    get:
+      summary: Get the list of products
+      operationId: productsPathGetProductsList
+      description: Get the list of products for the authorised user
+      tags:
+      - Product
+      parameters:
+      - name: name
+        description: "The product's name."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sku
+        description: "The product's SKU."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: project_id
+        description: The unique identifier for the project.
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: enabled
+        description: "The status of whether the product is enabled. Available values: all, true, false."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        description: The number of products returned in one page. Default value is 100.
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: offset
+        description: The ranking number of the first item on the page.
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns the list of products for the authorised user. This list can be filtered by the product's name, SKU, status and the project ID."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProductsResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+    post:
+      summary: Create a product
+      operationId: productsPathCreateProduct
+      description: Create a new product in the project
+      tags:
+      - Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Returns the created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /system/api/v1/products/merchant/{merchant_id}:
+    get:
+      summary: Get the list of products using the merchant ID
+      operationId: productsMerchantPathGetProductsList
+      description: Get the list of products using the merchant ID
+      tags:
+      - Product
+      parameters:
+      - name: merchant_id
+        description: The unique identifier for the merchant.
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: name
+        description: "The product's name."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: sku
+        description: "The product's SKU."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: project_id
+        description: The unique identifier for the project.
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: enabled
+        description: "The status of whether the product is enabled. Available values: all, true, false."
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: limit
+        description: The number of products returned in one page. Default value is 100.
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: offset
+        description: The ranking number of the first item on the page.
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns the list of merchant's products. This list can be filtered by the product's name, SKU, status and the project ID."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProductsResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /admin/api/v1/products/{product_id}:
+    get:
+      summary: Get the product
+      operationId: productsIdPathGetProduct
+      description: Get the product using the product ID
+      tags:
+      - Product
+      parameters:
+      - name: product_id
+        description: The unique identifier for the product.
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Returns the product data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetProductResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+    delete:
+      summary: Delete the product
+      operationId: productsIdPathDeleteProduct
+      description: Delete the product using the product ID
+      tags:
+      - Product
+      parameters:
+      - name: product_id
+        description: The unique identifier for the product.
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Returns an empty response body if the product was successfully removed
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+    put:
+      summary: Update the product
+      operationId: productsIdPathUpdateProduct
+      description: Update the product using the product ID
+      tags:
+      - Product
+      parameters:
+      - name: product_id
+        description: The unique identifier for the product.
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Product"
+      responses:
+        "200":
+          description: Returns the updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /admin/api/v1/products/{product_id}/prices:
+    get:
+      summary: "Get the product's prices"
+      operationId: productsPricesPathGetProductPrices
+      description: "Get the product's prices using the product ID"
+      tags:
+      - Product
+      parameters:
+      - name: product_id
+        description: The unique identifier for the product.
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: "Returns the list of the product's prices"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductPricesResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+    put:
+      summary: "Set the product's price"
+      operationId: productsPricesPathUpdateProductPrices
+      description: "Set the product's price using the product ID"
+      tags:
+      - Product
+      parameters:
+      - name: product_id
+        description: The unique identifier for the product.
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProductPrice"
+      responses:
+        "200":
+          description: "Returns an empty response body if the product's price was successfully set"
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/report_file/download/{file_id}.{file_type}:
+    get:
+      summary: Export the report file
+      operationId: reportFileDownloadPathDownload
+      description: "Export the report file into a PDF, CSV, XLSX"
+      tags:
+      - Report file
+      parameters:
+      - name: file_id
+        description: The unique identifier for the report file.
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: file_type
+        description: "The supported file format (PDF, CSV, XLSX)."
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Returns the report file
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: "Invalid request data (unable to find the file, the file string is incorrect)"
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "404":
+          description: The file not found
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Unable to download the file because of the internal server error
+          content:
+            application/pdf:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            text/csv:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
   /api/v1/tokens:
     post:
       summary: Create a payment token
@@ -710,6 +2344,298 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/user/invite/check:
+    post:
+      summary: Check the invitation token
+      operationId: inviteCheckCheckInvite
+      description: Check the invitation token
+      tags:
+      - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckInviteTokenRequest"
+      responses:
+        "200":
+          description: "Returns the user's role ID and type"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckInviteTokenResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/user/invite/approve:
+    post:
+      summary: Approve the user invitation
+      operationId: inviteApproveApproveInvite
+      description: Approve the user invitation
+      tags:
+      - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AcceptInviteRequest"
+      responses:
+        "200":
+          description: "Returns the user's role data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptInviteResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/user/merchants:
+    get:
+      summary: Get the list of merchants for this user
+      operationId: getMerchantsGetMerchants
+      description: Get the list of merchants for this user
+      tags:
+      - User
+      responses:
+        "200":
+          description: Returns the list of merchants
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetMerchantsForUserResponse"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/user/profile:
+    get:
+      summary: Get the user profile
+      operationId: userProfilePathGetUserProfile
+      description: Get the user profile
+      tags:
+      - User Profile
+      responses:
+        "200":
+          description: "Returns the user's personal and company data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "404":
+          description: The user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+    patch:
+      summary: Create or update the user profile
+      operationId: userProfilePathSetUserProfile
+      description: Create or update the user profile
+      tags:
+      - User Profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfile"
+      responses:
+        "200":
+          description: "Returns the user's personal and company data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "404":
+          description: The user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /system/api/v1/user/profile:
+    get:
+      summary: Get the user profile
+      operationId: userProfilePathIdGetUserProfile
+      description: Get the user profile
+      tags:
+      - User Profile
+      responses:
+        "200":
+          description: "Returns the user's personal and company data"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "404":
+          description: The user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/user/profile/common:
+    get:
+      summary: Get the common user profile
+      operationId: userCommonProfilePathGetUserCommonProfile
+      description: "Get the user's main profile data, role, permissions"
+      tags:
+      - User Profile
+      responses:
+        "200":
+          description: "Returns the user's main profile data, role and permissions"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommonUserProfile"
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "404":
+          description: The user not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
   /api/v1/user/confirm_email:
     put:
       summary: "Confirm the user's email"
@@ -737,6 +2663,43 @@ paths:
                 $ref: "#/components/schemas/ResponseErrorMessage"
         "404":
           description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+  /auth/api/v1/user/feedback:
+    post:
+      summary: Send the feedback
+      operationId: userProfilePathFeedbackCreateFeedback
+      description: Create and send the feedback using the page URL
+      tags:
+      - User Profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePageReviewRequest"
+      responses:
+        "200":
+          description: Returns an empty response body if the feedback was successfully sent
+          content:
+            text/plain:
+              schema:
+                type: string
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResponseErrorMessage"
+        "401":
+          description: Unauthorized request
           content:
             application/json:
               schema:
