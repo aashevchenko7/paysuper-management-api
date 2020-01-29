@@ -54,11 +54,11 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param name query {string} false The product's name.
-// @param sku query {string} false The product's SKU.
+// @param sku query {string} false The SKU of the product.
 // @param project_id query {string} false The unique identifier for the project.
 // @param enabled query {string} false The status of whether the product is enabled. Available values: all, true, false.
-// @param limit query {string} true The number of products returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} true The number of products returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/products [get]
 
 // @summary Get the list of products using the merchant ID
@@ -72,11 +72,11 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param name query {string} false The product's name.
-// @param sku query {string} false The product's SKU.
+// @param sku query {string} false The SKU of the product.
 // @param project_id query {string} false The unique identifier for the project.
 // @param enabled query {string} false The status of whether the product is enabled. Available values: all, true, false.
-// @param limit query {string} true The number of products returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} true The number of products returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /system/api/v1/products/merchant/{merchant_id} [get]
 func (h *ProductRoute) getProductsList(ctx echo.Context) error {
 
@@ -135,7 +135,7 @@ func (h *ProductRoute) getProduct(ctx echo.Context) error {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 404 {object} grpc.ResponseErrorMessage The product not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id} [delete]
@@ -163,7 +163,7 @@ func (h *ProductRoute) deleteProduct(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @body grpc.Product
-// @success 200 {object} grpc.Product Returns the created product
+// @success 200 {object} grpc.Product Returns the created product data
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/products [post]

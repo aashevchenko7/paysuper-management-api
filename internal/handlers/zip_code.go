@@ -40,7 +40,7 @@ func (h *ZipCodeRoute) Route(groups *common.Groups) {
 // @produce application/json
 // @success 200 {object} grpc.FindByZipCodeResponse Returns the country data (region, city, and others)
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param country query {string} true The country's name.
 // @param zip query {string} false The postal code. It's required for US.

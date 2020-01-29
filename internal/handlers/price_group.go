@@ -78,12 +78,12 @@ func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} grpc.PriceGroupCurrenciesResponse Returns a full list of currencies with information about regions and countries
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param country query {string} true The country's name.
 // @param zip query {string} true The postal code. Required for US.
-// @param limit query {string} false The number of objects returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} false The number of objects returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /api/v1/price_group/currencies [get]
 func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
 	req := &grpc.EmptyRequest{}
