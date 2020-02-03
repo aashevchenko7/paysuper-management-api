@@ -10,9 +10,9 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/gurukami/typ/v2"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"reflect"
 	"strings"
@@ -23,7 +23,7 @@ var (
 	MerchantBinderDefault  = &MerchantBinder{}
 	BinderDefault          = &Binder{}
 	EchoBinderDefault      = &echo.DefaultBinder{}
-	AvailableProtocolTypes = []string{pkg.ProjectCallbackProtocolEmpty, pkg.ProjectCallbackProtocolDefault}
+	AvailableProtocolTypes = []string{billingpb.ProjectCallbackProtocolEmpty, billingpb.ProjectCallbackProtocolDefault}
 )
 
 const (
@@ -216,7 +216,7 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 		return err
 	}
 
-	o := i.(*billing.OrderCreateRequest)
+	o := i.(*billingpb.OrderCreateRequest)
 
 	for key, value := range params {
 		if _, ok := OrderReservedWords[key]; !ok {
@@ -251,7 +251,7 @@ func (cb *OrderJsonBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 		return err
 	}
 
-	structure := i.(*billing.OrderCreateRequest)
+	structure := i.(*billingpb.OrderCreateRequest)
 	structure.RawBody = string(buf)
 
 	return
@@ -292,7 +292,7 @@ func (cb *OnboardingMerchantListingBinder) Bind(i interface{}, ctx echo.Context)
 	}
 
 	params := ctx.QueryParams()
-	structure := i.(*grpc.MerchantListingRequest)
+	structure := i.(*billingpb.MerchantListingRequest)
 
 	if structure.Limit <= 0 {
 		structure.Limit = cb.LimitDefault
@@ -321,7 +321,7 @@ func (cb *OnboardingNotificationsListBinder) Bind(i interface{}, ctx echo.Contex
 	}
 
 	params := ctx.QueryParams()
-	structure := i.(*grpc.ListingNotificationRequest)
+	structure := i.(*billingpb.ListingNotificationRequest)
 
 	if structure.Limit <= 0 {
 		structure.Limit = cb.LimitDefault
@@ -357,7 +357,7 @@ func (cb *OnboardingGetPaymentMethodBinder) Bind(i interface{}, ctx echo.Context
 		return ErrorIncorrectPaymentMethodId
 	}
 
-	structure := i.(*grpc.GetMerchantPaymentMethodRequest)
+	structure := i.(*billingpb.GetMerchantPaymentMethodRequest)
 	structure.MerchantId = merchantId
 	structure.PaymentMethodId = paymentMethodId
 
@@ -371,7 +371,7 @@ func (cb *OnboardingChangePaymentMethodBinder) Bind(i interface{}, ctx echo.Cont
 		return err
 	}
 
-	structure := i.(*grpc.MerchantPaymentMethodRequest)
+	structure := i.(*billingpb.MerchantPaymentMethodRequest)
 	merchantId := ctx.Param(RequestParameterMerchantId)
 	methodId := ctx.Param(RequestParameterPaymentMethodId)
 
@@ -402,7 +402,7 @@ func (b *OnboardingChangeMerchantStatusBinder) Bind(i interface{}, ctx echo.Cont
 		return ErrorIncorrectMerchantId
 	}
 
-	structure := i.(*grpc.MerchantChangeStatusRequest)
+	structure := i.(*billingpb.MerchantChangeStatusRequest)
 	structure.MerchantId = merchantId
 
 	return nil
@@ -421,7 +421,7 @@ func (b *OnboardingCreateNotificationBinder) Bind(i interface{}, ctx echo.Contex
 		return ErrorIncorrectMerchantId
 	}
 
-	structure := i.(*grpc.NotificationRequest)
+	structure := i.(*billingpb.NotificationRequest)
 	structure.MerchantId = merchantId
 
 	return nil
@@ -434,7 +434,7 @@ func (b *ProductsCreateProductBinder) Bind(i interface{}, ctx echo.Context) erro
 		return err
 	}
 
-	structure := i.(*grpc.Product)
+	structure := i.(*billingpb.Product)
 	structure.Id = ""
 
 	return nil
@@ -451,7 +451,7 @@ func (b *ProductsUpdateProductBinder) Bind(i interface{}, ctx echo.Context) erro
 		return err
 	}
 
-	structure := i.(*grpc.Product)
+	structure := i.(*billingpb.Product)
 	structure.Id = id
 
 	return nil
@@ -470,7 +470,7 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 	// Restore the io.ReadCloser to its original state
 	ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
-	projectReq := &billing.Project{}
+	projectReq := &billingpb.Project{}
 	if err := ctx.Bind(projectReq); err != nil {
 		return err
 	}
@@ -491,7 +491,7 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 		return ErrorIncorrectProjectId
 	}
 
-	pReq := &grpc.GetProjectRequest{ProjectId: projectId, MerchantId: projectReq.MerchantId}
+	pReq := &billingpb.GetProjectRequest{ProjectId: projectId, MerchantId: projectReq.MerchantId}
 	pRsp, err := b.dispatch.Services.Billing.GetProject(context.Background(), pReq)
 
 	if err != nil {
@@ -499,11 +499,11 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 		return err
 	}
 
-	if pRsp.Status != pkg.ResponseStatusOk {
+	if pRsp.Status != billingpb.ResponseStatusOk {
 		return pRsp.Message
 	}
 
-	structure := i.(*billing.Project)
+	structure := i.(*billingpb.Project)
 	structure.Id = projectId
 	structure.MerchantId = pRsp.Item.MerchantId
 	structure.Name = pRsp.Item.Name
@@ -532,6 +532,7 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 	structure.Currencies = pRsp.Item.Currencies
 	structure.VirtualCurrency = pRsp.Item.VirtualCurrency
 	structure.VatPayer = pRsp.Item.VatPayer
+	structure.RedirectSettings = pRsp.Item.RedirectSettings
 
 	if v, ok := req[RequestParameterName]; ok {
 		tv, ok := v.(map[string]interface{})
@@ -761,6 +762,10 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 
 	if _, ok := req[RequestParameterVatPayer]; ok {
 		structure.VatPayer = projectReq.VatPayer
+	}
+
+	if _, ok := req[RequestParameterRedirectSettings]; ok {
+		structure.RedirectSettings = projectReq.RedirectSettings
 	}
 
 	return nil

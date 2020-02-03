@@ -4,11 +4,10 @@ import (
 	"errors"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billingMocks "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -35,20 +34,20 @@ func (suite *DashboardTestSuite) SetupTest() {
 	}
 	bs := &billingMocks.BillingService{}
 	bs.On("GetDashboardMainReport", mock.Anything, mock.Anything, mock.Anything).
-		Return(&grpc.GetDashboardMainResponse{Status: pkg.ResponseStatusOk, Item: &grpc.DashboardMainReport{}}, nil)
+		Return(&billingpb.GetDashboardMainResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.DashboardMainReport{}}, nil)
 	bs.On("GetDashboardRevenueDynamicsReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(
-			&grpc.GetDashboardRevenueDynamicsReportResponse{
-				Status: pkg.ResponseStatusOk,
-				Item:   &grpc.DashboardRevenueDynamicReport{},
+			&billingpb.GetDashboardRevenueDynamicsReportResponse{
+				Status: billingpb.ResponseStatusOk,
+				Item:   &billingpb.DashboardRevenueDynamicReport{},
 			},
 			nil,
 		)
 	bs.On("GetDashboardBaseReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(
-			&grpc.GetDashboardBaseReportResponse{
-				Status: pkg.ResponseStatusOk,
-				Item:   &grpc.DashboardBaseReports{},
+			&billingpb.GetDashboardBaseReportResponse{
+				Status: billingpb.ResponseStatusOk,
+				Item:   &billingpb.DashboardBaseReports{},
 			},
 			nil,
 		)
@@ -131,9 +130,9 @@ func (suite *DashboardTestSuite) TestDashboard_GetMainReports_BillingServerRetur
 	bs := &billingMocks.BillingService{}
 	bs.On("GetDashboardMainReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(
-			&grpc.GetDashboardMainResponse{
-				Status:  pkg.ResponseStatusBadData,
-				Message: &grpc.ResponseErrorMessage{Message: "some error"},
+			&billingpb.GetDashboardMainResponse{
+				Status:  billingpb.ResponseStatusBadData,
+				Message: &billingpb.ResponseErrorMessage{Message: "some error"},
 			},
 			nil,
 		)
@@ -151,7 +150,7 @@ func (suite *DashboardTestSuite) TestDashboard_GetMainReports_BillingServerRetur
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), "some error", msg.Message)
 }
@@ -216,9 +215,9 @@ func (suite *DashboardTestSuite) TestDashboard_GetRevenueDynamicsReport_BillingS
 	bs := &billingMocks.BillingService{}
 	bs.On("GetDashboardRevenueDynamicsReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(
-			&grpc.GetDashboardRevenueDynamicsReportResponse{
-				Status:  pkg.ResponseStatusBadData,
-				Message: &grpc.ResponseErrorMessage{Message: "some error"},
+			&billingpb.GetDashboardRevenueDynamicsReportResponse{
+				Status:  billingpb.ResponseStatusBadData,
+				Message: &billingpb.ResponseErrorMessage{Message: "some error"},
 			},
 			nil,
 		)
@@ -236,7 +235,7 @@ func (suite *DashboardTestSuite) TestDashboard_GetRevenueDynamicsReport_BillingS
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), "some error", msg.Message)
 }
@@ -302,9 +301,9 @@ func (suite *DashboardTestSuite) TestDashboard_GetBaseReports_BillingServerRetur
 	bs := &billingMocks.BillingService{}
 	bs.On("GetDashboardBaseReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(
-			&grpc.GetDashboardBaseReportResponse{
-				Status:  pkg.ResponseStatusBadData,
-				Message: &grpc.ResponseErrorMessage{Message: "some error"},
+			&billingpb.GetDashboardBaseReportResponse{
+				Status:  billingpb.ResponseStatusBadData,
+				Message: &billingpb.ResponseErrorMessage{Message: "some error"},
 			},
 			nil,
 		)
@@ -321,7 +320,7 @@ func (suite *DashboardTestSuite) TestDashboard_GetBaseReports_BillingServerRetur
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), "some error", msg.Message)
 }

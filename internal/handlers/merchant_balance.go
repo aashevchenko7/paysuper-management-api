@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -36,7 +36,7 @@ func (h *BalanceRoute) Route(groups *common.Groups) {
 }
 
 func (h *BalanceRoute) getBalance(ctx echo.Context) error {
-	req := &grpc.GetMerchantBalanceRequest{}
+	req := &billingpb.GetMerchantBalanceRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func (h *BalanceRoute) getBalance(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMerchantBalance(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBalance", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantBalance", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 

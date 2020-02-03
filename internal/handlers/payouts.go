@@ -4,10 +4,10 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
+	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
 
@@ -44,7 +44,7 @@ func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 }
 
 func (h *PayoutDocumentsRoute) getPayoutDocumentsList(ctx echo.Context) error {
-	req := &grpc.GetPayoutDocumentsRequest{}
+	req := &billingpb.GetPayoutDocumentsRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -52,7 +52,7 @@ func (h *PayoutDocumentsRoute) getPayoutDocumentsList(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPayoutDocuments(ctx.Request().Context(), req)
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetPayoutDocuments")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetPayoutDocuments")
 	}
 
 	if res.Status != http.StatusOK {
@@ -63,7 +63,7 @@ func (h *PayoutDocumentsRoute) getPayoutDocumentsList(ctx echo.Context) error {
 }
 
 func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
-	req := &grpc.GetPayoutDocumentRequest{}
+	req := &billingpb.GetPayoutDocumentRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -72,7 +72,7 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetPayoutDocument(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetPayoutDocument")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetPayoutDocument")
 	}
 
 	if res.Status != http.StatusOK {
@@ -98,7 +98,7 @@ func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 }
 
 func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
-	req := &grpc.CreatePayoutDocumentRequest{}
+	req := &billingpb.CreatePayoutDocumentRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -106,7 +106,7 @@ func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
 	}
 
 	req.Ip = ctx.RealIP()
-	req.Initiator = pkg.RoyaltyReportChangeSourceMerchant
+	req.Initiator = billingpb.RoyaltyReportChangeSourceMerchant
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {
@@ -115,7 +115,7 @@ func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.CreatePayoutDocument(ctx.Request().Context(), req)
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "CreatePayoutDocument")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "CreatePayoutDocument")
 	}
 
 	if res.Status != http.StatusOK {
@@ -126,7 +126,7 @@ func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
 }
 
 func (h *PayoutDocumentsRoute) updatePayoutDocument(ctx echo.Context) error {
-	req := &grpc.UpdatePayoutDocumentRequest{}
+	req := &billingpb.UpdatePayoutDocumentRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -135,7 +135,7 @@ func (h *PayoutDocumentsRoute) updatePayoutDocument(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.UpdatePayoutDocument(ctx.Request().Context(), req)
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "UpdatePayoutDocument")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "UpdatePayoutDocument")
 	}
 
 	if res.Status != http.StatusOK {
@@ -146,7 +146,7 @@ func (h *PayoutDocumentsRoute) updatePayoutDocument(ctx echo.Context) error {
 }
 
 func (h *PayoutDocumentsRoute) getPayoutRoyaltyReports(ctx echo.Context) error {
-	req := &grpc.GetPayoutDocumentRequest{}
+	req := &billingpb.GetPayoutDocumentRequest{}
 	req.PayoutDocumentId = ctx.Param(common.RequestParameterId)
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
@@ -156,7 +156,7 @@ func (h *PayoutDocumentsRoute) getPayoutRoyaltyReports(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetPayoutDocumentRoyaltyReports(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetPayoutDocumentRoyaltyReports")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetPayoutDocumentRoyaltyReports")
 	}
 
 	if res.Status != http.StatusOK {

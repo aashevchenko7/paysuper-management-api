@@ -437,6 +437,9 @@ definitions:
       vat_payer:
         type: string
         description: "definition of who pays vat for orders in this project, allowed values are buyer | seller | nobody"
+      is_production:
+        type: bool
+        description: "flag to mark an order as created form project having in test or production status"
 
   order.parent:
     type: object
@@ -2311,6 +2314,7 @@ definitions:
       - percent
       - fix_amount_currency
       - mcc_code
+      - payment_stage
 
   onboarding.cost.payment.merchant.all:
     properties:

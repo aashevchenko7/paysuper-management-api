@@ -10,7 +10,8 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/paysuper/paysuper-billing-server/pkg"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/pkg/micro"
 	"html/template"
@@ -159,7 +160,7 @@ func (d *Dispatcher) authUserGroup(grp *echo.Group) {
 		grp.Use(d.AuthOneMerchantPreMiddleware()) // 2
 		grp.Use(d.CasbinMiddleware(func(c echo.Context) string {
 			user := common.ExtractUserContext(c)
-			return fmt.Sprintf(pkg.CasbinMerchantUserMask, user.MerchantId, user.Id)
+			return fmt.Sprintf(billingpb.CasbinMerchantUserMask, user.MerchantId, user.Id)
 		})) // 3
 	}
 	grp.Use(d.MerchantBinderPreMiddleware) // 3

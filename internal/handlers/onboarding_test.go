@@ -9,11 +9,11 @@ import (
 	"github.com/labstack/echo/v4"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	awsWrapperMocks "github.com/paysuper/paysuper-aws-manager/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	billingMocks "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -125,7 +125,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetMerchant_Ok() {
 
 	assert.NoError(suite.T(), err)
 
-	obj := &billing.Merchant{}
+	obj := &billingpb.Merchant{}
 	err = json.Unmarshal(res.Body.Bytes(), obj)
 	assert.NoError(suite.T(), err)
 
@@ -160,7 +160,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetMerchant_LogicError() {
 
 	billingService := &billMock.BillingService{}
 	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantResponse{Status: pkg.ResponseStatusBadData, Message: mock.SomeError}, nil)
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusBadData, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -182,7 +182,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetMerchant_EmptyId_Error() {
 
 	billingService := &billMock.BillingService{}
 	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantResponse{Status: pkg.ResponseStatusBadData, Message: mock.SomeError}, nil)
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusBadData, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -211,7 +211,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_ListMerchants_Ok() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 
-	var m *grpc.MerchantListingResponse
+	var m *billingpb.MerchantListingResponse
 	err = json.Unmarshal(res.Body.Bytes(), &m)
 	assert.NoError(suite.T(), err)
 	assert.EqualValues(suite.T(), 3, m.Count)
@@ -274,7 +274,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_ListMerchants_BillingServiceUna
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_CreateNotification_Ok() {
-	n := &grpc.NotificationRequest{
+	n := &billingpb.NotificationRequest{
 		MerchantId: bson.NewObjectId().Hex(),
 		UserId:     "ffffffffffffffffffffffff",
 		Title:      "Title",
@@ -298,7 +298,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_CreateNotification_Ok() {
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_CreateNotification_ValidationError() {
-	n := &grpc.NotificationRequest{
+	n := &billingpb.NotificationRequest{
 		MerchantId: bson.NewObjectId().Hex(),
 		UserId:     "ffffffffffffffffffffffff",
 		Title:      "",
@@ -325,7 +325,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_CreateNotification_ValidationEr
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_CreateNotification_BillingServerUnavailable_Error() {
-	n := &grpc.NotificationRequest{
+	n := &billingpb.NotificationRequest{
 		MerchantId: bson.NewObjectId().Hex(),
 		UserId:     "ffffffffffffffffffffffff",
 		Title:      "Title",
@@ -337,7 +337,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_CreateNotification_BillingServe
 
 	billingService := &billMock.BillingService{}
 	billingService.On("CreateNotification", mock2.Anything, mock2.Anything).
-		Return(&grpc.CreateNotificationResponse{Status: pkg.ResponseStatusBadData, Message: mock.SomeError}, nil)
+		Return(&billingpb.CreateNotificationResponse{Status: billingpb.ResponseStatusBadData, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err = suite.caller.Builder().
@@ -669,7 +669,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementDocument_BillingSer
 
 	billingService := &billMock.BillingService{}
 	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantResponse{Status: pkg.ResponseStatusBadData, Message: mock.SomeError}, nil)
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusBadData, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -689,10 +689,10 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementDocument_BillingSer
 
 func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementDocument_AgreementNotGenerated_Error() {
 	billingService := &billMock.BillingService{}
-	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&grpc.GetMerchantResponse{
-		Status:  pkg.ResponseStatusOk,
-		Message: &grpc.ResponseErrorMessage{},
-		Item: &billing.Merchant{
+	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&billingpb.GetMerchantResponse{
+		Status:  billingpb.ResponseStatusOk,
+		Message: &billingpb.ResponseErrorMessage{},
+		Item: &billingpb.Merchant{
 			Id:              "ffffffffffffffffffffffff",
 			S3AgreementName: "",
 		},
@@ -716,10 +716,10 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementDocument_AgreementN
 
 func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementDocument_AgreementFileNotExist_Error() {
 	billingService := &billMock.BillingService{}
-	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&grpc.GetMerchantResponse{
-		Status:  pkg.ResponseStatusOk,
-		Message: &grpc.ResponseErrorMessage{},
-		Item: &billing.Merchant{
+	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&billingpb.GetMerchantResponse{
+		Status:  billingpb.ResponseStatusOk,
+		Message: &billingpb.ResponseErrorMessage{},
+		Item: &billingpb.Merchant{
 			Id:              "ffffffffffffffffffffffff",
 			S3AgreementName: mock.SomeAgreementName,
 		},
@@ -748,7 +748,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementDocument_AgreementF
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithoutMerchantId_Ok() {
-	company := &billing.MerchantCompanyInfo{
+	company := &billingpb.MerchantCompanyInfo{
 		Name:               mock.OnboardingMerchantMock.Company.Name,
 		AlternativeName:    mock.OnboardingMerchantMock.Company.Name,
 		Website:            "http://localhost",
@@ -774,14 +774,14 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithoutMerch
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	merchant := new(billing.Merchant)
+	merchant := new(billingpb.Merchant)
 	err = json.Unmarshal(res.Body.Bytes(), merchant)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), merchant.Company, company)
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithMerchantId_Ok() {
-	company := &billing.MerchantCompanyInfo{
+	company := &billingpb.MerchantCompanyInfo{
 		Name:               mock.OnboardingMerchantMock.Company.Name,
 		AlternativeName:    mock.OnboardingMerchantMock.Company.Name,
 		Website:            "http://localhost",
@@ -807,7 +807,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithMerchant
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	merchant := new(billing.Merchant)
+	merchant := new(billingpb.Merchant)
 	err = json.Unmarshal(res.Body.Bytes(), merchant)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), merchant.Company, company)
@@ -847,7 +847,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectCompanyName.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectCompanyName.Message, msg.Message)
@@ -870,7 +870,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectAlternativeName.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectAlternativeName.Message, msg.Message)
@@ -893,7 +893,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectWebsite.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectWebsite.Message, msg.Message)
@@ -916,7 +916,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorIncorrectCountryIdentifier.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorIncorrectCountryIdentifier.Message, msg.Message)
@@ -943,7 +943,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectState.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectState.Message, msg.Message)
@@ -973,7 +973,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectZip.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectZip.Message, msg.Message)
@@ -1003,7 +1003,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectCity.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectCity.Message, msg.Message)
@@ -1034,7 +1034,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectAddress.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectAddress.Message, msg.Message)
@@ -1088,7 +1088,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_BillingServe
 
 	billingService := &billMock.BillingService{}
 	billingService.On("ChangeMerchant", mock2.Anything, mock2.Anything).
-		Return(&grpc.ChangeMerchantResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
+		Return(&billingpb.ChangeMerchantResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -1107,14 +1107,14 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_BillingServe
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithoutMerchantId_Ok() {
-	contacts := &billing.MerchantContact{
-		Authorized: &billing.MerchantContactAuthorized{
+	contacts := &billingpb.MerchantContact{
+		Authorized: &billingpb.MerchantContactAuthorized{
 			Name:     "Unit Test",
 			Email:    "test@unit.test",
 			Phone:    "1234567890",
 			Position: "CEO",
 		},
-		Technical: &billing.MerchantContactTechnical{
+		Technical: &billingpb.MerchantContactTechnical{
 			Name:  "Unit Test",
 			Email: "test@unit.test",
 			Phone: "1234567890",
@@ -1134,21 +1134,21 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithoutMerc
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	merchant := new(billing.Merchant)
+	merchant := new(billingpb.Merchant)
 	err = json.Unmarshal(res.Body.Bytes(), merchant)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), merchant.Contacts, contacts)
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithMerchantId_Ok() {
-	contacts := &billing.MerchantContact{
-		Authorized: &billing.MerchantContactAuthorized{
+	contacts := &billingpb.MerchantContact{
+		Authorized: &billingpb.MerchantContactAuthorized{
 			Name:     "Unit Test",
 			Email:    "test@unit.test",
 			Phone:    "1234567890",
 			Position: "CEO",
 		},
-		Technical: &billing.MerchantContactTechnical{
+		Technical: &billingpb.MerchantContactTechnical{
 			Name:  "Unit Test",
 			Email: "test@unit.test",
 			Phone: "1234567890",
@@ -1169,7 +1169,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithMerchan
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	merchant := new(billing.Merchant)
+	merchant := new(billingpb.Merchant)
 	err = json.Unmarshal(res.Body.Bytes(), merchant)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), merchant.Contacts, contacts)
@@ -1209,7 +1209,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageRequiredContactAuthorized.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageRequiredContactAuthorized.Message, msg.Message)
@@ -1232,7 +1232,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageRequiredContactTechnical.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageRequiredContactTechnical.Message, msg.Message)
@@ -1258,7 +1258,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectName.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectName.Message, msg.Message)
@@ -1284,7 +1284,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectName.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectName.Message, msg.Message)
@@ -1310,7 +1310,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorEmailFieldIncorrect.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorEmailFieldIncorrect.Message, msg.Message)
@@ -1336,7 +1336,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorEmailFieldIncorrect.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorEmailFieldIncorrect.Message, msg.Message)
@@ -1362,7 +1362,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPhone.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPhone.Message, msg.Message)
@@ -1388,7 +1388,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPhone.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPhone.Message, msg.Message)
@@ -1414,7 +1414,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_ValidationE
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPosition.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectPosition.Message, msg.Message)
@@ -1454,7 +1454,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_BillingServ
 
 	billingService := &billMock.BillingService{}
 	billingService.On("ChangeMerchant", mock2.Anything, mock2.Anything).
-		Return(&grpc.ChangeMerchantResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
+		Return(&billingpb.ChangeMerchantResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -1473,7 +1473,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_BillingServ
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithoutMerchantId_Ok() {
-	banking := &billing.MerchantBanking{
+	banking := &billingpb.MerchantBanking{
 		Currency:             "RUB",
 		Name:                 "Bank Name-Spb.",
 		Address:              "St.Petersburg, Nevskiy st. 1",
@@ -1495,14 +1495,14 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithoutMerch
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	merchant := new(billing.Merchant)
+	merchant := new(billingpb.Merchant)
 	err = json.Unmarshal(res.Body.Bytes(), merchant)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), merchant.Banking, banking)
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithMerchantId_Ok() {
-	banking := &billing.MerchantBanking{
+	banking := &billingpb.MerchantBanking{
 		Currency:             "RUB",
 		Name:                 "Bank Name-Spb.",
 		Address:              "St.Petersburg, Nevskiy st. 1",
@@ -1525,7 +1525,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithMerchant
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	merchant := new(billing.Merchant)
+	merchant := new(billingpb.Merchant)
 	err = json.Unmarshal(res.Body.Bytes(), merchant)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), merchant.Banking, banking)
@@ -1571,7 +1571,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankName.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankName.Message, msg.Message)
@@ -1600,7 +1600,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankAddress.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankAddress.Message, msg.Message)
@@ -1629,7 +1629,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankAccountNumber.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankAccountNumber.Message, msg.Message)
@@ -1658,7 +1658,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankSwift.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankSwift.Message, msg.Message)
@@ -1688,7 +1688,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_ValidationEr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankCorrespondentAccount.Code, msg.Code)
 	assert.Equal(suite.T(), common.ErrorMessageIncorrectBankCorrespondentAccount.Message, msg.Message)
@@ -1736,7 +1736,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_BillingServe
 
 	billingService := &billMock.BillingService{}
 	billingService.On("ChangeMerchant", mock2.Anything, mock2.Anything).
-		Return(&grpc.ChangeMerchantResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
+		Return(&billingpb.ChangeMerchantResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -1791,7 +1791,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetMerchantStatus_BillingServer
 
 	billingService := &billMock.BillingService{}
 	billingService.On("GetMerchantOnboardingCompleteData", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantOnboardingCompleteDataResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
+		Return(&billingpb.GetMerchantOnboardingCompleteDataResponse{Status: http.StatusBadRequest, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -1806,7 +1806,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetMerchantStatus_BillingServer
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), mock.SomeError.Message, msg.Message)
 	assert.Equal(suite.T(), mock.SomeError.Details, msg.Details)
@@ -1818,7 +1818,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetTariffRates_Ok() {
 	q.Set("merchant_operations_type", "low-risk")
 	billingService := &billMock.BillingService{}
 	billingService.On("GetMerchantTariffRates", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantTariffRatesResponse{Status: pkg.ResponseStatusOk, Items: &grpc.GetMerchantTariffRatesResponseItems{}}, nil)
+		Return(&billingpb.GetMerchantTariffRatesResponse{Status: billingpb.ResponseStatusOk, Items: &billingpb.GetMerchantTariffRatesResponseItems{}}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -1871,7 +1871,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetTariffRates_ValidateError() 
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "Region", msg.Details)
 }
@@ -1906,7 +1906,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetTariffRates_BillingServerRes
 	q.Set("merchant_operations_type", "low-risk")
 	billingService := &billMock.BillingService{}
 	billingService.On("GetMerchantTariffRates", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantTariffRatesResponse{Status: pkg.ResponseStatusBadData, Message: mock.SomeError}, nil)
+		Return(&billingpb.GetMerchantTariffRatesResponse{Status: billingpb.ResponseStatusBadData, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -1929,7 +1929,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetTariffRates_Ok() {
 
 	billingService := &billMock.BillingService{}
 	billingService.On("SetMerchantTariffRates", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.CheckProjectRequestSignatureResponse{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.CheckProjectRequestSignatureResponse{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -1981,7 +1981,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetTariffRates_ValidationError(
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "HomeRegion", msg.Details)
 }
@@ -2015,7 +2015,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetTariffRates_BillingServerRes
 
 	billingService := &billMock.BillingService{}
 	billingService.On("SetMerchantTariffRates", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.CheckProjectRequestSignatureResponse{Status: pkg.ResponseStatusBadData, Message: mock.SomeError}, nil)
+		Return(&billingpb.CheckProjectRequestSignatureResponse{Status: billingpb.ResponseStatusBadData, Message: mock.SomeError}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -2036,10 +2036,10 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetTariffRates_BillingServerRes
 
 func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementData_Ok() {
 	billingService := &billMock.BillingService{}
-	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&grpc.GetMerchantResponse{
-		Status:  pkg.ResponseStatusOk,
-		Message: &grpc.ResponseErrorMessage{},
-		Item: &billing.Merchant{
+	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&billingpb.GetMerchantResponse{
+		Status:  billingpb.ResponseStatusOk,
+		Message: &billingpb.ResponseErrorMessage{},
+		Item: &billingpb.Merchant{
 			Id:              "ffffffffffffffffffffffff",
 			S3AgreementName: mock.SomeAgreementName,
 		},
@@ -2072,7 +2072,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_enableMerchantManualPayout_Ok()
 	billingService := &billingMocks.BillingService{}
 	billingService.
 		On("ChangeMerchantManualPayouts", mock2.Anything, mock2.Anything).
-		Return(&grpc.ChangeMerchantManualPayoutsResponse{Status: http.StatusOK}, nil)
+		Return(&billingpb.ChangeMerchantManualPayoutsResponse{Status: http.StatusOK}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -2083,7 +2083,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_enableMerchantManualPayout_Ok()
 
 	assert.NoError(suite.T(), err)
 
-	obj := &billing.Merchant{}
+	obj := &billingpb.Merchant{}
 	err = json.Unmarshal(res.Body.Bytes(), obj)
 	assert.NoError(suite.T(), err)
 
@@ -2094,7 +2094,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_disableMerchantManualPayout_Ok(
 	billingService := &billingMocks.BillingService{}
 	billingService.
 		On("ChangeMerchantManualPayouts", mock2.Anything, mock2.Anything).
-		Return(&grpc.ChangeMerchantManualPayoutsResponse{Status: http.StatusOK}, nil)
+		Return(&billingpb.ChangeMerchantManualPayoutsResponse{Status: http.StatusOK}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -2105,7 +2105,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_disableMerchantManualPayout_Ok(
 
 	assert.NoError(suite.T(), err)
 
-	obj := &billing.Merchant{}
+	obj := &billingpb.Merchant{}
 	err = json.Unmarshal(res.Body.Bytes(), obj)
 	assert.NoError(suite.T(), err)
 
@@ -2117,7 +2117,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetOperatingCompany_Ok() {
 
 	billingService := &billMock.BillingService{}
 	billingService.On("SetMerchantOperatingCompany", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.SetMerchantOperatingCompanyResponse{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.SetMerchantOperatingCompanyResponse{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	userOK := &common.AuthUser{

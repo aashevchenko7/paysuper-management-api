@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -69,7 +69,7 @@ func (h *PaymentCostRoute) Route(groups *common.Groups) {
 }
 
 func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
-	req := &billing.PaymentChannelCostSystemRequest{}
+	req := &billingpb.PaymentChannelCostSystemRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -85,7 +85,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetPaymentChannelCostSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaymentChannelCostSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaymentChannelCostSystem", req)
 
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
@@ -98,7 +98,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentChannelCostMerchantRequest{}
+	req := &billingpb.PaymentChannelCostMerchantRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -115,7 +115,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error
 	res, err := h.dispatch.Services.Billing.GetPaymentChannelCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaymentChannelCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaymentChannelCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -127,7 +127,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error
 }
 
 func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
-	req := &billing.MoneyBackCostSystemRequest{}
+	req := &billingpb.MoneyBackCostSystemRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -143,7 +143,7 @@ func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMoneyBackCostSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMoneyBackCostSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMoneyBackCostSystem", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -155,7 +155,7 @@ func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
-	req := &billing.MoneyBackCostMerchantRequest{}
+	req := &billingpb.MoneyBackCostMerchantRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -172,7 +172,7 @@ func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMoneyBackCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMoneyBackCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMoneyBackCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -184,7 +184,7 @@ func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) error {
-	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
+	req := &billingpb.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -194,7 +194,7 @@ func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) erro
 	res, err := h.dispatch.Services.Billing.DeletePaymentChannelCostSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "DeletePaymentChannelCostSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeletePaymentChannelCostSystem", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -206,7 +206,7 @@ func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) erro
 }
 
 func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterMerchantId)}
+	req := &billingpb.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -216,7 +216,7 @@ func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) er
 	res, err := h.dispatch.Services.Billing.DeletePaymentChannelCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "DeletePaymentChannelCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeletePaymentChannelCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -228,7 +228,7 @@ func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) er
 }
 
 func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
-	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
+	req := &billingpb.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -238,7 +238,7 @@ func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.DeleteMoneyBackCostSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "DeleteMoneyBackCostSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeleteMoneyBackCostSystem", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -250,7 +250,7 @@ func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterMerchantId)}
+	req := &billingpb.PaymentCostDeleteRequest{Id: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -260,7 +260,7 @@ func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.DeleteMoneyBackCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "DeleteMoneyBackCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeleteMoneyBackCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -272,7 +272,7 @@ func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
-	req := &billing.PaymentChannelCostSystem{}
+	req := &billingpb.PaymentChannelCostSystem{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -292,7 +292,7 @@ func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.SetPaymentChannelCostSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SetPaymentChannelCostSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetPaymentChannelCostSystem", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -304,7 +304,7 @@ func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentChannelCostMerchant{}
+	req := &billingpb.PaymentChannelCostMerchant{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -326,7 +326,7 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 	res, err := h.dispatch.Services.Billing.SetPaymentChannelCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SetPaymentChannelCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetPaymentChannelCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -338,7 +338,7 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 }
 
 func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
-	req := &billing.MoneyBackCostSystem{}
+	req := &billingpb.MoneyBackCostSystem{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -358,7 +358,7 @@ func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.SetMoneyBackCostSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SetMoneyBackCostSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetMoneyBackCostSystem", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -370,7 +370,7 @@ func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
-	req := &billing.MoneyBackCostMerchant{}
+	req := &billingpb.MoneyBackCostMerchant{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -392,7 +392,7 @@ func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.SetMoneyBackCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SetMoneyBackCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetMoneyBackCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -404,10 +404,10 @@ func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) getAllPaymentChannelCostSystem(ctx echo.Context) error {
-	res, err := h.dispatch.Services.Billing.GetAllPaymentChannelCostSystem(ctx.Request().Context(), &grpc.EmptyRequest{})
+	res, err := h.dispatch.Services.Billing.GetAllPaymentChannelCostSystem(ctx.Request().Context(), &billingpb.EmptyRequest{})
 
 	if err != nil {
-		h.L().Error(pkg.ErrorGrpcServiceCallFailed, logger.PairArgs("err", err.Error(), common.ErrorFieldService, pkg.ServiceName, common.ErrorFieldMethod, "GetAllPaymentChannelCostSystem"))
+		h.L().Error(billingpb.ErrorGrpcServiceCallFailed, logger.PairArgs("err", err.Error(), common.ErrorFieldService, billingpb.ServiceName, common.ErrorFieldMethod, "GetAllPaymentChannelCostSystem"))
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -419,7 +419,7 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostSystem(ctx echo.Context) erro
 }
 
 func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) error {
-	req := &billing.PaymentChannelCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterMerchantId)}
+	req := &billingpb.PaymentChannelCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -429,7 +429,7 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) er
 	res, err := h.dispatch.Services.Billing.GetAllPaymentChannelCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetAllPaymentChannelCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetAllPaymentChannelCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -441,10 +441,10 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) er
 }
 
 func (h *PaymentCostRoute) getAllMoneyBackCostSystem(ctx echo.Context) error {
-	res, err := h.dispatch.Services.Billing.GetAllMoneyBackCostSystem(ctx.Request().Context(), &grpc.EmptyRequest{})
+	res, err := h.dispatch.Services.Billing.GetAllMoneyBackCostSystem(ctx.Request().Context(), &billingpb.EmptyRequest{})
 
 	if err != nil {
-		h.L().Error(pkg.ErrorGrpcServiceCallFailed, logger.PairArgs("err", err.Error(), common.ErrorFieldService, pkg.ServiceName, common.ErrorFieldMethod, "GetAllMoneyBackCostSystem"))
+		h.L().Error(billingpb.ErrorGrpcServiceCallFailed, logger.PairArgs("err", err.Error(), common.ErrorFieldService, billingpb.ServiceName, common.ErrorFieldMethod, "GetAllMoneyBackCostSystem"))
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
@@ -456,7 +456,7 @@ func (h *PaymentCostRoute) getAllMoneyBackCostSystem(ctx echo.Context) error {
 }
 
 func (h *PaymentCostRoute) getAllMoneyBackCostMerchant(ctx echo.Context) error {
-	req := &billing.MoneyBackCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterMerchantId)}
+	req := &billingpb.MoneyBackCostMerchantListRequest{MerchantId: ctx.Param(common.RequestParameterMerchantId)}
 	err := h.dispatch.Validate.Struct(req)
 
 	if err != nil {
@@ -466,7 +466,7 @@ func (h *PaymentCostRoute) getAllMoneyBackCostMerchant(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAllMoneyBackCostMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetAllMoneyBackCostMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetAllMoneyBackCostMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 

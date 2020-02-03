@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -18,6 +18,13 @@ type TokenRoute struct {
 	dispatch common.HandlerSet
 	cfg      common.Config
 	provider.LMT
+}
+
+type TokenCreationResponse struct {
+	// The secure string which contains encrypted information about your customer and sales option data.
+	Token string `json:"token"`
+	// The PaySuper-hosted URL of a payment form.
+	PaymentFormUrl string `json:"payment_form_url"`
 }
 
 func NewTokenRoute(set common.HandlerSet, cfg *common.Config) *TokenRoute {
@@ -33,8 +40,20 @@ func (h *TokenRoute) Route(groups *common.Groups) {
 	groups.Common.POST(tokenPath, h.createToken)
 }
 
+// @summary Create a payment token
+// @desc Create a payment token that encrypts details of your customer, the game and purchase parameters.
+// @id tokenPathCreateToken
+// @tag Token
+// @accept application/json
+// @produce application/json
+// @body grpc.TokenRequest
+// @success 200 {object} TokenCreationResponse Returns the payment token string and the PaySuper-hosted URL for a payment form
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /api/v1/tokens [post]
 func (h *TokenRoute) createToken(ctx echo.Context) error {
-	req := &grpc.TokenRequest{}
+	req := &billingpb.TokenRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -60,7 +79,7 @@ func (h *TokenRoute) createToken(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

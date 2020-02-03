@@ -2,9 +2,9 @@ package handlers
 
 import (
 	"github.com/globalsign/mgo/bson"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -53,7 +53,7 @@ func (suite *OperatingCompanyTestSuite) TearDownTest() {}
 func (suite *OperatingCompanyTestSuite) TestOperatingCompany_GetOperatingCompaniesList_Ok() {
 	billingService := &billMock.BillingService{}
 	billingService.On("GetOperatingCompaniesList", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.GetOperatingCompaniesListResponse{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.GetOperatingCompaniesListResponse{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -70,7 +70,7 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_GetOperatingCompani
 func (suite *OperatingCompanyTestSuite) TestOperatingCompany_GetOperatingCompany_Ok() {
 	billingService := &billMock.BillingService{}
 	billingService.On("GetOperatingCompany", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.GetOperatingCompanyResponse{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.GetOperatingCompanyResponse{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -88,7 +88,7 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_GetOperatingCompany
 func (suite *OperatingCompanyTestSuite) TestOperatingCompany_AddOperatingCompany_Ok() {
 	billingService := &billMock.BillingService{}
 	billingService.On("AddOperatingCompany", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.EmptyResponseWithStatus{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.EmptyResponseWithStatus{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	body := `{"name" : "Paysuper", "country" : "CY", 
@@ -112,7 +112,7 @@ func (suite *OperatingCompanyTestSuite) TestOperatingCompany_AddOperatingCompany
 func (suite *OperatingCompanyTestSuite) TestOperatingCompany_UpdateOperatingCompany_Ok() {
 	billingService := &billMock.BillingService{}
 	billingService.On("AddOperatingCompany", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.EmptyResponseWithStatus{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.EmptyResponseWithStatus{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	body := `{"name" : "Paysuper", "country" : "CY", 
