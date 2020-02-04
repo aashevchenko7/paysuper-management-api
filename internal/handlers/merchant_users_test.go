@@ -4,11 +4,11 @@ import (
 	"errors"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -55,9 +55,9 @@ func (suite *MerchantUsersTestSuite) TestMerchantUsers_GetList_Ok() {
 	shouldBe := require.New(suite.T())
 
 	billingService := suite.router.dispatch.Services.Billing.(*mocks.BillingService)
-	billingService.On("GetMerchantUsers", mock2.Anything, mock2.Anything).Return(&grpc.GetMerchantUsersResponse{
+	billingService.On("GetMerchantUsers", mock2.Anything, mock2.Anything).Return(&billingpb.GetMerchantUsersResponse{
 		Status: 200,
-		Users: []*billing.UserRole{
+		Users: []*billingpb.UserRole{
 			{Id: ""},
 		},
 	}, nil)
@@ -98,9 +98,9 @@ func (suite *MerchantUsersTestSuite) TestMerchantChangeRole_ValidationError() {
 	shouldBe := require.New(suite.T())
 
 	billingService := suite.router.dispatch.Services.Billing.(*mocks.BillingService)
-	billingService.On("ChangeRoleForMerchantUser", mock2.Anything, mock2.Anything).Return(&grpc.EmptyResponseWithStatus{
+	billingService.On("ChangeRoleForMerchantUser", mock2.Anything, mock2.Anything).Return(&billingpb.EmptyResponseWithStatus{
 		Status:  400,
-		Message: &grpc.ResponseErrorMessage{Message: "some error"},
+		Message: &billingpb.ResponseErrorMessage{Message: "some error"},
 	}, nil)
 
 	res, err := suite.caller.Builder().
@@ -122,9 +122,9 @@ func (suite *MerchantUsersTestSuite) TestMerchantChangeRole_Error() {
 	shouldBe := require.New(suite.T())
 
 	billingService := suite.router.dispatch.Services.Billing.(*mocks.BillingService)
-	billingService.On("ChangeRoleForMerchantUser", mock2.Anything, mock2.Anything).Return(&grpc.EmptyResponseWithStatus{
+	billingService.On("ChangeRoleForMerchantUser", mock2.Anything, mock2.Anything).Return(&billingpb.EmptyResponseWithStatus{
 		Status:  400,
-		Message: &grpc.ResponseErrorMessage{Message: "some error"},
+		Message: &billingpb.ResponseErrorMessage{Message: "some error"},
 	}, nil)
 
 	res, err := suite.caller.Builder().
@@ -163,7 +163,7 @@ func (suite *MerchantUsersTestSuite) TestMerchantChangeRole_Ok() {
 	shouldBe := require.New(suite.T())
 
 	billingService := suite.router.dispatch.Services.Billing.(*mocks.BillingService)
-	billingService.On("ChangeRoleForMerchantUser", mock2.Anything, mock2.Anything).Return(&grpc.EmptyResponseWithStatus{
+	billingService.On("ChangeRoleForMerchantUser", mock2.Anything, mock2.Anything).Return(&billingpb.EmptyResponseWithStatus{
 		Status: 200,
 	}, nil)
 

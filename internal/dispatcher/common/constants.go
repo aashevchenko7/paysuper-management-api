@@ -2,7 +2,8 @@ package common
 
 import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
-	"github.com/paysuper/paysuper-billing-server/pkg"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+
 	"regexp"
 )
 
@@ -82,6 +83,7 @@ const (
 	RequestProductId                         = "product_id"
 	RequestRoleId                            = "role_id"
 	RequestPayoutDocumentId                  = "payout_document_id"
+	RequestParameterRedirectSettings         = "redirect_settings"
 
 	ImageCollectionImagesField  = "images"
 	ImageCollectionUseOneForAll = "use_one_for_all"
@@ -398,7 +400,7 @@ var (
 )
 
 func LogSrvCallFailedGRPC(log logger.Logger, err error, name, method string, req interface{}) {
-	log.Error(pkg.ErrorGrpcServiceCallFailed,
+	log.Error(billingpb.ErrorGrpcServiceCallFailed,
 		logger.PairArgs(
 			ErrorFieldService, name,
 			ErrorFieldMethod, method,

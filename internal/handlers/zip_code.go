@@ -4,7 +4,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -32,8 +32,23 @@ func (h *ZipCodeRoute) Route(groups *common.Groups) {
 	groups.Common.GET(zipCodePath, h.checkZip)
 }
 
+// @summary Search the city
+// @desc Search the city using the country (and the ZIP code for US)
+// @id zipCodePathCheckZip
+// @tag Country
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.FindByZipCodeResponse Returns the country data (region, city, and others)
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param country query {string} true The country's name.
+// @param zip query {string} false The postal code. It's required for US.
+// @param limit query {string} false The number of objects returned in one page. Default value is 100.
+// @param offset query {string} false The ranking number of the first item on the page.
+// @router /api/v1/zip [get]
 func (h *ZipCodeRoute) checkZip(ctx echo.Context) error {
-	req := &grpc.FindByZipCodeRequest{}
+	req := &billingpb.FindByZipCodeRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)

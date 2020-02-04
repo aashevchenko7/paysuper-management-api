@@ -4,10 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
 
@@ -27,7 +26,7 @@ const (
 type CreateOrderJsonProjectResponse struct {
 	Id              string                    `json:"id"`
 	PaymentFormUrl  string                    `json:"payment_form_url"`
-	PaymentFormData *grpc.PaymentFormJsonData `json:"payment_form_data,omitempty"`
+	PaymentFormData *billingpb.PaymentFormJsonData `json:"payment_form_data,omitempty"`
 }
 
 type ListOrdersRequest struct {
@@ -57,7 +56,7 @@ func (b *OrderListRefundsBinder) Bind(i interface{}, ctx echo.Context) error {
 		return err
 	}
 
-	structure := i.(*grpc.ListRefundsRequest)
+	structure := i.(*billingpb.ListRefundsRequest)
 	structure.OrderId = ctx.Param(common.RequestParameterOrderId)
 
 	if structure.Limit <= 0 {
@@ -94,7 +93,7 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 }
 
 func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
-	req := &grpc.GetOrderRequest{}
+	req := &billingpb.GetOrderRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -103,10 +102,10 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetOrderPublic(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetOrderPublic")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetOrderPublic")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -114,7 +113,7 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 }
 
 func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
-	req := &grpc.ListOrdersRequest{}
+	req := &billingpb.ListOrdersRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -138,10 +137,10 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.FindAllOrdersPublic(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "FindAllOrdersPublic")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "FindAllOrdersPublic")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -171,7 +170,7 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 }
 
 func (h *OrderRoute) getRefund(ctx echo.Context) error {
-	req := &grpc.GetRefundRequest{}
+	req := &billingpb.GetRefundRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -180,10 +179,10 @@ func (h *OrderRoute) getRefund(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetRefund(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetRefund")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetRefund")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -191,7 +190,7 @@ func (h *OrderRoute) getRefund(ctx echo.Context) error {
 }
 
 func (h *OrderRoute) listRefunds(ctx echo.Context) error {
-	req := &grpc.ListRefundsRequest{}
+	req := &billingpb.ListRefundsRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -204,14 +203,14 @@ func (h *OrderRoute) listRefunds(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ListRefunds(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ListRefunds")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ListRefunds")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *OrderRoute) replaceCode(ctx echo.Context) error {
-	req := &grpc.ChangeCodeInOrderRequest{}
+	req := &billingpb.ChangeCodeInOrderRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -221,14 +220,14 @@ func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
-	res := &grpc.ChangeCodeInOrderResponse{}
+	res := &billingpb.ChangeCodeInOrderResponse{}
 
 	res, err := h.dispatch.Services.Billing.ChangeCodeInOrder(ctx.Request().Context(), req)
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeCodeInOrder")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeCodeInOrder")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -237,7 +236,7 @@ func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 
 func (h *OrderRoute) createRefund(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.CreateRefundRequest{}
+	req := &billingpb.CreateRefundRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -255,10 +254,10 @@ func (h *OrderRoute) createRefund(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.CreateRefund(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "CreateRefund")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "CreateRefund")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

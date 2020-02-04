@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -45,32 +45,32 @@ func (suite *TokenTestSuite) SetupTest() {
 func (suite *TokenTestSuite) TearDownTest() {}
 
 func (suite *TokenTestSuite) TestToken_CreateToken_Ok() {
-	body := &grpc.TokenRequest{
-		User: &billing.TokenUser{
+	body := &billingpb.TokenRequest{
+		User: &billingpb.TokenUser{
 			Id: bson.NewObjectId().Hex(),
-			Email: &billing.TokenUserEmailValue{
+			Email: &billingpb.TokenUserEmailValue{
 				Value: "test@unit.test",
 			},
-			Phone: &billing.TokenUserPhoneValue{
+			Phone: &billingpb.TokenUserPhoneValue{
 				Value: "1234567890",
 			},
-			Name: &billing.TokenUserValue{
+			Name: &billingpb.TokenUserValue{
 				Value: "Unit Test",
 			},
-			Ip: &billing.TokenUserIpValue{
+			Ip: &billingpb.TokenUserIpValue{
 				Value: "127.0.0.1",
 			},
-			Locale: &billing.TokenUserLocaleValue{
+			Locale: &billingpb.TokenUserLocaleValue{
 				Value: "ru-RU",
 			},
-			Address: &billing.OrderBillingAddress{
+			Address: &billingpb.OrderBillingAddress{
 				Country:    "RU",
 				City:       "St.Petersburg",
 				PostalCode: "190000",
 				State:      "SPE",
 			},
 		},
-		Settings: &billing.TokenSettings{
+		Settings: &billingpb.TokenSettings{
 			ProjectId:   bson.NewObjectId().Hex(),
 			Currency:    "RUB",
 			Amount:      100,
@@ -120,32 +120,32 @@ func (suite *TokenTestSuite) TestToken_CreateToken_BindError() {
 }
 
 func (suite *TokenTestSuite) TestToken_CreateToken_ValidationError() {
-	body := &grpc.TokenRequest{
-		User: &billing.TokenUser{
+	body := &billingpb.TokenRequest{
+		User: &billingpb.TokenUser{
 			Id: bson.NewObjectId().Hex(),
-			Email: &billing.TokenUserEmailValue{
+			Email: &billingpb.TokenUserEmailValue{
 				Value: "test@unit.test",
 			},
-			Phone: &billing.TokenUserPhoneValue{
+			Phone: &billingpb.TokenUserPhoneValue{
 				Value: "1234567890",
 			},
-			Name: &billing.TokenUserValue{
+			Name: &billingpb.TokenUserValue{
 				Value: "Unit Test",
 			},
-			Ip: &billing.TokenUserIpValue{
+			Ip: &billingpb.TokenUserIpValue{
 				Value: "127.0.0.1",
 			},
-			Locale: &billing.TokenUserLocaleValue{
+			Locale: &billingpb.TokenUserLocaleValue{
 				Value: "ru",
 			},
-			Address: &billing.OrderBillingAddress{
+			Address: &billingpb.OrderBillingAddress{
 				Country:    "RU",
 				City:       "St.Petersburg",
 				PostalCode: "190000",
 				State:      "SPE",
 			},
 		},
-		Settings: &billing.TokenSettings{
+		Settings: &billingpb.TokenSettings{
 			ProjectId:   bson.NewObjectId().Hex(),
 			Currency:    "RUB",
 			Amount:      -100,
@@ -173,32 +173,32 @@ func (suite *TokenTestSuite) TestToken_CreateToken_ValidationError() {
 }
 
 func (suite *TokenTestSuite) TestToken_CreateToken_CheckProjectRequestSignature_System_Error() {
-	body := &grpc.TokenRequest{
-		User: &billing.TokenUser{
+	body := &billingpb.TokenRequest{
+		User: &billingpb.TokenUser{
 			Id: bson.NewObjectId().Hex(),
-			Email: &billing.TokenUserEmailValue{
+			Email: &billingpb.TokenUserEmailValue{
 				Value: "test@unit.test",
 			},
-			Phone: &billing.TokenUserPhoneValue{
+			Phone: &billingpb.TokenUserPhoneValue{
 				Value: "1234567890",
 			},
-			Name: &billing.TokenUserValue{
+			Name: &billingpb.TokenUserValue{
 				Value: "Unit Test",
 			},
-			Ip: &billing.TokenUserIpValue{
+			Ip: &billingpb.TokenUserIpValue{
 				Value: "127.0.0.1",
 			},
-			Locale: &billing.TokenUserLocaleValue{
+			Locale: &billingpb.TokenUserLocaleValue{
 				Value: "ru-RU",
 			},
-			Address: &billing.OrderBillingAddress{
+			Address: &billingpb.OrderBillingAddress{
 				Country:    "RU",
 				City:       "St.Petersburg",
 				PostalCode: "190000",
 				State:      "SPE",
 			},
 		},
-		Settings: &billing.TokenSettings{
+		Settings: &billingpb.TokenSettings{
 			ProjectId:   bson.NewObjectId().Hex(),
 			Currency:    "RUB",
 			Amount:      100,
@@ -233,32 +233,32 @@ func (suite *TokenTestSuite) TestToken_CreateToken_CheckProjectRequestSignature_
 }
 
 func (suite *TokenTestSuite) TestToken_CreateToken_CheckProjectRequestSignature_ResultError() {
-	body := &grpc.TokenRequest{
-		User: &billing.TokenUser{
+	body := &billingpb.TokenRequest{
+		User: &billingpb.TokenUser{
 			Id: bson.NewObjectId().Hex(),
-			Email: &billing.TokenUserEmailValue{
+			Email: &billingpb.TokenUserEmailValue{
 				Value: "test@unit.test",
 			},
-			Phone: &billing.TokenUserPhoneValue{
+			Phone: &billingpb.TokenUserPhoneValue{
 				Value: "1234567890",
 			},
-			Name: &billing.TokenUserValue{
+			Name: &billingpb.TokenUserValue{
 				Value: "Unit Test",
 			},
-			Ip: &billing.TokenUserIpValue{
+			Ip: &billingpb.TokenUserIpValue{
 				Value: "127.0.0.1",
 			},
-			Locale: &billing.TokenUserLocaleValue{
+			Locale: &billingpb.TokenUserLocaleValue{
 				Value: "ru-RU",
 			},
-			Address: &billing.OrderBillingAddress{
+			Address: &billingpb.OrderBillingAddress{
 				Country:    "RU",
 				City:       "St.Petersburg",
 				PostalCode: "190000",
 				State:      "SPE",
 			},
 		},
-		Settings: &billing.TokenSettings{
+		Settings: &billingpb.TokenSettings{
 			ProjectId:   bson.NewObjectId().Hex(),
 			Currency:    "RUB",
 			Amount:      100,
@@ -293,32 +293,32 @@ func (suite *TokenTestSuite) TestToken_CreateToken_CheckProjectRequestSignature_
 }
 
 func (suite *TokenTestSuite) TestToken_CreateToken_ChangeCustomer_System_Error() {
-	body := &grpc.TokenRequest{
-		User: &billing.TokenUser{
+	body := &billingpb.TokenRequest{
+		User: &billingpb.TokenUser{
 			Id: bson.NewObjectId().Hex(),
-			Email: &billing.TokenUserEmailValue{
+			Email: &billingpb.TokenUserEmailValue{
 				Value: "test@unit.test",
 			},
-			Phone: &billing.TokenUserPhoneValue{
+			Phone: &billingpb.TokenUserPhoneValue{
 				Value: "1234567890",
 			},
-			Name: &billing.TokenUserValue{
+			Name: &billingpb.TokenUserValue{
 				Value: "Unit Test",
 			},
-			Ip: &billing.TokenUserIpValue{
+			Ip: &billingpb.TokenUserIpValue{
 				Value: "127.0.0.1",
 			},
-			Locale: &billing.TokenUserLocaleValue{
+			Locale: &billingpb.TokenUserLocaleValue{
 				Value: "ru-RU",
 			},
-			Address: &billing.OrderBillingAddress{
+			Address: &billingpb.OrderBillingAddress{
 				Country:    "RU",
 				City:       "St.Petersburg",
 				PostalCode: "190000",
 				State:      "SPE",
 			},
 		},
-		Settings: &billing.TokenSettings{
+		Settings: &billingpb.TokenSettings{
 			ProjectId:   bson.NewObjectId().Hex(),
 			Currency:    "RUB",
 			Amount:      100,
@@ -353,32 +353,32 @@ func (suite *TokenTestSuite) TestToken_CreateToken_ChangeCustomer_System_Error()
 }
 
 func (suite *TokenTestSuite) TestToken_CreateToken_ChangeCustomer_ResultError() {
-	body := &grpc.TokenRequest{
-		User: &billing.TokenUser{
+	body := &billingpb.TokenRequest{
+		User: &billingpb.TokenUser{
 			Id: bson.NewObjectId().Hex(),
-			Email: &billing.TokenUserEmailValue{
+			Email: &billingpb.TokenUserEmailValue{
 				Value: "test@unit.test",
 			},
-			Phone: &billing.TokenUserPhoneValue{
+			Phone: &billingpb.TokenUserPhoneValue{
 				Value: "1234567890",
 			},
-			Name: &billing.TokenUserValue{
+			Name: &billingpb.TokenUserValue{
 				Value: "Unit Test",
 			},
-			Ip: &billing.TokenUserIpValue{
+			Ip: &billingpb.TokenUserIpValue{
 				Value: "127.0.0.1",
 			},
-			Locale: &billing.TokenUserLocaleValue{
+			Locale: &billingpb.TokenUserLocaleValue{
 				Value: "ru-RU",
 			},
-			Address: &billing.OrderBillingAddress{
+			Address: &billingpb.OrderBillingAddress{
 				Country:    "RU",
 				City:       "St.Petersburg",
 				PostalCode: "190000",
 				State:      "SPE",
 			},
 		},
-		Settings: &billing.TokenSettings{
+		Settings: &billingpb.TokenSettings{
 			ProjectId:   bson.NewObjectId().Hex(),
 			Currency:    "RUB",
 			Amount:      100,
