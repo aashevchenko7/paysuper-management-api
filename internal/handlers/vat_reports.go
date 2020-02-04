@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"strings"
 )
@@ -46,7 +46,7 @@ func (h *VatReportsRoute) Route(groups *common.Groups) {
 
 func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 
-	res, err := h.dispatch.Services.Billing.GetVatReportsDashboard(ctx.Request().Context(), &grpc.EmptyRequest{})
+	res, err := h.dispatch.Services.Billing.GetVatReportsDashboard(ctx.Request().Context(), &billingpb.EmptyRequest{})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -57,7 +57,7 @@ func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 }
 
 func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
-	req := &grpc.VatReportsRequest{}
+	req := &billingpb.VatReportsRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -97,7 +97,7 @@ func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
 }
 
 func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
-	req := &grpc.VatTransactionsRequest{}
+	req := &billingpb.VatTransactionsRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -138,7 +138,7 @@ func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error 
 
 func (h *VatReportsRoute) updateVatReportStatus(ctx echo.Context) error {
 
-	req := &grpc.UpdateVatReportStatusRequest{}
+	req := &billingpb.UpdateVatReportStatusRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {

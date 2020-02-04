@@ -3,7 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -57,7 +57,7 @@ func (suite *ZipCodeTestSuite) TestCheckZip_Ok() {
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	data := &grpc.FindByZipCodeResponse{}
+	data := &billingpb.FindByZipCodeResponse{}
 	err = json.Unmarshal(res.Body.Bytes(), data)
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), int32(1), data.Count)

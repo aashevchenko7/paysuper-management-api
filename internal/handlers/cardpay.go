@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -44,7 +44,7 @@ func (h *CardPayWebHook) Route(groups *common.Groups) {
 
 func (h *CardPayWebHook) paymentCallback(ctx echo.Context) error {
 
-	st := &billing.CardPayPaymentCallback{}
+	st := &billingpb.CardPayPaymentCallback{}
 
 	if err := ctx.Bind(st); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
@@ -54,7 +54,7 @@ func (h *CardPayWebHook) paymentCallback(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
-	req := &grpc.PaymentNotifyRequest{
+	req := &billingpb.PaymentNotifyRequest{
 		OrderId:   st.MerchantOrder.Id,
 		Request:   common.ExtractRawBodyContext(ctx),
 		Signature: ctx.Request().Header.Get(common.CardPayPaymentResponseHeaderSignature),
@@ -71,13 +71,13 @@ func (h *CardPayWebHook) paymentCallback(ctx echo.Context) error {
 	var message = map[string]string{"message": res.Error}
 
 	switch res.Status {
-	case pkg.StatusErrorValidation:
+	case billingpb.StatusErrorValidation:
 		httpStatus = http.StatusBadRequest
 		break
-	case pkg.StatusErrorSystem:
+	case billingpb.StatusErrorSystem:
 		httpStatus = http.StatusInternalServerError
 		break
-	case pkg.StatusTemporary:
+	case billingpb.StatusTemporary:
 		httpStatus = http.StatusGone
 		break
 	default:
@@ -90,7 +90,7 @@ func (h *CardPayWebHook) paymentCallback(ctx echo.Context) error {
 
 func (h *CardPayWebHook) refundCallback(ctx echo.Context) error {
 
-	st := &billing.CardPayRefundCallback{}
+	st := &billingpb.CardPayRefundCallback{}
 	err := ctx.Bind(st)
 
 	if err != nil {
@@ -103,8 +103,8 @@ func (h *CardPayWebHook) refundCallback(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
-	req := &grpc.CallbackRequest{
-		Handler:   pkg.PaymentSystemHandlerCardPay,
+	req := &billingpb.CallbackRequest{
+		Handler:   billingpb.PaymentSystemHandlerCardPay,
 		Body:      common.ExtractRawBodyContext(ctx),
 		Signature: ctx.Request().Header.Get(common.CardPayPaymentResponseHeaderSignature),
 	}
@@ -116,7 +116,7 @@ func (h *CardPayWebHook) refundCallback(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Error)
 	}
 

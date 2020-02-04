@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -44,7 +44,7 @@ func (h *AdminUsersRoute) Route(groups *common.Groups) {
 }
 
 func (h *AdminUsersRoute) changeRole(ctx echo.Context) error {
-	req := &grpc.ChangeRoleForAdminUserRequest{}
+	req := &billingpb.ChangeRoleForAdminUserRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -53,10 +53,10 @@ func (h *AdminUsersRoute) changeRole(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeRoleForAdminUser(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeRoleForAdminUser")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeRoleForAdminUser")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -64,10 +64,10 @@ func (h *AdminUsersRoute) changeRole(ctx echo.Context) error {
 }
 
 func (h *AdminUsersRoute) listUsers(ctx echo.Context) error {
-	res, err := h.dispatch.Services.Billing.GetAdminUsers(ctx.Request().Context(), &grpc.EmptyRequest{})
+	res, err := h.dispatch.Services.Billing.GetAdminUsers(ctx.Request().Context(), &billingpb.EmptyRequest{})
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(&grpc.EmptyRequest{}, err, pkg.ServiceName, "GetAdminUsers")
+		return h.dispatch.SrvCallHandler(&billingpb.EmptyRequest{}, err, billingpb.ServiceName, "GetAdminUsers")
 	}
 
 	if res.Status != http.StatusOK {
@@ -78,7 +78,7 @@ func (h *AdminUsersRoute) listUsers(ctx echo.Context) error {
 }
 
 func (h *AdminUsersRoute) sendInvite(ctx echo.Context) error {
-	req := &grpc.InviteUserAdminRequest{}
+	req := &billingpb.InviteUserAdminRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -87,10 +87,10 @@ func (h *AdminUsersRoute) sendInvite(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.InviteUserAdmin(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "InviteUserAdmin")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "InviteUserAdmin")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -98,7 +98,7 @@ func (h *AdminUsersRoute) sendInvite(ctx echo.Context) error {
 }
 
 func (h *AdminUsersRoute) resendInvite(ctx echo.Context) error {
-	req := &grpc.ResendInviteAdminRequest{}
+	req := &billingpb.ResendInviteAdminRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -107,10 +107,10 @@ func (h *AdminUsersRoute) resendInvite(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ResendInviteAdmin(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ResendInviteAdmin")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ResendInviteAdmin")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -118,18 +118,18 @@ func (h *AdminUsersRoute) resendInvite(ctx echo.Context) error {
 }
 
 func (h *AdminUsersRoute) listRoles(ctx echo.Context) error {
-	req := &grpc.GetRoleListRequest{Type: pkg.RoleTypeSystem}
+	req := &billingpb.GetRoleListRequest{Type: billingpb.RoleTypeSystem}
 	res, err := h.dispatch.Services.Billing.GetRoleList(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetRoleList")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetRoleList")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *AdminUsersRoute) deleteUser(ctx echo.Context) error {
-	req := &grpc.AdminRoleRequest{}
+	req := &billingpb.AdminRoleRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -138,10 +138,10 @@ func (h *AdminUsersRoute) deleteUser(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.DeleteAdminUser(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "DeleteAdminUser")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "DeleteAdminUser")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -149,7 +149,7 @@ func (h *AdminUsersRoute) deleteUser(ctx echo.Context) error {
 }
 
 func (h *AdminUsersRoute) getUser(ctx echo.Context) error {
-	req := &grpc.AdminRoleRequest{}
+	req := &billingpb.AdminRoleRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -158,10 +158,10 @@ func (h *AdminUsersRoute) getUser(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAdminUserRole(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetAdminUserRole")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetAdminUserRole")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

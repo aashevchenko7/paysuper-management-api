@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -42,7 +42,7 @@ func (h *ProjectRoute) Route(groups *common.Groups) {
 }
 
 func (h *ProjectRoute) createProject(ctx echo.Context) error {
-	req := &billing.Project{}
+	req := &billingpb.Project{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -54,11 +54,11 @@ func (h *ProjectRoute) createProject(ctx echo.Context) error {
 	}
 
 	if len(req.CallbackProtocol) == 0 {
-		req.CallbackProtocol = pkg.ProjectCallbackProtocolEmpty
+		req.CallbackProtocol = billingpb.ProjectCallbackProtocolEmpty
 	}
 
 	// vat payer is seller by default on project creation
-	req.VatPayer = pkg.VatPayerSeller
+	req.VatPayer = billingpb.VatPayerSeller
 
 	if err := h.dispatch.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
@@ -71,15 +71,15 @@ func (h *ProjectRoute) createProject(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	return ctx.JSON(http.StatusCreated, res)
+	return ctx.JSON(http.StatusCreated, res.Item)
 }
 
 func (h *ProjectRoute) updateProject(ctx echo.Context) error {
-	req := &billing.Project{}
+	req := &billingpb.Project{}
 	binder := common.NewChangeProjectRequestBinder(h.dispatch, h.cfg)
 
 	if err := binder.Bind(req, ctx); err != nil {
@@ -102,7 +102,7 @@ func (h *ProjectRoute) updateProject(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -110,7 +110,7 @@ func (h *ProjectRoute) updateProject(ctx echo.Context) error {
 }
 
 func (h *ProjectRoute) getProject(ctx echo.Context) error {
-	req := &grpc.GetProjectRequest{}
+	req := &billingpb.GetProjectRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -127,7 +127,7 @@ func (h *ProjectRoute) getProject(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -135,7 +135,7 @@ func (h *ProjectRoute) getProject(ctx echo.Context) error {
 }
 
 func (h *ProjectRoute) listProjects(ctx echo.Context) error {
-	req := &grpc.ListProjectsRequest{}
+	req := &billingpb.ListProjectsRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -160,7 +160,7 @@ func (h *ProjectRoute) listProjects(ctx echo.Context) error {
 }
 
 func (h *ProjectRoute) deleteProject(ctx echo.Context) error {
-	req := &grpc.GetProjectRequest{}
+	req := &billingpb.GetProjectRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -177,14 +177,14 @@ func (h *ProjectRoute) deleteProject(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
 	return ctx.JSON(http.StatusOK, res)
 }
 func (h *ProjectRoute) checkSku(ctx echo.Context) error {
-	req := &grpc.CheckSkuAndKeyProjectRequest{}
+	req := &billingpb.CheckSkuAndKeyProjectRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -201,7 +201,7 @@ func (h *ProjectRoute) checkSku(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
