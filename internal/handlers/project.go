@@ -171,7 +171,7 @@ func (h *ProjectRoute) getProject(ctx echo.Context) error {
 }
 
 // @summary Get the list of projects
-// @desc Get the list of projects for the authorised merchant
+// @desc Get the list of projects for the authorized merchant
 // @id projectsPathListProjects
 // @tag Project
 // @accept application/json
@@ -222,7 +222,7 @@ func (h *ProjectRoute) listProjects(ctx echo.Context) error {
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the project.
-// @router /admin/api/v1/projects/{project_id} [patch]
+// @router /admin/api/v1/projects/{project_id} [delete]
 func (h *ProjectRoute) deleteProject(ctx echo.Context) error {
 	req := &grpc.GetProjectRequest{}
 

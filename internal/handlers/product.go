@@ -45,12 +45,12 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 }
 
 // @summary Get the list of products
-// @desc Get the list of products for the authorised user
+// @desc Get the list of products for the authorized user
 // @id productsPathGetProductsList
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListProductsResponse Returns the list of products for the authorised user. This list can be filtered by the product's name, SKU, status and the project ID.
+// @success 200 {object} grpc.ListProductsResponse Returns the list of products for the authorized user. This list can be filtered by the product's name, SKU, status and the project ID.
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param name query {string} false The product's name.

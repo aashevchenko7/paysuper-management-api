@@ -58,7 +58,7 @@ func (h *PayLinkRoute) Route(groups *common.Groups) {
 }
 
 // @summary Get the list of payment links
-// @desc Get the list of payment links for the authorised merchant
+// @desc Get the list of payment links for the authorized merchant
 // @id paylinksPathGetPaylinksList
 // @tag Payment link
 // @accept application/json
@@ -67,8 +67,8 @@ func (h *PayLinkRoute) Route(groups *common.Groups) {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-// @param limit query {string} false The number of payment links returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} false The number of payment links returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/paylinks [get]
 func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 	req := &grpc.GetPaylinksRequest{}
@@ -329,6 +329,19 @@ func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the payment link summary grouped by the country
+// @desc Get payment link statistical results for the period grouped by the country using the payment link ID
+// @id paylinksIdStatCountryPathGetPaylinkStatByCountry
+// @tag Payment link
+// @accept application/json
+// @produce application/json
+// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the payment link.
+// @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
+// @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
+// @router /admin/api/v1/paylinks/{id}/dashboard/country [get]
 func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
@@ -353,6 +366,19 @@ func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the payment link summary grouped by the referrer
+// @desc Get payment link statistical results for the period grouped by the referrer using the payment link ID
+// @id paylinksIdStatReferrerPathGetPaylinkStatByReferrer
+// @tag Payment link
+// @accept application/json
+// @produce application/json
+// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the payment link.
+// @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
+// @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
+// @router /admin/api/v1/paylinks/{id}/dashboard/referrer [get]
 func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
@@ -377,6 +403,19 @@ func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the payment link summary grouped by the date
+// @desc Get payment link statistical results for the period grouped by the date using the payment link ID
+// @id paylinksIdStatDatePathGetPaylinkStatByDate
+// @tag Payment link
+// @accept application/json
+// @produce application/json
+// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the payment link.
+// @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
+// @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
+// @router /admin/api/v1/paylinks/{id}/dashboard/date [get]
 func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
@@ -401,6 +440,19 @@ func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the payment link summary grouped by the UTM-tag
+// @desc Get payment link statistical results for the period grouped by the UTM-tag using the payment link ID
+// @id paylinksIdStatUtmPathGetPaylinkStatByUtm
+// @tag Payment link
+// @accept application/json
+// @produce application/json
+// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the payment link.
+// @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
+// @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
+// @router /admin/api/v1/paylinks/{id}/dashboard/utm [get]
 func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 	req := &grpc.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
@@ -425,6 +477,19 @@ func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the list of payment link's transactions
+// @desc Get the list of payment link's transactions using the payment link ID
+// @id paylinksIdTransactionsPathGetPaylinkTransactions
+// @tag Payment link
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.TransactionsPaginate Returns the list of payment link's transactions
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the payment link.
+// @param limit query {integer} false The number of transactions returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /admin/api/v1/paylinks/{id}/transactions [get]
 func (h *PayLinkRoute) getPaylinkTransactions(ctx echo.Context) error {
 	req := &grpc.GetPaylinkTransactionsRequest{}
 

@@ -44,8 +44,8 @@ func (h *ZipCodeRoute) Route(groups *common.Groups) {
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param country query {string} true The country's name.
 // @param zip query {string} false The postal code. It's required for US.
-// @param limit query {string} false The number of objects returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} false The number of objects returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /api/v1/zip [get]
 func (h *ZipCodeRoute) checkZip(ctx echo.Context) error {
 	req := &grpc.FindByZipCodeRequest{}
