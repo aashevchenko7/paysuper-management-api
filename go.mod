@@ -22,6 +22,7 @@ require (
 	github.com/micro/go-plugins v1.2.0
 	github.com/paysuper/echo-casbin-middleware v0.0.0-20191201120027-e10b488ca709
 	github.com/paysuper/paysuper-aws-manager v0.0.1
+	github.com/paysuper/paysuper-billing-server v1.2.0
 	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200201164450-5646d436a00c
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200122152034-6d6bb19abebf
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200123200131-df93e6644cbd
@@ -30,7 +31,6 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
-	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.0.1
 	go.uber.org/automaxprocs v1.2.0
 	gopkg.in/go-playground/validator.v9 v9.30.0
