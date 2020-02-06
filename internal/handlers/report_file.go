@@ -9,8 +9,7 @@ import (
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
-	reporterProto "github.com/paysuper/paysuper-reporter/pkg/proto"
+	reporterProto "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"os"
 	"strings"
@@ -77,7 +76,7 @@ func (h *ReportFileRoute) create(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Reporter.CreateFile(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, reporterPkg.ServiceName, "CreateFile", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, reporterProto.ServiceName, "CreateFile", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorMessageCreateReportFile)
 	}
 
@@ -114,7 +113,7 @@ func (h *ReportFileRoute) download(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	fileName := fmt.Sprintf(reporterPkg.FileMask, common.ExtractUserContext(ctx).Id, params[0], params[1])
+	fileName := fmt.Sprintf(reporterProto.FileMask, common.ExtractUserContext(ctx).Id, params[0], params[1])
 	filePath := os.TempDir() + string(os.PathSeparator) + fileName
 	_, err := h.awsManager.Download(ctx.Request().Context(), filePath, &awsWrapper.DownloadInput{FileName: fileName})
 

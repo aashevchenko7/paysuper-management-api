@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	casbinMiddleware "github.com/paysuper/echo-casbin-middleware"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"io/ioutil"
 	"net/http"
@@ -165,7 +165,7 @@ func (d *Dispatcher) AuthOneMerchantPreMiddleware() echo.MiddlewareFunc {
 
 				res, err := d.appSet.Services.Billing.GetMerchantsForUser(
 					c.Request().Context(),
-					&grpc.GetMerchantsForUserRequest{UserId: user.Id},
+					&billingpb.GetMerchantsForUserRequest{UserId: user.Id},
 				)
 
 				if err != nil {

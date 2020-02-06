@@ -4,9 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -46,7 +45,7 @@ func (h *KeyRoute) Route(groups *common.Groups) {
 // @param key_id path {string} true The unique identifier for the key.
 // @router /admin/api/v1/keys/{key_id} [get]
 func (h *KeyRoute) getKeyInfo(ctx echo.Context) error {
-	req := &grpc.KeyForOrderRequest{
+	req := &billingpb.KeyForOrderRequest{
 		KeyId: ctx.Param("key_id"),
 	}
 
@@ -60,7 +59,7 @@ func (h *KeyRoute) getKeyInfo(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -53,7 +53,7 @@ func (h *TokenRoute) Route(groups *common.Groups) {
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /api/v1/tokens [post]
 func (h *TokenRoute) createToken(ctx echo.Context) error {
-	req := &grpc.TokenRequest{}
+	req := &billingpb.TokenRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -79,7 +79,7 @@ func (h *TokenRoute) createToken(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

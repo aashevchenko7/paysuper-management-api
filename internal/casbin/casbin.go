@@ -5,8 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/invoker"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
-	"github.com/paysuper/casbin-server/pkg/generated/api/proto/casbinpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/casbinpb"
 	"github.com/pkg/errors"
 	"io/ioutil"
 )

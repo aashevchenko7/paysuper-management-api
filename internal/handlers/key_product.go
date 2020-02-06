@@ -6,8 +6,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/micro/go-micro/client"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"io/ioutil"
 	"net/http"
@@ -57,7 +57,7 @@ func (h *KeyProductRoute) Route(groups *common.Groups) {
 }
 
 func (h *KeyProductRoute) unpublishKeyProduct(ctx echo.Context) error {
-	req := &grpc.UnPublishKeyProductRequest{}
+	req := &billingpb.UnPublishKeyProductRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -74,7 +74,7 @@ func (h *KeyProductRoute) unpublishKeyProduct(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -82,7 +82,7 @@ func (h *KeyProductRoute) unpublishKeyProduct(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) publishKeyProduct(ctx echo.Context) error {
-	req := &grpc.PublishKeyProductRequest{}
+	req := &billingpb.PublishKeyProductRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -107,7 +107,7 @@ func (h *KeyProductRoute) publishKeyProduct(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) getPlatformsList(ctx echo.Context) error {
-	req := &grpc.ListPlatformsRequest{}
+	req := &billingpb.ListPlatformsRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -131,7 +131,7 @@ func (h *KeyProductRoute) getPlatformsList(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -139,7 +139,7 @@ func (h *KeyProductRoute) getPlatformsList(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) deleteKeyProductById(ctx echo.Context) error {
-	req := &grpc.RequestKeyProductMerchant{}
+	req := &billingpb.RequestKeyProductMerchant{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -156,7 +156,7 @@ func (h *KeyProductRoute) deleteKeyProductById(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -164,7 +164,7 @@ func (h *KeyProductRoute) deleteKeyProductById(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) changeKeyProduct(ctx echo.Context) error {
-	req := &grpc.CreateOrUpdateKeyProductRequest{}
+	req := &billingpb.CreateOrUpdateKeyProductRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -181,7 +181,7 @@ func (h *KeyProductRoute) changeKeyProduct(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -189,7 +189,7 @@ func (h *KeyProductRoute) changeKeyProduct(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) getKeyProductById(ctx echo.Context) error {
-	req := &grpc.RequestKeyProductMerchant{}
+	req := &billingpb.RequestKeyProductMerchant{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -206,7 +206,7 @@ func (h *KeyProductRoute) getKeyProductById(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -214,7 +214,7 @@ func (h *KeyProductRoute) getKeyProductById(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) createKeyProduct(ctx echo.Context) error {
-	req := &grpc.CreateOrUpdateKeyProductRequest{}
+	req := &billingpb.CreateOrUpdateKeyProductRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -240,7 +240,7 @@ func (h *KeyProductRoute) createKeyProduct(ctx echo.Context) error {
 
 func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.ListKeyProductsRequest{}
+	req := &billingpb.ListKeyProductsRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -287,7 +287,7 @@ func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
 // @param currency query {string} false The price currency.
 // @router /auth/api/v1/key-products/{key_product_id} [get]
 func (h *KeyProductRoute) getKeyProduct(ctx echo.Context) error {
-	req := &grpc.GetKeyProductInfoRequest{}
+	req := &billingpb.GetKeyProductInfoRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -318,7 +318,7 @@ func (h *KeyProductRoute) getKeyProduct(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -326,7 +326,7 @@ func (h *KeyProductRoute) getKeyProduct(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
-	req := &grpc.PlatformKeysFileRequest{}
+	req := &billingpb.PlatformKeysFileRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -354,13 +354,13 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 	req.KeyProductId = ctx.Param("key_product_id")
 	req.PlatformId = ctx.Param("platform_id")
 
-	keyProductRes, err := h.dispatch.Services.Billing.GetKeyProduct(ctx.Request().Context(), &grpc.RequestKeyProductMerchant{Id: req.KeyProductId, MerchantId: req.MerchantId})
+	keyProductRes, err := h.dispatch.Services.Billing.GetKeyProduct(ctx.Request().Context(), &billingpb.RequestKeyProductMerchant{Id: req.KeyProductId, MerchantId: req.MerchantId})
 	if err != nil {
 		h.L().Error(common.InternalErrorTemplate, logger.PairArgs("err", err.Error()))
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if keyProductRes.Status != pkg.ResponseStatusOk {
+	if keyProductRes.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(keyProductRes.Status), keyProductRes.Message)
 	}
 
@@ -374,7 +374,7 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -382,7 +382,7 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 }
 
 func (h *KeyProductRoute) getCountOfKeys(ctx echo.Context) error {
-	req := &grpc.GetPlatformKeyCountRequest{}
+	req := &billingpb.GetPlatformKeyCountRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
@@ -401,7 +401,7 @@ func (h *KeyProductRoute) getCountOfKeys(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

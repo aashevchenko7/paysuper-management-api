@@ -5,10 +5,10 @@ import (
 	"errors"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -56,18 +56,18 @@ func (suite *ProjectTestSuite) SetupTest() {
 func (suite *ProjectTestSuite) TearDownTest() {}
 
 func (suite *ProjectTestSuite) TestProject_CreateProject_Ok() {
-	body := &billing.Project{
+	body := &billingpb.Project{
 		MerchantId:         bson.NewObjectId().Hex(),
 		Name:               map[string]string{"en": "A", "ru": "А"},
 		CallbackCurrency:   "RUB",
-		CallbackProtocol:   pkg.ProjectCallbackProtocolEmpty,
+		CallbackProtocol:   billingpb.ProjectCallbackProtocolEmpty,
 		LimitsCurrency:     "RUB",
 		MinPaymentAmount:   0,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
-		RedirectSettings: &billing.ProjectRedirectSettings{
-			Mode:  pkg.ProjectRedirectModeAny,
-			Usage: pkg.ProjectRedirectUsageAny,
+		RedirectSettings: &billingpb.ProjectRedirectSettings{
+			Mode:  billingpb.ProjectRedirectModeAny,
+			Usage: billingpb.ProjectRedirectUsageAny,
 		},
 	}
 
@@ -105,18 +105,18 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_BindError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_CreateProject_ValidationError() {
-	body := &billing.Project{
+	body := &billingpb.Project{
 		MerchantId:         bson.NewObjectId().Hex(),
 		Name:               map[string]string{"en": "A", "ru": "А"},
 		CallbackCurrency:   "RUB",
-		CallbackProtocol:   pkg.ProjectCallbackProtocolEmpty,
+		CallbackProtocol:   billingpb.ProjectCallbackProtocolEmpty,
 		LimitsCurrency:     "RUB",
 		MinPaymentAmount:   -100,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
-		RedirectSettings: &billing.ProjectRedirectSettings{
-			Mode:  pkg.ProjectRedirectModeAny,
-			Usage: pkg.ProjectRedirectUsageAny,
+		RedirectSettings: &billingpb.ProjectRedirectSettings{
+			Mode:  billingpb.ProjectRedirectModeAny,
+			Usage: billingpb.ProjectRedirectUsageAny,
 		},
 	}
 
@@ -139,19 +139,19 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_ValidationError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerError() {
-	body := &billing.Project{
+	body := &billingpb.Project{
 		MerchantId:         bson.NewObjectId().Hex(),
 		Name:               map[string]string{"en": "A", "ru": "А"},
 		CallbackCurrency:   "RUB",
-		CallbackProtocol:   pkg.ProjectCallbackProtocolEmpty,
+		CallbackProtocol:   billingpb.ProjectCallbackProtocolEmpty,
 		LimitsCurrency:     "RUB",
 		MinPaymentAmount:   100,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
-		VatPayer:           pkg.VatPayerBuyer,
-		RedirectSettings: &billing.ProjectRedirectSettings{
-			Mode:  pkg.ProjectRedirectModeAny,
-			Usage: pkg.ProjectRedirectUsageAny,
+		VatPayer:           billingpb.VatPayerBuyer,
+		RedirectSettings: &billingpb.ProjectRedirectSettings{
+			Mode:  billingpb.ProjectRedirectModeAny,
+			Usage: billingpb.ProjectRedirectUsageAny,
 		},
 	}
 
@@ -176,19 +176,19 @@ func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_CreateProject_BillingServerResultError() {
-	body := &billing.Project{
+	body := &billingpb.Project{
 		MerchantId:         bson.NewObjectId().Hex(),
 		Name:               map[string]string{"en": "A", "ru": "А"},
 		CallbackCurrency:   "RUB",
-		CallbackProtocol:   pkg.ProjectCallbackProtocolEmpty,
+		CallbackProtocol:   billingpb.ProjectCallbackProtocolEmpty,
 		LimitsCurrency:     "RUB",
 		MinPaymentAmount:   100,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
-		VatPayer:           pkg.VatPayerBuyer,
-		RedirectSettings: &billing.ProjectRedirectSettings{
-			Mode:  pkg.ProjectRedirectModeAny,
-			Usage: pkg.ProjectRedirectUsageAny,
+		VatPayer:           billingpb.VatPayerBuyer,
+		RedirectSettings: &billingpb.ProjectRedirectSettings{
+			Mode:  billingpb.ProjectRedirectModeAny,
+			Usage: billingpb.ProjectRedirectUsageAny,
 		},
 	}
 
@@ -579,9 +579,9 @@ func (suite *ProjectTestSuite) TestProjectCheckSku_ServiceError() {
 	body := `{"sku": "test"}`
 
 	billingService := &billMock.BillingService{}
-	billingService.On("CheckSkuAndKeyProject", mock2.Anything, mock2.Anything).Return(&grpc.EmptyResponseWithStatus{
+	billingService.On("CheckSkuAndKeyProject", mock2.Anything, mock2.Anything).Return(&billingpb.EmptyResponseWithStatus{
 		Status: 400,
-		Message: &grpc.ResponseErrorMessage{
+		Message: &billingpb.ResponseErrorMessage{
 			Message: "some error",
 		},
 	}, nil)
@@ -606,7 +606,7 @@ func (suite *ProjectTestSuite) TestProjectCheckSku_Ok() {
 	body := `{"sku": "test"}`
 
 	billingService := &billMock.BillingService{}
-	billingService.On("CheckSkuAndKeyProject", mock2.Anything, mock2.Anything).Return(&grpc.EmptyResponseWithStatus{
+	billingService.On("CheckSkuAndKeyProject", mock2.Anything, mock2.Anything).Return(&billingpb.EmptyResponseWithStatus{
 		Status: 200,
 	}, nil)
 	suite.router.dispatch.Services.Billing = billingService
@@ -651,7 +651,7 @@ func (suite *ProjectTestSuite) TestProject_UpdateProjectWrongCallback_Error() {
 }
 
 func (suite *ProjectTestSuite) TestProject_CreateProjectWithoutCallbackProtocol_Error() {
-	body := &billing.Project{
+	body := &billingpb.Project{
 		MerchantId:         bson.NewObjectId().Hex(),
 		Name:               map[string]string{"en": "A", "ru": "А"},
 		CallbackCurrency:   "RUB",
@@ -659,10 +659,10 @@ func (suite *ProjectTestSuite) TestProject_CreateProjectWithoutCallbackProtocol_
 		MinPaymentAmount:   0,
 		MaxPaymentAmount:   15000,
 		IsProductsCheckout: false,
-		VatPayer:           pkg.VatPayerBuyer,
-		RedirectSettings: &billing.ProjectRedirectSettings{
-			Mode:  pkg.ProjectRedirectModeAny,
-			Usage: pkg.ProjectRedirectUsageAny,
+		VatPayer:           billingpb.VatPayerBuyer,
+		RedirectSettings: &billingpb.ProjectRedirectSettings{
+			Mode:  billingpb.ProjectRedirectModeAny,
+			Usage: billingpb.ProjectRedirectUsageAny,
 		},
 	}
 

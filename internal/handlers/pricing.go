@@ -4,7 +4,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -49,7 +49,7 @@ func (h *Pricing) Route(groups *common.Groups) {
 // @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
 // @router /api/v1/pricing/recommended/conversion [get]
 func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
-	req := &grpc.RecommendedPriceRequest{}
+	req := &billingpb.RecommendedPriceRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -83,7 +83,7 @@ func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
 // @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
 // @router /api/v1/pricing/recommended/steam [get]
 func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
-	req := &grpc.RecommendedPriceRequest{}
+	req := &billingpb.RecommendedPriceRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -116,7 +116,7 @@ func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
 // @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
 // @router /api/v1/pricing/recommended/table [get]
 func (h *Pricing) getRecommendedTable(ctx echo.Context) error {
-	req := &grpc.RecommendedPriceTableRequest{}
+	req := &billingpb.RecommendedPriceTableRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {

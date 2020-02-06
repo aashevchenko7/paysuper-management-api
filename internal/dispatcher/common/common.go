@@ -6,13 +6,10 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billingService "github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
-	recurringService "github.com/paysuper/paysuper-recurring-repository/pkg/proto/repository"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
-	reporterProto "github.com/paysuper/paysuper-reporter/pkg/proto"
-	reporterService "github.com/paysuper/paysuper-reporter/pkg/proto"
-	taxService "github.com/paysuper/paysuper-tax-service/proto"
+	billingService "github.com/paysuper/paysuper-proto/go/billingpb"
+	recurringService "github.com/paysuper/paysuper-proto/go/recurringpb"
+	reporterService "github.com/paysuper/paysuper-proto/go/reporterpb"
+	taxService "github.com/paysuper/paysuper-proto/go/taxpb"
 	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 )
@@ -138,7 +135,7 @@ func (h HandlerSet) BindAndValidate(req interface{}, ctx echo.Context) *echo.HTT
 
 // SrvCallHandler returns error if present, otherwise response as JSON with 200 OK
 func (h HandlerSet) SrvCallHandler(req interface{}, err error, name, method string) *echo.HTTPError {
-	h.AwareSet.L().Error(pkg.ErrorGrpcServiceCallFailed,
+	h.AwareSet.L().Error(billingService.ErrorGrpcServiceCallFailed,
 		logger.PairArgs(
 			ErrorFieldService, name,
 			ErrorFieldMethod, method,
@@ -172,7 +169,7 @@ func (h *HandlerSet) RequestReportFile(ctx echo.Context, data *ReportFileRequest
 		return echo.NewHTTPError(http.StatusInternalServerError, ErrorRequestDataInvalid)
 	}
 
-	req := &reporterProto.ReportFile{
+	req := &reporterService.ReportFile{
 		UserId:           ExtractUserContext(ctx).Id,
 		MerchantId:       data.MerchantId,
 		ReportType:       data.ReportType,
@@ -189,7 +186,7 @@ func (h *HandlerSet) RequestReportFile(ctx echo.Context, data *ReportFileRequest
 	res, err := h.Services.Reporter.CreateFile(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.SrvCallHandler(req, err, reporterPkg.ServiceName, "CreateFile")
+		return h.SrvCallHandler(req, err, reporterService.ServiceName, "CreateFile")
 	}
 
 	if res.Status != http.StatusOK {

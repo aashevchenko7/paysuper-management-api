@@ -9,7 +9,7 @@ import (
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
-	"github.com/paysuper/paysuper-tax-service/proto"
+	tax_service "github.com/paysuper/paysuper-proto/go/taxpb"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"

@@ -7,10 +7,10 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -72,7 +72,7 @@ func (suite *OrderTestSuite) TestOrder_GetRefund_Ok() {
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
 
-	refund := &billing.JsonRefund{}
+	refund := &billingpb.JsonRefund{}
 	err = json.Unmarshal(res.Body.Bytes(), refund)
 	assert.NoError(suite.T(), err)
 	assert.NotEmpty(suite.T(), refund.Id)
@@ -304,11 +304,11 @@ func (suite *OrderTestSuite) TestOrder_GetOrders_Ok() {
 	bs := &billMock.BillingService{}
 	bs.On("FindAllOrdersPublic", mock2.Anything, mock2.Anything, mock2.Anything).
 		Return(
-			&grpc.ListOrdersPublicResponse{
-				Status: pkg.ResponseStatusOk,
-				Item: &grpc.ListOrdersPublicResponseItem{
+			&billingpb.ListOrdersPublicResponse{
+				Status: billingpb.ResponseStatusOk,
+				Item: &billingpb.ListOrdersPublicResponseItem{
 					Count: 1,
-					Items: []*billing.OrderViewPublic{},
+					Items: []*billingpb.OrderViewPublic{},
 				},
 			},
 			nil,
@@ -388,16 +388,16 @@ func (suite *OrderTestSuite) testGetOrdersBindError(q url.Values, error string) 
 func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_Ok() {
 	shouldBe := require.New(suite.T())
 
-	changeOrderRequest := &grpc.ChangeCodeInOrderRequest{
+	changeOrderRequest := &billingpb.ChangeCodeInOrderRequest{
 		KeyProductId: bson.NewObjectId().Hex(),
 	}
 	b, err := json.Marshal(changeOrderRequest)
 	assert.NoError(suite.T(), err)
 
 	billingService := &billMock.BillingService{}
-	billingService.On("ChangeCodeInOrder", mock2.Anything, mock2.Anything).Return(&grpc.ChangeCodeInOrderResponse{
-		Status: pkg.ResponseStatusOk,
-		Order:  &billing.Order{},
+	billingService.On("ChangeCodeInOrder", mock2.Anything, mock2.Anything).Return(&billingpb.ChangeCodeInOrderResponse{
+		Status: billingpb.ResponseStatusOk,
+		Order:  &billingpb.Order{},
 	}, nil)
 
 	suite.router.dispatch.Services.Billing = billingService
@@ -419,7 +419,7 @@ func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_Ok() {
 func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ServiceError() {
 	shouldBe := require.New(suite.T())
 
-	changeOrderRequest := &grpc.ChangeCodeInOrderRequest{
+	changeOrderRequest := &billingpb.ChangeCodeInOrderRequest{
 		KeyProductId: bson.NewObjectId().Hex(),
 	}
 	b, err := json.Marshal(changeOrderRequest)
@@ -447,16 +447,16 @@ func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ServiceError() {
 func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ErrorInService() {
 	shouldBe := require.New(suite.T())
 
-	changeOrderRequest := &grpc.ChangeCodeInOrderRequest{
+	changeOrderRequest := &billingpb.ChangeCodeInOrderRequest{
 		KeyProductId: bson.NewObjectId().Hex(),
 	}
 	b, err := json.Marshal(changeOrderRequest)
 	assert.NoError(suite.T(), err)
 
 	billingService := &billMock.BillingService{}
-	billingService.On("ChangeCodeInOrder", mock2.Anything, mock2.Anything).Return(&grpc.ChangeCodeInOrderResponse{
+	billingService.On("ChangeCodeInOrder", mock2.Anything, mock2.Anything).Return(&billingpb.ChangeCodeInOrderResponse{
 		Status:  400,
-		Message: &grpc.ResponseErrorMessage{Message: "Some error"},
+		Message: &billingpb.ResponseErrorMessage{Message: "Some error"},
 	}, nil)
 
 	suite.router.dispatch.Services.Billing = billingService
@@ -479,7 +479,7 @@ func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ValidationError() {
 	shouldBe := require.New(suite.T())
 
 	// Missing key product id
-	changeOrderRequest := &grpc.ChangeCodeInOrderRequest{
+	changeOrderRequest := &billingpb.ChangeCodeInOrderRequest{
 		KeyProductId: "",
 	}
 	b, err := json.Marshal(changeOrderRequest)
@@ -499,7 +499,7 @@ func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ValidationError() {
 	shouldBe.EqualValues(http.StatusBadRequest, httpErr.Code)
 
 	// Wrong order id
-	changeOrderRequest = &grpc.ChangeCodeInOrderRequest{
+	changeOrderRequest = &billingpb.ChangeCodeInOrderRequest{
 		KeyProductId: bson.NewObjectId().Hex(),
 	}
 	b, err = json.Marshal(changeOrderRequest)

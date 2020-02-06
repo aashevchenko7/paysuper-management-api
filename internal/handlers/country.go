@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -43,7 +43,7 @@ func (h *CountryApiV1) Route(groups *common.Groups) {
 // @router /api/v1/country [get]
 func (h *CountryApiV1) get(ctx echo.Context) error {
 
-	res, err := h.dispatch.Services.Billing.GetCountriesList(ctx.Request().Context(), &grpc.EmptyRequest{})
+	res, err := h.dispatch.Services.Billing.GetCountriesList(ctx.Request().Context(), &billingpb.EmptyRequest{})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError /*ErrorCountriesListError*/, err)
 	}
@@ -69,7 +69,7 @@ func (h *CountryApiV1) getById(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorIncorrectCountryIdentifier)
 	}
 
-	req := &billing.GetCountryRequest{
+	req := &billingpb.GetCountryRequest{
 		IsoCode: code,
 	}
 	err := h.dispatch.Validate.Struct(req)
