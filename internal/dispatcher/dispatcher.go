@@ -2,6 +2,7 @@ package dispatcher
 
 import (
 	"context"
+	"fmt"
 	jwtverifier "github.com/ProtocolONE/authone-jwt-verifier-golang"
 	"github.com/ProtocolONE/go-core/v2/pkg/invoker"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
@@ -11,6 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/pkg/micro"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -153,12 +155,12 @@ func (d *Dispatcher) accessGroup(grp *echo.Group) {
 func (d *Dispatcher) authUserGroup(grp *echo.Group) {
 	// Called before routes
 	if !d.globalCfg.DisableAuthMiddleware {
-		/*grp.Use(d.GetUserDetailsMiddleware)       // 1
+		grp.Use(d.GetUserDetailsMiddleware)       // 1
 		grp.Use(d.AuthOneMerchantPreMiddleware()) // 2
 		grp.Use(d.CasbinMiddleware(func(c echo.Context) string {
 			user := common.ExtractUserContext(c)
 			return fmt.Sprintf(billingpb.CasbinMerchantUserMask, user.MerchantId, user.Id)
-		})) // 3*/
+		})) // 3
 	}
 	grp.Use(d.MerchantBinderPreMiddleware) // 3
 }

@@ -36,11 +36,7 @@ func ExtractUserContext(ctx echo.Context) *AuthUser {
 	if user, ok := ctx.Get("user").(*AuthUser); ok {
 		return user
 	}
-	return &AuthUser{
-		Id:         "5db80bb42a10a40001348b0a",
-		Email:      "dmitriy.sinichkin@protocol.one",
-		MerchantId: "5dbac7bb120a810001a8fe80",
-	}
+	return &AuthUser{}
 }
 
 // ExtractRawBodyContext
