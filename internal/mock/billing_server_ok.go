@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/micro/go-micro/client"
 
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 
 	"net/http"
@@ -1368,14 +1367,14 @@ func (s *BillingServerOkMock) GetPaylinkTransactions(ctx context.Context, in *bi
 	}, nil
 }
 
-func (s *BillingServerOkMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
-	return &grpc.SendWebhookToMerchantResponse{
-		Status: 200,
+func (s *BillingServerOkMock) SendWebhookToMerchant(ctx context.Context, in *billingpb.OrderCreateRequest, opts ...client.CallOption) (*billingpb.SendWebhookToMerchantResponse, error) {
+	return &billingpb.SendWebhookToMerchantResponse{
+		Status:  200,
 		OrderId: bson.NewObjectId().Hex(),
 		Message: nil,
 	}, nil
 }
 
-func (s *BillingServerOkMock) NotifyWebhookTestResults(ctx context.Context, in *grpc.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+func (s *BillingServerOkMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }

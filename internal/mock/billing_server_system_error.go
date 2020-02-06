@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/micro/go-micro/client"
 
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 
 	"net/http"
@@ -1014,11 +1013,10 @@ func (s *BillingServerSystemErrorMock) GetPaylinkTransactions(ctx context.Contex
 	panic("implement me")
 }
 
-
-func (s *BillingServerSystemErrorMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
+func (s *BillingServerSystemErrorMock) SendWebhookToMerchant(ctx context.Context, in *billingpb.OrderCreateRequest, opts ...client.CallOption) (*billingpb.SendWebhookToMerchantResponse, error) {
 	panic("implement me")
 }
 
-func (s *BillingServerSystemErrorMock) NotifyWebhookTestResults(ctx context.Context, in *grpc.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+func (s *BillingServerSystemErrorMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }

@@ -5,9 +5,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/micro/go-micro/client"
 
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-
 )
 
 type BillingServerOkTemporaryMock struct{}
@@ -1062,14 +1060,14 @@ func (s *BillingServerOkTemporaryMock) GetOperatingCompany(ctx context.Context, 
 	panic("implement me")
 }
 
-func (s *BillingServerOkTemporaryMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
+func (s *BillingServerOkTemporaryMock) SendWebhookToMerchant(ctx context.Context, in *billingpb.OrderCreateRequest, opts ...client.CallOption) (*billingpb.SendWebhookToMerchantResponse, error) {
 	panic("implement me")
 }
 
-func (s *BillingServerOkTemporaryMock) NotifyWebhookTestResults(ctx context.Context, in *grpc.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+func (s *BillingServerOkTemporaryMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
-func (s *BillingServerOkTemporaryMock) GetCountriesListForOrder(ctx context.Context, in *grpc.GetCountriesListForOrderRequest, opts ...client.CallOption) (*grpc.GetCountriesListForOrderResponse, error) {
+func (s *BillingServerOkTemporaryMock) GetCountriesListForOrder(ctx context.Context, in *billingpb.GetCountriesListForOrderRequest, opts ...client.CallOption) (*billingpb.GetCountriesListForOrderResponse, error) {
 	panic("implement me")
 }
 

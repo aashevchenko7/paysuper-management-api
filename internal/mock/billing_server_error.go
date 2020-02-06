@@ -1130,10 +1130,10 @@ func (s *BillingServerErrorMock) GetPaylinkTransactions(ctx context.Context, in 
 	panic("implement me")
 }
 
-func (s *BillingServerErrorMock) SendWebhookToMerchant(ctx context.Context, in *billing.OrderCreateRequest, opts ...client.CallOption) (*grpc.SendWebhookToMerchantResponse, error) {
+func (s *BillingServerErrorMock) SendWebhookToMerchant(ctx context.Context, in *billingpb.OrderCreateRequest, opts ...client.CallOption) (*billingpb.SendWebhookToMerchantResponse, error) {
 	panic("implement me")
 }
 
-func (s *BillingServerErrorMock) NotifyWebhookTestResults(ctx context.Context, in *grpc.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*grpc.EmptyResponseWithStatus, error) {
+func (s *BillingServerErrorMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
