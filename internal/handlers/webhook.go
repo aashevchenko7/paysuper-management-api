@@ -4,9 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -32,7 +31,7 @@ func (h *WebHookRoute) Route(groups *common.Groups) {
 }
 
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
-	req := &billing.OrderCreateRequest{}
+	req := &billingpb.OrderCreateRequest{}
 	if err := ctx.Bind(req); err != nil {
 		h.L().Error(common.BindingErrorTemplate, logger.PairArgs("err", err.Error()))
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -50,11 +49,11 @@ func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.SendWebhookToMerchant(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SendWebhookToMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SendWebhookToMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
