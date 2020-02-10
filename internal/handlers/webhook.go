@@ -30,16 +30,24 @@ func (h *WebHookRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(testMerchantWebhook, h.sendWebhookTest)
 }
 
+// @summary Test project's webhook settings
+// @desc Test project's webhook settings
+// @id testMerchantWebhookPathSendWebhookTest
+// @tag Project
+// @accept application/json
+// @produce application/json
+// @body billingpb.OrderCreateRequest
+// @success 200 {object} billingpb.SendWebhookToMerchantResponse Request complete successfully
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/projects/{project_id}/webhook/testing [post]
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
 	req := &billingpb.OrderCreateRequest{}
-	if err := ctx.Bind(req); err != nil {
-		h.L().Error(common.BindingErrorTemplate, logger.PairArgs("err", err.Error()))
-		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
-	}
+	errBind := h.dispatch.BindAndValidate(req, ctx)
 
-	if err := h.dispatch.Validate.Struct(req); err != nil {
-		h.L().Error(common.BindingErrorTemplate, logger.PairArgs("err", err.Error()))
-		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	if errBind != nil {
+		return errBind
 	}
 
 	if len(req.TestingCase) == 0 {
@@ -48,6 +56,7 @@ func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
 	}
 
 	res, err := h.dispatch.Services.Billing.SendWebhookToMerchant(ctx.Request().Context(), req)
+
 	if err != nil {
 		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SendWebhookToMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
