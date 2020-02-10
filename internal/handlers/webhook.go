@@ -5,7 +5,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billing "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -37,13 +37,13 @@ func (h *WebHookRoute) Route(groups *common.Groups) {
 // @accept application/json
 // @produce application/json
 // @body billingpb.OrderCreateRequest
-// @success 200 {object} billingpb.SendWebhookToMerchantResponse Request complete successfully
-// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
-// @failure 404 {object} billingpb.ResponseErrorMessage Not found
-// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billing.SendWebhookToMerchantResponse Request complete successfully
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/projects/{project_id}/webhook/testing [post]
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
-	req := &billingpb.OrderCreateRequest{}
+	req := &billing.OrderCreateRequest{}
 	errBind := h.dispatch.BindAndValidate(req, ctx)
 
 	if errBind != nil {
@@ -58,11 +58,11 @@ func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.SendWebhookToMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SendWebhookToMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billing.ServiceName, "SendWebhookToMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 	}
 
-	if res.Status != billingpb.ResponseStatusOk {
+	if res.Status != billing.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
