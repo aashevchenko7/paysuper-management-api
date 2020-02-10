@@ -84,6 +84,7 @@ const (
 	RequestRoleId                            = "role_id"
 	RequestPayoutDocumentId                  = "payout_document_id"
 	RequestParameterRedirectSettings         = "redirect_settings"
+	RequestParameterWebhookMode              = "webhook_mode"
 
 	ImageCollectionImagesField  = "images"
 	ImageCollectionUseOneForAll = "use_one_for_all"
@@ -153,6 +154,8 @@ const (
 	ErrorFieldRequest = "request"
 
 	InternalErrorTemplate = "internal error"
+	ServiceErrorTemplate  = "service error"
+	BindingErrorTemplate  = "bind error"
 )
 
 var (

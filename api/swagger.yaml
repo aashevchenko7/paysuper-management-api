@@ -650,7 +650,39 @@ definitions:
         type: object
         additionalProperties:
           type: string
+      webhook_mode:
+        type: string
+        enum:
+          - default
+          - pre_approval
+      webhook_testing:
+        $ref: '#/definitions/model.ProjectWebHookTesting'
     type: object
+
+  model.ProjectWebHookTesting:
+    type: object
+    properties:
+      products:
+        $ref: '#/definitions/model.ProductsTesting'
+      virtual_currency:
+        $ref: '#/definitions/model.ProductsTesting'
+      keys:
+        type: object
+        properties:
+          is_passed:
+            type: boolean
+
+  model.ProductsTesting:
+    type: object
+    properties:
+      non_existing_user:
+        type: boolean
+      existing_user:
+        type: boolean
+      correct_payment:
+        type: boolean
+      incorrect_payment:
+        type: boolean
 
   model.VirtualCurrency:
     type: object
@@ -3363,6 +3395,17 @@ definitions:
         items:
           $ref: '#/definitions/payment_min_limit_system'
 
+  model.WebHookTesting:
+    allOf:
+      - $ref: '#/definitions/model.OrderScalar'
+      - properties:
+          testing_case:
+            type: string
+            enum:
+              - keys
+              - non_existing_user
+              - existing_user
+              - incorrect_payment
   InviteUserAdmin:
     type: object
     properties:
@@ -10109,6 +10152,54 @@ paths:
           schema:
             $ref: '#/definitions/model.Error'
 
+  "/admin/api/v1/projects/{id}/webhook/testing":
+    post:
+      summary: "Send webhook to merchant API for testing"
+      description: "Send webhook to merchant API for testing"
+      tags:
+        - Project
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - description: Project identifier
+          in: path
+          name: id
+          required: true
+          type: string
+        - description: Order testing for webhook
+          in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/model.WebHookTesting'
+            type: object
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+            properties:
+              order_id:
+                type: string
+                description: "Id of order"
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.Error'
+        "403":
+          description: Access denied
+          schema:
+            $ref: '#/definitions/model.Error'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/model.Error'
+        "500":
+          description: Some unknown error
+          schema:
+            $ref: '#/definitions/model.Error'
   "/api/v1/user/merchants":
     get:
       summary: Get merchants list for user
