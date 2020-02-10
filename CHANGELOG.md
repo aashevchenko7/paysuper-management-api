@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - Added API documentation using the OpenAPI specification in GO source files.
 
 ### Changed
-- The merchant's license agreement file name edited.
+- The merchant's license agreement (downloadable from PaySuper Dashboard) filename has been edited.
 - Removed unused code.
 - Updated GO and Alpine Linux versions in the dockerfile
 - Update project's dependencies.
