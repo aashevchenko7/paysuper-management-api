@@ -11,7 +11,6 @@ import (
 	"github.com/gurukami/typ/v2"
 	"github.com/labstack/echo/v4"
 
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"reflect"
@@ -533,6 +532,7 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 	structure.VirtualCurrency = pRsp.Item.VirtualCurrency
 	structure.VatPayer = pRsp.Item.VatPayer
 	structure.RedirectSettings = pRsp.Item.RedirectSettings
+	structure.WebhookMode = pRsp.Item.WebhookMode
 
 	if v, ok := req[RequestParameterName]; ok {
 		tv, ok := v.(map[string]interface{})
@@ -766,6 +766,10 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 
 	if _, ok := req[RequestParameterRedirectSettings]; ok {
 		structure.RedirectSettings = projectReq.RedirectSettings
+	}
+
+	if _, ok := req[RequestParameterWebhookMode]; ok {
+		structure.WebhookMode = projectReq.WebhookMode
 	}
 
 	return nil
