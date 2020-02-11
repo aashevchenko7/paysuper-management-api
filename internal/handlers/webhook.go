@@ -43,6 +43,7 @@ func (h *WebHookRoute) Route(groups *common.Groups) {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 404 {object} grpc.ResponseErrorMessage Not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param project_id path {string} true The unique identifier for the Project found in the merchant account in the PaySuper Dashboard.
 // @router /admin/api/v1/projects/{project_id}/webhook/testing [post]
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {
 	req := &billingpb.OrderCreateRequest{}
