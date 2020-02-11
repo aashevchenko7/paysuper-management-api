@@ -25,7 +25,7 @@ require (
 	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200122193247-3dba658a3cbc
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200122152034-6d6bb19abebf
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200122152034-6d6bb19abebf
-	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200122152034-6d6bb19abebf
+	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200211080654-935ed390e2e5
 	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200122152034-6d6bb19abebf
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.5
