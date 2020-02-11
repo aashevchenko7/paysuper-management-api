@@ -19,16 +19,18 @@ require (
 	github.com/karlseguin/expect v1.0.1 // indirect
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/mattn/go-colorable v0.1.4 // indirect
-	github.com/micro/go-micro v1.8.0
+	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-plugins v1.2.0
-	github.com/paysuper/casbin-server v0.0.0-20191128090724-930a08d68cec
 	github.com/paysuper/echo-casbin-middleware v0.0.0-20191201120027-e10b488ca709
 	github.com/paysuper/paysuper-aws-manager v0.0.1
 	github.com/paysuper/paysuper-billing-server v1.1.1-0.20200121103017-15f58f786464
 	github.com/paysuper/paysuper-proto v0.1.72 // indirect
-	github.com/paysuper/paysuper-recurring-repository v1.0.128
-	github.com/paysuper/paysuper-reporter v0.0.0-20191203194948-36a2d983f406
-	github.com/paysuper/paysuper-tax-service v1.0.0
+	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200210182947-d23607b55c05
+	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200210102812-9d6a3b24437d
+	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200201160112-2ee519914bfd
+	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200210102812-9d6a3b24437d
+	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200210102812-9d6a3b24437d
+	github.com/paysuper/paysuper-reporter v0.0.0-20191203194948-36a2d983f406 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/spaceavocado/apidoc v0.3.5 // indirect
 	github.com/spf13/cobra v0.0.5
@@ -36,7 +38,7 @@ require (
 	github.com/ttacon/libphonenumber v1.0.1
 	github.com/wsxiaoys/terminal v0.0.0-20160513160801-0940f3fc43a0 // indirect
 	go.uber.org/automaxprocs v1.2.0
-	gopkg.in/go-playground/validator.v9 v9.29.1
+	gopkg.in/go-playground/validator.v9 v9.30.0
 	gopkg.in/karlseguin/expect.v1 v1.0.1 // indirect
 	gopkg.in/paysuper/paysuper-database-mongo.v1 v1.0.0-20191120092306-dc35c6f924f1 // indirect
 )
