@@ -24,8 +24,8 @@ const (
 )
 
 type CreateOrderJsonProjectResponse struct {
-	Id              string                    `json:"id"`
-	PaymentFormUrl  string                    `json:"payment_form_url"`
+	Id              string                         `json:"id"`
+	PaymentFormUrl  string                         `json:"payment_form_url"`
 	PaymentFormData *billingpb.PaymentFormJsonData `json:"payment_form_data,omitempty"`
 }
 

@@ -18,7 +18,7 @@ import (
 
 var (
 	casbinFlag bool
-	Cmd    = &cobra.Command{
+	Cmd        = &cobra.Command{
 		Use:           "http",
 		Short:         "HTTP API daemon",
 		SilenceUsage:  true,
