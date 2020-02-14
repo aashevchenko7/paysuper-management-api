@@ -44,7 +44,6 @@ func (h *PaymentMinLimitSystemRoute) Route(groups *common.Groups) {
 // @produce application/json
 // @success 200 {object} []billing.OperatingCompany Returns the operating company's payment system limits
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/payment_min_limit_system [get]
 func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Context) error {
@@ -70,7 +69,6 @@ func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Conte
 // @body billing.PaymentMinLimitSystem
 // @success 200 {string} Returns an empty response body if the system limits were successfully set
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/payment_min_limit_system [post]
 func (h *PaymentMinLimitSystemRoute) setPaymentMinLimitSystem(ctx echo.Context) error {

@@ -112,7 +112,6 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 // @produce application/json
 // @success 200 {object} billing.OrderViewPublic Returns the order data
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id} [get]
@@ -144,7 +143,6 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} grpc.ListOrdersPublicResponseItem Returns the orders list
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param id query {string} false The unique identifier for the order.
 // @param project query {[]string} false The list of projects.
@@ -207,7 +205,6 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 // @body ListOrdersRequest
 // @success 200 {string} Returns the file with the orders list
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/order/download [post]
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
@@ -240,7 +237,6 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} billing.Refund Returns the refund data
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @param refund_id path {string} true The unique identifier for the refund.
@@ -273,7 +269,6 @@ func (h *OrderRoute) getRefund(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} grpc.ListRefundsResponse Returns the order's refunds list
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @param limit query {integer} true The number of refunds returned in one page. Default value is 100.
@@ -308,7 +303,6 @@ func (h *OrderRoute) listRefunds(ctx echo.Context) error {
 // @body grpc.ChangeCodeInOrderRequest
 // @success 200 {object} billing.Order Returns the order data
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /system/api/v1/order/{order_id}/replace_code [put]
@@ -346,7 +340,6 @@ func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 // @body grpc.CreateRefundRequest
 // @success 200 {object} billing.Refund Returns the refund data
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id}/refunds [post]

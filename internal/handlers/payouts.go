@@ -54,7 +54,6 @@ func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 // @produce application/json
 // @success 200 {object} grpc.PayoutDocumentsPaginate Returns the list of the payout documents
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id query {string} false The unique identifier for the payout document.
 // @param status query {[]string} false The document status. Available values: skip, pending, in_progress, paid, canceled, failed.
@@ -90,7 +89,6 @@ func (h *PayoutDocumentsRoute) getPayoutDocumentsList(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} billing.PayoutDocument Returns the payout document
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id} [get]
@@ -122,7 +120,6 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} reporter.CreateFileResponse Returns the payout document file
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id}/download [post]
@@ -150,7 +147,6 @@ func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 // @body grpc.CreatePayoutDocumentRequest
 // @success 200 {object} []billing.PayoutDocument Returns the list of the payout documents
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/payout_documents [post]
 func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
@@ -190,7 +186,6 @@ func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
 // @body grpc.UpdatePayoutDocumentRequest
 // @success 200 {object} billing.PayoutDocument Returns the payout document
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /system/api/v1/payout_documents/{payout_document_id} [post]
@@ -222,7 +217,6 @@ func (h *PayoutDocumentsRoute) updatePayoutDocument(ctx echo.Context) error {
 // @produce application/json
 // @success 200 {object} []billing.RoyaltyReport Returns the list of the payout documents
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id}/reports [get]
