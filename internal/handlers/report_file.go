@@ -47,6 +47,17 @@ func (h *ReportFileRoute) Route(groups *common.Groups) {
 	groups.AuthProject.GET(reportFileDownloadPath, h.download)
 }
 
+// @summary Create a report file
+// @desc Create a report file
+// @id reportFilePathCreate
+// @tag Report file
+// @accept application/json
+// @produce application/json
+// @success 200 {object} reporter.CreateFileResponse Returns the report file ID
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Unable to download the file because of the internal server error
+// @router /admin/api/v1/report_file [post]
 func (h *ReportFileRoute) create(ctx echo.Context) error {
 	data := &common.ReportFileRequest{}
 
@@ -89,15 +100,27 @@ func (h *ReportFileRoute) create(ctx echo.Context) error {
 // @tag Report file
 // @accept application/json
 // @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-// @success 200 {string} Returns the report file
+// @success 200 {string} Returns the report file ID
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data (unable to find the file, the file string is incorrect)
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage The file not found
 // @failure 500 {object} grpc.ResponseErrorMessage Unable to download the file because of the internal server error
 // @param file_id path {string} true The unique identifier for the report file.
 // @param file_type path {string} true The supported file format (PDF, CSV, XLSX).
 // @router /auth/api/v1/report_file/download/{file_id}.{file_type} [get]
+
+// @summary Export the report file
+// @desc Export the report file into a PDF, CSV, XLSX
+// @id reportFileDownloadPathDownload
+// @tag Report file
+// @accept application/json
+// @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @success 200 {string} Returns the report file ID
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data (unable to find the file, the file string is incorrect)
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Unable to download the file because of the internal server error
+// @param file_id path {string} true The unique identifier for the report file.
+// @param file_type path {string} true The supported file format (PDF, CSV, XLSX).
+// @router /admin/api/v1/report_file/download/{file_id}.{file_type} [get]
 func (h *ReportFileRoute) download(ctx echo.Context) error {
 	file := ctx.Param("file")
 
