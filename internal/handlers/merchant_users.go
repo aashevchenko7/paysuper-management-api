@@ -5,8 +5,10 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billing "github.com/paysuper/paysuper-proto/go/billingpb"
+	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -43,6 +45,17 @@ func (h *MerchantUsersRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(merchantUsersRole, h.getUser)
 }
 
+// @summary Update the merchant user's role
+// @desc Update the merchant user's role using the role ID
+// @id merchantUsersRoleСhangeRole
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @success 200 {string} Returns an empty response body if the user's role was successfully changed
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param role_id path {string} true The unique identifier for the role.
+// @router /admin/api/v1/merchants/users/roles/{role_id} [put]
 func (h *MerchantUsersRoute) changeRole(ctx echo.Context) error {
 	req := &billingpb.ChangeRoleForMerchantUserRequest{}
 
@@ -63,6 +76,16 @@ func (h *MerchantUsersRoute) changeRole(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusOK)
 }
 
+// @summary Get the list of the merchant users
+// @desc Get the list of the merchant users
+// @id merchantUsersGetMerchantUsers
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @success 200 {object} []billing.UserRole Returns the list of the merchant users
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/merchants/users [get]
 func (h *MerchantUsersRoute) getMerchantUsers(ctx echo.Context) error {
 	req := &billingpb.GetMerchantUsersRequest{}
 
@@ -83,6 +106,17 @@ func (h *MerchantUsersRoute) getMerchantUsers(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Users)
 }
 
+// @summary Send an invitation to the merchant user
+// @desc Send an invitation to the merchant user
+// @id merchantInviteSendInvite
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @body grpc.InviteUserMerchantRequest
+// @success 200 {object} grpc.InviteUserMerchantResponse Returns the merchant user's role data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/merchants/invite [post]
 func (h *MerchantUsersRoute) sendInvite(ctx echo.Context) error {
 	req := &billingpb.InviteUserMerchantRequest{}
 
@@ -103,6 +137,17 @@ func (h *MerchantUsersRoute) sendInvite(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Resend an invitation to the merchant user
+// @desc Resend an invitation to the merchant user
+// @id merchantInviteResendResendInvite
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @body grpc.ResendInviteMerchantRequest
+// @success 200 {object} grpc.EmptyResponseWithStatus Returns an empty response body if the user's invitation was successfully send
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/merchants/users/resend [post]
 func (h *MerchantUsersRoute) resendInvite(ctx echo.Context) error {
 	req := &billingpb.ResendInviteMerchantRequest{}
 
@@ -123,6 +168,16 @@ func (h *MerchantUsersRoute) resendInvite(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Get the list of the merchant's types of roles
+// @desc Get the list of the merchant's types of roles
+// @id merchantListRolesListRoles
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.GetRoleListResponse Returns the list of the merchant's types of roles
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/merchants/roles [get]
 func (h *MerchantUsersRoute) listRoles(ctx echo.Context) error {
 	req := &billingpb.GetRoleListRequest{Type: billingpb.RoleTypeMerchant}
 	res, err := h.dispatch.Services.Billing.GetRoleList(ctx.Request().Context(), req)
@@ -134,6 +189,17 @@ func (h *MerchantUsersRoute) listRoles(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Delete the merchant user
+// @desc Delete the merchant user
+// @id merchantUsersRoleDeleteUser
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.EmptyResponseWithStatus Returns an empty response body if the user was successfully removed
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param role_id path {string} true The unique identifier for the role.
+// @router /admin/api/v1/merchants/users/roles/{role_id} [delete]
 func (h *MerchantUsersRoute) deleteUser(ctx echo.Context) error {
 	req := &billingpb.MerchantRoleRequest{}
 
@@ -154,6 +220,17 @@ func (h *MerchantUsersRoute) deleteUser(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Get the merchant user's role
+// @desc Get the merchant user's role
+// @id merchantUsersRoleGetUser
+// @tag Merchant user's roles
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.UserRoleResponse Returns the merchant user's role
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param role_id path {string} true The unique identifier for the role.
+// @router /admin/api/v1/merchants/users/roles/{role_id} [get]
 func (h *MerchantUsersRoute) getUser(ctx echo.Context) error {
 	req := &billingpb.MerchantRoleRequest{}
 
