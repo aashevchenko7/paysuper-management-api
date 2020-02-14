@@ -5,9 +5,10 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billing "github.com/paysuper/paysuper-proto/go/billingpb"
+	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -35,6 +36,17 @@ func (h *PaymentMinLimitSystemRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(paymentMinLimitSystemPath, h.setPaymentMinLimitSystem)
 }
 
+// @summary Get the list of the payment system limits
+// @desc Get the list of the payment system limits
+// @id paymentMinLimitSystemPathGetPaymentMinLimitSystemList
+// @tag Limits
+// @accept application/json
+// @produce application/json
+// @success 200 {object} []billing.OperatingCompany Returns the operating company's payment system limits
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage The country not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/payment_min_limit_system [get]
 func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Context) error {
 	req := &billingpb.EmptyRequest{}
 
@@ -49,6 +61,18 @@ func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Conte
 	return ctx.JSON(http.StatusOK, res.Items)
 }
 
+// @summary Set the payment system limits
+// @desc Set the payment system limits
+// @id paymentMinLimitSystemPathSetPaymentMinLimitSystem
+// @tag Limits
+// @accept application/json
+// @produce application/json
+// @body billing.PaymentMinLimitSystem
+// @success 200 {string} Returns an empty response body if the system limits were successfully set
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage The country not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/payment_min_limit_system [post]
 func (h *PaymentMinLimitSystemRoute) setPaymentMinLimitSystem(ctx echo.Context) error {
 	req := &billingpb.PaymentMinLimitSystem{}
 	err := ctx.Bind(req)
