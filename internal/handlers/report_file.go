@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	reportFilePath         = "/report_file"
 	reportFileDownloadPath = "/report_file/download/:file"
 )
 
@@ -36,32 +35,8 @@ func NewReportFileRoute(set common.HandlerSet, awsManager awsWrapper.AwsManagerI
 }
 
 func (h *ReportFileRoute) Route(groups *common.Groups) {
-	groups.AuthUser.POST(reportFilePath, h.create)
 	groups.AuthUser.GET(reportFileDownloadPath, h.download)
 	groups.AuthProject.GET(reportFileDownloadPath, h.download)
-}
-
-func (h *ReportFileRoute) create(ctx echo.Context) error {
-	req := &reporterProto.ReportFile{}
-	err := (&common.ReportFileBinder{}).Bind(req, ctx)
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
-	}
-
-	req.UserId = common.ExtractUserContext(ctx).Id
-
-	if err = h.dispatch.Validate.Struct(req); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
-	}
-
-	res, err := h.dispatch.Services.Reporter.CreateFile(ctx.Request().Context(), req)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, reporterProto.ServiceName, "CreateFile", req)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorMessageCreateReportFile)
-	}
-
-	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *ReportFileRoute) download(ctx echo.Context) error {
