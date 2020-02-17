@@ -154,30 +154,20 @@ type AuthUser struct {
 	MerchantId string
 }
 
-type ReportFileRequest struct {
-	MerchantId string                 `json:"merchant_id" validate:"omitempty,hexadecimal,len=24"`
-	FileType   string                 `json:"file_type" validate:"required"`
-	ReportType string                 `json:"report_type"`
-	Template   string                 `json:"template"`
-	Params     map[string]interface{} `json:"params"`
-}
-
-func (h *HandlerSet) RequestReportFile(ctx echo.Context, data *ReportFileRequest) error {
-	params, err := json.Marshal(data.Params)
+func (h *HandlerSet) RequestReportFile(
+	ctx echo.Context,
+	req *reporterService.ReportFile,
+	params map[string]interface{},
+) error {
+	b, err := json.Marshal(params)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, ErrorRequestDataInvalid)
 	}
 
-	req := &reporterService.ReportFile{
-		UserId:           ExtractUserContext(ctx).Id,
-		MerchantId:       data.MerchantId,
-		ReportType:       data.ReportType,
-		FileType:         data.FileType,
-		Template:         data.Template,
-		Params:           params,
-		SendNotification: true,
-	}
+	req.UserId = ExtractUserContext(ctx).Id
+	req.Params = b
+	req.SendNotification = true
 
 	if err = h.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, GetValidationError(err))

@@ -5,8 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
@@ -83,18 +83,18 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 }
 
 func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
-	req := &common.ReportFileRequest{}
+	req := &reporterPkg.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypePayout
-	req.Params = map[string]interface{}{
+	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestPayoutDocumentId),
 	}
 
-	return h.dispatch.RequestReportFile(ctx, req)
+	return h.dispatch.RequestReportFile(ctx, req, params)
 }
 
 func (h *PayoutDocumentsRoute) createPayoutDocument(ctx echo.Context) error {
