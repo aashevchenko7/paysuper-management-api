@@ -26,6 +26,7 @@ require (
 	github.com/micro/go-plugins/transport/grpc v0.0.0-20200119172437-4fe21aa238fd
 	github.com/paysuper/echo-casbin-middleware v1.0.1-0.20200203133300-6f18edeb3072
 	github.com/paysuper/paysuper-aws-manager v0.0.1
+	github.com/paysuper/paysuper-proto v0.1.100 // indirect
 	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200211091809-d34cc6fa8ff5
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200203130641-45056764a1d7

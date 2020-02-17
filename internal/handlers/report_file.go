@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
@@ -43,30 +42,17 @@ func (h *ReportFileRoute) Route(groups *common.Groups) {
 }
 
 func (h *ReportFileRoute) create(ctx echo.Context) error {
-	data := &reporterProto.ReportFile{}
+	req := &reporterProto.ReportFile{}
+	err := (&common.ReportFileBinder{}).Bind(req, ctx)
 
-	if err := ctx.Bind(data); err != nil {
+	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
 
-	params, err := json.Marshal(data.Params)
+	req.UserId = common.ExtractUserContext(ctx).Id
 
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorRequestDataInvalid)
-	}
-
-	if err = h.dispatch.Validate.Struct(data); err != nil {
+	if err = h.dispatch.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
-	}
-
-	req := &reporterProto.ReportFile{
-		UserId:           common.ExtractUserContext(ctx).Id,
-		MerchantId:       data.MerchantId,
-		ReportType:       data.ReportType,
-		FileType:         data.FileType,
-		Template:         data.Template,
-		Params:           params,
-		SendNotification: true,
 	}
 
 	res, err := h.dispatch.Services.Reporter.CreateFile(ctx.Request().Context(), req)

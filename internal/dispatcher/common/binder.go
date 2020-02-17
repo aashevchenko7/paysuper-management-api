@@ -3,6 +3,7 @@ package common
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
@@ -10,6 +11,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/gurukami/typ/v2"
 	"github.com/labstack/echo/v4"
+	reporterProto "github.com/paysuper/paysuper-proto/go/reporterpb"
 
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
@@ -770,6 +772,49 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 
 	if _, ok := req[RequestParameterWebhookMode]; ok {
 		structure.WebhookMode = projectReq.WebhookMode
+	}
+
+	return nil
+}
+
+type ReportFileBinder struct{}
+
+func (b *ReportFileBinder) Bind(i interface{}, ctx echo.Context) error {
+	var (
+		body []byte
+		err  error
+	)
+
+	if ctx.Request().Body != nil {
+		body, err = ioutil.ReadAll(ctx.Request().Body)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	db := new(echo.DefaultBinder)
+	err = db.Bind(&i, ctx)
+
+	if err != nil {
+		return err
+	}
+
+	ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(body))
+	req := make(map[string]interface{})
+	err = db.Bind(&req, ctx)
+
+	if err != nil {
+		return err
+	}
+
+	if v, ok := req["params"]; ok {
+		i.(*reporterProto.ReportFile).Params, err = json.Marshal(v)
+
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
