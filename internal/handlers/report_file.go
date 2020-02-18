@@ -43,7 +43,7 @@ func (h *ReportFileRoute) Route(groups *common.Groups) {
 }
 
 func (h *ReportFileRoute) create(ctx echo.Context) error {
-	data := &common.ReportFileRequest{}
+	data := &reporterProto.ReportFile{}
 
 	if err := ctx.Bind(data); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)

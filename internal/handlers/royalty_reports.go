@@ -99,18 +99,18 @@ func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 }
 
 func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
-	req := &common.ReportFileRequest{}
+	req := &reporterPkg.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypeRoyalty
-	req.Params = map[string]interface{}{
+	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterReportId),
 	}
 
-	return h.dispatch.RequestReportFile(ctx, req)
+	return h.dispatch.RequestReportFile(ctx, req, params)
 }
 
 func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
@@ -139,18 +139,18 @@ func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 }
 
 func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) error {
-	req := &common.ReportFileRequest{}
+	req := &reporterPkg.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypeRoyaltyTransactions
-	req.Params = map[string]interface{}{
+	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterReportId),
 	}
 
-	return h.dispatch.RequestReportFile(ctx, req)
+	return h.dispatch.RequestReportFile(ctx, req, params)
 }
 
 func (h *RoyaltyReportsRoute) merchantReviewRoyaltyReport(ctx echo.Context) error {
