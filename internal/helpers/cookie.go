@@ -17,8 +17,8 @@ func SetResponseCookie(ctx echo.Context, name, value, domain string, expires tim
 	cookie.Domain = domain
 	cookie.Expires = expires
 	cookie.HttpOnly = true
-	cookie.Path="/"
-	
+	cookie.Path = "/"
+
 	ctx.SetCookie(cookie)
 }
 
