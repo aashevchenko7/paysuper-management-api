@@ -113,6 +113,7 @@ func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
+// @body reporter.ReportFile
 // @success 200 {object} reporter.CreateFileResponse Returns the file ID
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error

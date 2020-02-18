@@ -133,6 +133,7 @@ func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 // @tag Royalty reports
 // @accept application/json
 // @produce application/json
+// @body reporter.ReportFile
 // @success 200 {object} reporter.CreateFileResponse Returns the report file ID
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 404 {object} grpc.ResponseErrorMessage Not found
@@ -199,6 +200,7 @@ func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 // @tag Royalty reports
 // @accept application/json
 // @produce application/json
+// @body reporter.ReportFile
 // @success 200 {object} reporter.CreateFileResponse Returns the file ID
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 404 {object} grpc.ResponseErrorMessage Not found
