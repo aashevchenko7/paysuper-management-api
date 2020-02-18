@@ -146,7 +146,7 @@ var rootCmd = &cobra.Command{
 						item.Key + "\n-> " + strings.Join(item.ENV, "\n-> "),
 						item.Value,
 						item.Type,
-					},[]interface{}{"","",""})
+					}, []interface{}{"", "", ""})
 				}
 
 				table := simpletable.New()

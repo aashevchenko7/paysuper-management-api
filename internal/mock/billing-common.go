@@ -3,7 +3,6 @@ package mock
 import (
 	"github.com/globalsign/mgo/bson"
 
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 )
 

@@ -7,8 +7,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/micro/go-micro/client"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -366,7 +366,6 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusOK, res)
 }
-
 
 func (h *KeyProductRoute) getCountOfKeys(ctx echo.Context) error {
 	req := &billingpb.GetPlatformKeyCountRequest{}

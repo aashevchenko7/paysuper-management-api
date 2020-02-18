@@ -5,9 +5,9 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
