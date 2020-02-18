@@ -11,7 +11,6 @@ import (
 	"github.com/paysuper/paysuper-management-api/internal/casbin"
 	"github.com/paysuper/paysuper-management-api/internal/daemon"
 	"github.com/paysuper/paysuper-management-api/pkg/http"
-	"github.com/paysuper/paysuper-management-api/pkg/micro"
 	"github.com/spf13/cobra"
 	"sync"
 )
@@ -26,7 +25,6 @@ var (
 		Run: func(_ *cobra.Command, _ []string) {
 			var (
 				sHttp     *http.HTTP
-				sMicro    *micro.Micro
 				sCabin    *casbin.Casbin
 				c         func()
 				e         error
@@ -51,10 +49,6 @@ var (
 				if e != nil {
 					return e
 				}
-				sMicro, c, e = daemon.BuildMicro(ctxAll, initial, cmd.Observer)
-				if e != nil {
-					return e
-				}
 				return nil
 			}, func(ctx context.Context) error {
 				if casbinFlag {
@@ -66,16 +60,9 @@ var (
 					sCabin.L().Info("casbin policy successfully applied")
 				}
 				var wg sync.WaitGroup
-				wg.Add(2)
+				wg.Add(1)
 				go func() {
 					if err := sHttp.ListenAndServe(); err != nil {
-						e = err
-						ctxCancel()
-					}
-					wg.Done()
-				}()
-				go func() {
-					if err := sMicro.ListenAndServe(); err != nil {
 						e = err
 						ctxCancel()
 					}
