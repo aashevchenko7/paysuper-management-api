@@ -116,7 +116,7 @@ func (d *Dispatcher) CasbinMiddleware(fn func(c echo.Context) string) echo.Middl
 		Logger:           d.L(),
 		CtxUserExtractor: fn,
 	}
-	return casbinMiddleware.MiddlewareWithConfig(d.ms.Client(), cfg)
+	return casbinMiddleware.MiddlewareWithConfig(d.ms.Client("", ""), cfg)
 }
 
 // BodyDumpMiddleware
