@@ -124,6 +124,18 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 	groups.SystemUser.POST(merchantsIdSetOperatingCompanyPath, h.setOperatingCompany)
 }
 
+// @summary Get the merchant user
+// @desc Get the merchant user using the user ID
+// @id merchantsIdPathGetMerchant
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billing.Merchant Returns the merchant user
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id} [get]
 func (h *OnboardingRoute) getMerchant(ctx echo.Context) error {
 	req := &billingpb.GetMerchantByRequest{}
 	err := ctx.Bind(req)
@@ -163,6 +175,29 @@ func (h *OnboardingRoute) getMerchantByUser(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the merchants list
+// @desc Get the merchants list. This list can be filtered.
+// @id merchantsPathListMerchants
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.MerchantListingResponse Returns the merchants list
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param name query {string} false The merchant's name.
+// @param last_payout_date_from query {integer} false The start date of the payout to the merchant.
+// @param last_payout_date_to query {integer} false The end date of the payout to the merchant.
+// @param last_payout_amount query {integer} false The last payout amount.
+// @param sort query {[]string} false The list of the merchant's fields for sorting.
+// @param quick_search query {string} false The quick search by the merchant's name or the user owner email.
+// @param status query {[]string} false The merchant's statuses list.
+// @param registration_date_from query {integer} false The start date of the owner was registered.
+// @param registration_date_to query {integer} false The end date of the owner was registered.
+// @param received_date_from query {integer} false The start date when the license agreement was signed by the merchant owner.
+// @param received_date_to query {integer} false The end date when the license agreement was signed by the merchant owner.
+// @param limit query {integer} true The number of merchants returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /system/api/v1/merchants [get]
 func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
 	req := &billingpb.MerchantListingRequest{}
 	err := (&common.OnboardingMerchantListingBinder{
@@ -190,6 +225,19 @@ func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Update the merchant's status
+// @desc Update the merchant's status
+// @id merchantsIdChangeStatusCompanyPathChangeMerchantStatus
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body grpc.MerchantChangeStatusRequest
+// @success 200 {object} billing.Merchant Returns the merchant user
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/change-status [put]
 func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &billingpb.MerchantChangeStatusRequest{}
@@ -217,6 +265,19 @@ func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Create a new notification for the merchant
+// @desc Create a new notification for the merchant
+// @id merchantsIdNotificationsPathCreateNotification
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body grpc.NotificationRequest
+// @success 200 {object} billing.Notification Returns the notification
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/notifications [post]
 func (h *OnboardingRoute) createNotification(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &billingpb.NotificationRequest{}
@@ -288,6 +349,24 @@ func (h *OnboardingRoute) getNotification(ctx echo.Context) error {
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @param sort query {[]string} false The list of the notification's fields for sorting.
 // @router /admin/api/v1/merchants/notifications [get]
+
+// @summary Get the list of merchant's notifications
+// @desc Get the list of merchant's notifications
+// @id merchantsIdNotificationsPathListNotifications
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.Notifications Returns the list of notifications
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @param user query {string} false The unique identifier for the user who is the sender of the notification.
+// @param is_system query {integer} false Available values: 1 - the notifications between the merchant's owner and the PaySuper admin, 2 - the notifications generated automatically.
+// @param limit query {integer} false The number of notifications returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @param sort query {[]string} false The list of the notification's fields for sorting.
+// @router /system/api/v1/merchants/{merchant_id}/notifications [get]
 func (h *OnboardingRoute) listNotifications(ctx echo.Context) error {
 	req := &billingpb.ListingNotificationRequest{}
 	err := (&common.OnboardingNotificationsListBinder{
@@ -387,6 +466,19 @@ func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/agreement/document [get]
+
+// @summary Download the merchant's agreement document
+// @desc Download the merchant's agreement document
+// @id merchantsIdAgreementDocumentPathGetAgreementDocument
+// @tag Onboarding
+// @accept application/json
+// @produce application/pdf
+// @success 200 {string} Returns the merchant's agreement file
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/agreement/document [get]
 func (h *OnboardingRoute) getAgreementDocument(ctx echo.Context) error {
 	req := &billingpb.GetMerchantByRequest{}
 
@@ -509,8 +601,20 @@ func (h *OnboardingRoute) validateUpload(file *multipart.FileHeader) (multipart.
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-
 // @router /admin/api/v1/merchants/company [put]
+
+// @summary Update the merchant's company information
+// @desc Update the merchant's company information
+// @id merchantsIdCompanyPathSetMerchantCompany
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body billing.MerchantCompanyInfo
+// @success 200 {object} billing.Merchant Returns the merchant data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/company [put]
 func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	in := &billingpb.MerchantCompanyInfo{}
@@ -560,6 +664,20 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/contacts [put]
+
+// @summary Update the merchant's contacts
+// @desc Update the merchant's contacts for the authorized merchant
+// @id merchantsIdContactsPathSetMerchantContacts
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body billing.MerchantContact
+// @success 200 {object} billing.Merchant Returns the merchant data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/contacts [put]
 func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	in := &billingpb.MerchantContact{}
@@ -609,6 +727,20 @@ func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/banking [put]
+
+// @summary Update the merchant's banking data
+// @desc Update the merchant's banking data for the authorized merchant
+// @id merchantsIdBankingPathSetMerchantBanking
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body billing.MerchantBanking
+// @success 200 {object} billing.Merchant Returns the merchant data
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/banking [put]
 func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	in := &billingpb.MerchantBanking{}
@@ -733,6 +865,20 @@ func (h *OnboardingRoute) getTariffRates(ctx echo.Context) error {
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param merchant_operations_type query {string} true The merchant's operations type. Available values: low-risk, high-risk.
 // @router /admin/api/v1/merchants/tariffs [post]
+
+// @summary Set the tariff rates
+// @desc Set the tariff rates using the merchant ID
+// @id merchantsIdTariffsPathSetTariffRates
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {string} Returns an empty response body if the tariff was successfully set
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @param merchant_operations_type query {string} true The merchant's operations type. Available values: low-risk, high-risk.
+// @router /system/api/v1/merchants/{merchant_id}/tariffs [post]
 func (h *OnboardingRoute) setTariffRates(ctx echo.Context) error {
 	req := &billingpb.SetMerchantTariffRatesRequest{}
 	err := ctx.Bind(req)
@@ -765,8 +911,8 @@ func (h *OnboardingRoute) setTariffRates(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusOK)
 }
 
-// @summary Create the agreement
-// @desc Create the agreement
+// @summary Create the license agreement
+// @desc Create the license agreement
 // @id merchantsAgreementPathGetMerchantAgreementData
 // @tag Onboarding
 // @accept application/json
@@ -780,6 +926,18 @@ func (h *OnboardingRoute) getMerchantAgreementData(ctx echo.Context) error {
 	return h.getAgreementData(ctx, billingpb.SignerTypeMerchant)
 }
 
+// @summary Create the license agreement
+// @desc Create the license agreement
+// @id merchantsIdAgreementPathGetSystemAgreementData
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {object} OnboardingFileData Returns the printable agreement document
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/agreement [get]
 func (h *OnboardingRoute) getSystemAgreementData(ctx echo.Context) error {
 	return h.getAgreementData(ctx, billingpb.SignerTypePs)
 }
@@ -875,6 +1033,19 @@ func (h *OnboardingRoute) changeMerchantManualPayout(ctx echo.Context, enableMan
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Set the operating company to the merchant
+// @desc Set the operating company to the merchant
+// @id merchantsIdSetOperatingCompanyPathSetOperatingCompany
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body grpc.SetMerchantOperatingCompanyRequest
+// @success 200 {object} billing.Merchant Returns the merchant user
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/set_operating_company [post]
 func (h *OnboardingRoute) setOperatingCompany(ctx echo.Context) error {
 	req := &billingpb.SetMerchantOperatingCompanyRequest{}
 	err := ctx.Bind(req)

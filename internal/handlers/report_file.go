@@ -9,6 +9,7 @@ import (
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
+	reporter "github.com/paysuper/paysuper-proto/go/reporterpb"
 	reporterProto "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"os"
@@ -100,7 +101,7 @@ func (h *ReportFileRoute) create(ctx echo.Context) error {
 // @tag Report file
 // @accept application/json
 // @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-// @success 200 {string} Returns the report file ID
+// @success 200 {string} Returns the report file
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data (unable to find the file, the file string is incorrect)
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Unable to download the file because of the internal server error
@@ -114,7 +115,7 @@ func (h *ReportFileRoute) create(ctx echo.Context) error {
 // @tag Report file
 // @accept application/json
 // @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-// @success 200 {string} Returns the report file ID
+// @success 200 {string} Returns the report file
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data (unable to find the file, the file string is incorrect)
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} grpc.ResponseErrorMessage Unable to download the file because of the internal server error

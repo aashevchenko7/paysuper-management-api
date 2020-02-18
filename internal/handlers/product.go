@@ -132,7 +132,7 @@ func (h *ProductRoute) getProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {string} Returns an empty response body if the product was successfully removed
+// @success 204 {string} Returns an empty response body if the product was successfully removed
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
 // @failure 403 {object} grpc.ResponseErrorMessage Access denied

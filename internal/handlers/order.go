@@ -8,6 +8,7 @@ import (
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	billing "github.com/paysuper/paysuper-proto/go/billingpb"
 	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
+	reporter "github.com/paysuper/paysuper-proto/go/reporterpb"
 	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
@@ -197,13 +198,13 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 }
 
 // @summary Export the orders list
-// @desc Export the orders list into a PDF, CSV, XLSX
+// @desc Export the orders list
 // @id orderDownloadPathDownloadOrdersPublic
 // @tag Order
 // @accept application/json
-// @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// @produce application/json
 // @body ListOrdersRequest
-// @success 200 {string} Returns the file with the orders list
+// @success 200 {object} reporter.CreateFileResponse Returns the file ID
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/order/download [post]

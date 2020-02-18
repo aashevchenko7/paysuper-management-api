@@ -56,7 +56,7 @@ func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id query {string} false The unique identifier for the payout document.
-// @param status query {[]string} false The document status. Available values: skip, pending, in_progress, paid, canceled, failed.
+// @param status query {[]string} false The list of documents' statuses. Available values: skip, pending, in_progress, paid, canceled, failed.
 // @param date_from query {integer} false The payout period start date.
 // @param date_to query {integer} false The payout period end date.
 // @param limit query {integer} true The number of documents returned in one page. Default value is 100.
@@ -113,12 +113,12 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 }
 
 // @summary Export the payout document
-// @desc Export the payout document into a PDF, CSV, XLSX using the payout document ID
+// @desc Export the payout document using the payout document ID
 // @id payoutsIdDownloadPathDownloadPayoutDocument
 // @tag Payouts
 // @accept application/json
 // @produce application/json
-// @success 200 {object} reporter.CreateFileResponse Returns the payout document file
+// @success 200 {object} reporter.CreateFileResponse Returns the payout document file ID
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.

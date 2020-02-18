@@ -182,7 +182,7 @@ func (h *ProjectRoute) getProject(ctx echo.Context) error {
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param limit query {integer} true The number of projects returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
-// @param quick_search query {string} false The project's name for the quick search.
+// @param quick_search query {string} false The quick search by the project's name.
 // @param status query {[]string} false The list of the project's statuses.
 // @param sort query {[]integer} false The list of the project's fields for sorting.
 // @router /admin/api/v1/projects [get]

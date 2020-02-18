@@ -67,7 +67,7 @@ func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Conte
 // @accept application/json
 // @produce application/json
 // @body billing.PaymentMinLimitSystem
-// @success 200 {string} Returns an empty response body if the system limits were successfully set
+// @success 204 {string} Returns an empty response body if the system limits were successfully set
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/payment_min_limit_system [post]

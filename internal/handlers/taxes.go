@@ -5,7 +5,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/taxpb"
+	tax_service "github.com/paysuper/paysuper-proto/go/taxpb"
 	"net/http"
 	"strconv"
 )
@@ -36,6 +38,22 @@ func (h *TaxesRoute) Route(groups *common.Groups) {
 	groups.SystemUser.DELETE(taxesIDPath, h.deleteTax)
 }
 
+// @summary Get the system tax rates list
+// @desc Get the system tax rates list
+// @id taxesPathGetTaxes
+// @tag Tax
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.GetPaymentMethodSettingsResponse Returns the production settings
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param zip query {string} false The postal code. Required for US.
+// @param country query {string} false The country's name.
+// @param city query {string} false The city's name.
+// @param state query {string} false The state's name.
+// @param limit query {integer} true The number of taxes returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /system/api/v1/taxes [get]
 func (h *TaxesRoute) getTaxes(ctx echo.Context) error {
 	req := h.bindGetTaxes(ctx)
 	res, err := h.dispatch.Services.Tax.GetRates(ctx.Request().Context(), req)
@@ -88,6 +106,17 @@ func (h *TaxesRoute) bindGetTaxes(ctx echo.Context) *taxpb.GetRatesRequest {
 	return structure
 }
 
+// @summary Edit the system tax rate
+// @desc Create or update the system tax rate
+// @id taxesPathSetTax
+// @tag Tax
+// @accept application/json
+// @produce application/json
+// @body tax_service.TaxRate
+// @success 200 {object} tax_service.TaxRate Returns the tax rate
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /system/api/v1/taxes [post]
 func (h *TaxesRoute) setTax(ctx echo.Context) error {
 	if ctx.Request().ContentLength == 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
@@ -109,6 +138,17 @@ func (h *TaxesRoute) setTax(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Delete the system tax rate
+// @desc Mark the system tax rate as removed
+// @id taxesIDPathDeleteTax
+// @tag Tax
+// @accept application/json
+// @produce application/json
+// @success 200 {string} Returns an empty response body if the tax rate has been successfully removed
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the tax rate.
+// @router /system/api/v1/taxes/{id} [delete]
 func (h *TaxesRoute) deleteTax(ctx echo.Context) error {
 	id := ctx.Param("id")
 	if id == "" {

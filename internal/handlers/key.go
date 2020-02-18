@@ -35,13 +35,13 @@ func (h *KeyRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(keysIdPath, h.getKeyInfo)
 }
 
-// @summary Get the key's data
-// @desc Get the key's data
+// @summary Get the key data
+// @desc Get the key data
 // @id keysIdPathGetKeyInfo
 // @tag Key, Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Key Returns the key's data
+// @success 200 {object} billing.Key Returns the key data
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param key_id path {string} true The unique identifier for the key.
