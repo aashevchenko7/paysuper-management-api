@@ -80,7 +80,7 @@ func (h *PaymentCostRoute) Route(groups *common.Groups) {
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param name query {string} true The payment method's name.
 // @param region query {string} true The region name. Available values: CIS, Russia, West Asia, EU, North America, Central America, South America, United Kingdom, Worldwide, South Pacific.
-// @param country query {string} false The country's name.
+// @param country query {string} false The country code.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
 // @router /system/api/v1/payment_costs/channel/system [get]
 func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
@@ -126,7 +126,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
 // @param amount query {integer} true The payout amount.
 // @param name query {string} true The payment method's name.
 // @param region query {string} true The region name. Available values: CIS, Russia, West Asia, EU, North America, Central America, South America, United Kingdom, Worldwide, South Pacific.
-// @param country query {string} false The country's name.
+// @param country query {string} false The country code.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
 // @router /system/api/v1/payment_costs/channel/merchant/{merchant_id} [get]
 func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error {
@@ -173,7 +173,7 @@ func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error
 // @param payment_stage query {integer} true The payout stage.
 // @param days query {integer} true The number of days after the payment operation.
 // @param region query {string} true The region name. Available values: CIS, Russia, West Asia, EU, North America, Central America, South America, United Kingdom, Worldwide, South Pacific.
-// @param country query {string} false The country's name.
+// @param country query {string} false The country code.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
 // @router /system/api/v1/payment_costs/money_back/system [get]
 func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
@@ -220,7 +220,7 @@ func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
 // @param payment_stage query {integer} true The payout stage.
 // @param days query {integer} true The number of days after the payment operation.
 // @param region query {string} true The region name. Available values: CIS, Russia, West Asia, EU, North America, Central America, South America, United Kingdom, Worldwide, South Pacific.
-// @param country query {string} false The country's name.
+// @param country query {string} false The country code.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
 // @router /system/api/v1/payment_costs/money_back/merchant/{merchant_id} [get]
 func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {

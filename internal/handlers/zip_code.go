@@ -43,7 +43,7 @@ func (h *ZipCodeRoute) Route(groups *common.Groups) {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 404 {object} grpc.ResponseErrorMessage The country not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-// @param country query {string} true The country's name.
+// @param country query {string} true The country code.
 // @param zip query {string} false The postal code. It's required for US.
 // @param limit query {integer} false The number of objects returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.

@@ -48,7 +48,7 @@ func (h *TaxesRoute) Route(groups *common.Groups) {
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param zip query {string} false The postal code. Required for US.
-// @param country query {string} false The country's name.
+// @param country query {string} false The country code.
 // @param city query {string} false The city's name.
 // @param state query {string} false The state's name.
 // @param limit query {integer} true The number of taxes returned in one page. Default value is 100.

@@ -385,7 +385,7 @@ func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
 // @failure 404 {object} grpc.ResponseErrorMessage Not found
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the key-activated product.
-// @param country query {string} false The country's name to calculate the price for.
+// @param country query {string} false The country code to calculate the price for.
 // @param language query {string} false The language.
 // @param currency query {string} false The price currency.
 // @router /auth/api/v1/key-products/{key_product_id} [get]
