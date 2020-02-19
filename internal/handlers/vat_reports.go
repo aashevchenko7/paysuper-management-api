@@ -83,11 +83,13 @@ func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 
 func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
 	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterPkg.ReportTypeVat
 	params := map[string]interface{}{
 		reporterPkg.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
@@ -123,11 +125,13 @@ func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
 
 func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error {
 	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterPkg.ReportTypeVatTransactions
 	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterId),

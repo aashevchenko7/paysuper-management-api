@@ -84,11 +84,13 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 
 func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterPkg.ReportTypePayout
 	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestPayoutDocumentId),

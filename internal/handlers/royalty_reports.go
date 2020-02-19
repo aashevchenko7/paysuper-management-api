@@ -100,11 +100,13 @@ func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 
 func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterPkg.ReportTypeRoyalty
 	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterReportId),
@@ -140,11 +142,13 @@ func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 
 func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) error {
 	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterPkg.ReportTypeRoyaltyTransactions
 	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterReportId),
