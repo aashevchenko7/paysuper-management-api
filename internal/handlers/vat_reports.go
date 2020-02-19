@@ -82,18 +82,18 @@ func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 }
 
 func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
-	req := &common.ReportFileRequest{}
+	req := &reporterPkg.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypeVat
-	req.Params = map[string]interface{}{
+	params := map[string]interface{}{
 		reporterPkg.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
 	}
 
-	return h.dispatch.RequestReportFile(ctx, req)
+	return h.dispatch.RequestReportFile(ctx, req, params)
 }
 
 func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
@@ -122,18 +122,18 @@ func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
 }
 
 func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error {
-	req := &common.ReportFileRequest{}
+	req := &reporterPkg.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
 	req.ReportType = reporterPkg.ReportTypeVatTransactions
-	req.Params = map[string]interface{}{
+	params := map[string]interface{}{
 		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterId),
 	}
 
-	return h.dispatch.RequestReportFile(ctx, req)
+	return h.dispatch.RequestReportFile(ctx, req, params)
 }
 
 func (h *VatReportsRoute) updateVatReportStatus(ctx echo.Context) error {

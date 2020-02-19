@@ -24,8 +24,8 @@ const (
 )
 
 type CreateOrderJsonProjectResponse struct {
-	Id              string                    `json:"id"`
-	PaymentFormUrl  string                    `json:"payment_form_url"`
+	Id              string                         `json:"id"`
+	PaymentFormUrl  string                         `json:"payment_form_url"`
 	PaymentFormData *billingpb.PaymentFormJsonData `json:"payment_form_data,omitempty"`
 }
 
@@ -154,19 +154,19 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 		return err
 	}
 
-	file := &common.ReportFileRequest{
+	file := &reporterPkg.ReportFile{
 		ReportType: reporterPkg.ReportTypeTransactions,
 		FileType:   req.FileType,
 		MerchantId: req.MerchantId,
-		Params: map[string]interface{}{
-			reporterPkg.ParamsFieldStatus:        req.Status,
-			reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
-			reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
-			reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
-		},
+	}
+	params := map[string]interface{}{
+		reporterPkg.ParamsFieldStatus:        req.Status,
+		reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
+		reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
+		reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
 	}
 
-	return h.dispatch.RequestReportFile(ctx, file)
+	return h.dispatch.RequestReportFile(ctx, file, params)
 }
 
 func (h *OrderRoute) getRefund(ctx echo.Context) error {
