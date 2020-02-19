@@ -294,7 +294,7 @@ func (h *PaymentMethodApiV1) createTestSettings(ctx echo.Context) error {
 
 // @summary Update the testing settings of the payment method
 // @desc Update the testing settings of the payment method
-// @id paymentMethodTestPathCreateTestSettings
+// @id paymentMethodTestPathUpdateTestSettings
 // @tag Payment method
 // @accept application/json
 // @produce application/json
@@ -335,7 +335,7 @@ func (h *PaymentMethodApiV1) createOrUpdateTestSettings(ctx echo.Context) error 
 
 // @summary Delete the testing settings of the payment method
 // @desc Delete the testing settings of the payment method
-// @id paymentMethodTestPathCreateTestSettings
+// @id paymentMethodTestPathDeleteTestSettings
 // @tag Payment method
 // @accept application/json
 // @produce application/json

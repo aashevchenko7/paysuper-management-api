@@ -8,8 +8,8 @@ import (
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
-	reporterProto "github.com/paysuper/paysuper-proto/go/reporterpb"
 	reporter "github.com/paysuper/paysuper-proto/go/reporterpb"
+	reporterProto "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"os"
 	"strings"
@@ -57,7 +57,7 @@ func (h *ReportFileRoute) Route(groups *common.Groups) {
 
 // @summary Export the report file
 // @desc Export the report file into a PDF, CSV, XLSX
-// @id reportFileDownloadPathDownload
+// @id reportFileDownloadPathDownloadByAdmin
 // @tag Report file
 // @accept application/json
 // @produce application/pdf, text/csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet

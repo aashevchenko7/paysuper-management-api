@@ -4,6 +4,7 @@ require (
 	github.com/ProtocolONE/authone-jwt-verifier-golang v0.0.0-20190327070329-4dd563b01681
 	github.com/ProtocolONE/geoip-service v0.0.0-20190903084234-1d5ae6b96679
 	github.com/ProtocolONE/go-core/v2 v2.1.0
+	github.com/ProtocolONE/go-micro-plugins/wrapper/select/version v0.0.0-20200213135655-2678e485cc54
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/alexeyco/simpletable v0.0.0-20190222165044-2eb48bcee7cf
 	github.com/aws/aws-sdk-go v1.23.16
@@ -25,11 +26,11 @@ require (
 	github.com/paysuper/paysuper-aws-manager v0.0.1
 	github.com/paysuper/paysuper-billing-server v1.1.1-0.20200121103017-15f58f786464 // indirect
 	github.com/paysuper/paysuper-proto v0.1.72 // indirect
-	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200214080629-447aa42d534d
+	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200219080251-e61fcc689caf
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200210102812-9d6a3b24437d
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200201160112-2ee519914bfd
-	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200210102812-9d6a3b24437d
-	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200210102812-9d6a3b24437d
+	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200219080251-e61fcc689caf
+	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200219080251-e61fcc689caf
 	github.com/paysuper/paysuper-reporter v0.0.0-20191203194948-36a2d983f406 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/spaceavocado/apidoc v0.3.5 // indirect

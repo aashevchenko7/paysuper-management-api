@@ -406,6 +406,7 @@ func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
 // @success 200 {object} billing.PaymentChannelCostSystem Returns system costs for payments operations
 // @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
 // @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/channel/system/{id} [put]
 func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 	req := &billingpb.PaymentChannelCostSystem{}
