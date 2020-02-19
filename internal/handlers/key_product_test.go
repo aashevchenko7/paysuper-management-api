@@ -60,9 +60,9 @@ func (suite *KeyProductTestSuite) SetupTestForTestProject_CreateKeyProduct_Group
 		Geo:     mock.NewGeoIpServiceTestOk(),
 	}
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
@@ -89,9 +89,9 @@ func (suite *KeyProductTestSuite) SetupTestForTestProject_CreateKeyProduct_Group
 
 	billingService.On("GetPriceGroupByRegion", mock2.Anything, mock2.Anything).Return(&billingpb.GetPriceGroupByRegionResponse{Status: 400, Group: nil, Message: &billingpb.ResponseErrorMessage{Message: "some error"}}, nil)
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 	var e error
 	settings := test.DefaultSettings()
@@ -120,9 +120,9 @@ func (suite *KeyProductTestSuite) SetupTest() {
 	}
 
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
@@ -423,7 +423,7 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Ok() {
 					},
 				}},
 		},
-		Pricing:     "manual",
+		Pricing: "manual",
 	}
 
 	b, err := json.Marshal(&body)

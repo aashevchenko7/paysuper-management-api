@@ -23,7 +23,7 @@ func ProviderCfg(cfg config.Configurator) (*Config, func(), error) {
 
 // ProviderCasbinService
 func ProviderCasbinService(srv *micro.Micro) casbinpb.CasbinService {
-	return casbinpb.NewCasbinService("", srv.Client())
+	return casbinpb.NewCasbinService("", srv.Client("", ""))
 }
 
 // ProviderDispatcher

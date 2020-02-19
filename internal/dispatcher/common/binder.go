@@ -10,7 +10,6 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/gurukami/typ/v2"
 	"github.com/labstack/echo/v4"
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"reflect"

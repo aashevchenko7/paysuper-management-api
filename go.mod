@@ -4,6 +4,7 @@ require (
 	github.com/ProtocolONE/authone-jwt-verifier-golang v0.0.0-20190327070329-4dd563b01681
 	github.com/ProtocolONE/geoip-service v1.0.3-0.20200203172514-41df5c78bf01
 	github.com/ProtocolONE/go-core/v2 v2.1.0
+	github.com/ProtocolONE/go-micro-plugins/wrapper/select/version v0.0.0-20200213135655-2678e485cc54
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/alexeyco/simpletable v0.0.0-20190222165044-2eb48bcee7cf
@@ -18,6 +19,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/google/wire v0.3.0
 	github.com/gurukami/typ/v2 v2.0.1
+	github.com/karlseguin/expect v1.0.1 // indirect
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-plugins/broker/rabbitmq v0.0.0-20200119172437-4fe21aa238fd
@@ -26,18 +28,21 @@ require (
 	github.com/micro/go-plugins/transport/grpc v0.0.0-20200119172437-4fe21aa238fd
 	github.com/paysuper/echo-casbin-middleware v1.0.1-0.20200203133300-6f18edeb3072
 	github.com/paysuper/paysuper-aws-manager v0.0.1
-	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200211091809-d34cc6fa8ff5
+	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200218084741-4dee284b77de
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200203130641-45056764a1d7
-	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200211080654-935ed390e2e5
+	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200218090503-e603ee3997a4
 	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200203130641-45056764a1d7
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
+	github.com/tidwall/pretty v1.0.1 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.0.1
+	github.com/wsxiaoys/terminal v0.0.0-20160513160801-0940f3fc43a0 // indirect
 	go.uber.org/automaxprocs v1.2.0
 	gopkg.in/go-playground/validator.v9 v9.30.0
+	gopkg.in/karlseguin/expect.v1 v1.0.1 // indirect
 )
 
 replace (
