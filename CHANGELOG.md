@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 - The new parameter to filter the transactions log by the production or test mode.
-- The new settings group to redirect user at the end of the payment process.
+- The new project's settings group to redirect user at the end of the payment process.
 - Added API documentation using the OpenAPI specification in GO source files.
 
 ### Changed
