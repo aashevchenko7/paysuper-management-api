@@ -250,7 +250,7 @@ func (h *PaymentMethodApiV1) deleteProductionSettings(ctx echo.Context) error {
 // @param currency_a3 query {string} false Three-letter currency code by ISO 4217, in uppercase.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
 // @param operating_company_id query {string} false The unique identifier for the operation company.
-// @router /system/api/v1/payment_method/{id}/production [get]
+// @router /system/api/v1/payment_method/{id}/test [get]
 func (h *PaymentMethodApiV1) getTestSettings(ctx echo.Context) error {
 	req := &billingpb.GetPaymentMethodSettingsRequest{
 		PaymentMethodId: ctx.Param("id"),
