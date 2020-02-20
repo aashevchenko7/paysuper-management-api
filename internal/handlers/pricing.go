@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -31,13 +31,25 @@ func NewPricingRoute(set common.HandlerSet, cfg *common.Config) *Pricing {
 }
 
 func (h *Pricing) Route(groups *common.Groups) {
-	groups.AuthProject.GET(pricingRecommendedConversionPath, h.getRecommendedByConversion)
-	groups.AuthProject.GET(pricingRecommendedSteamPath, h.getRecommendedBySteam)
-	groups.AuthProject.GET(pricingRecommendedTablePath, h.getRecommendedTable)
+	groups.Common.GET(pricingRecommendedConversionPath, h.getRecommendedByConversion)
+	groups.Common.GET(pricingRecommendedSteamPath, h.getRecommendedBySteam)
+	groups.Common.GET(pricingRecommendedTablePath, h.getRecommendedTable)
 }
 
+// @summary Get recommended currency conversion prices based on exchange rates
+// @desc Calculation of recommended currency conversion prices for regions based on the exchange rates
+// @id pricingRecommendedConversionPathGetRecommendedByConversion
+// @tag Pricing
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.RecommendedPriceResponse Returns the list of recommended currency conversion prices
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param amount query {string} true The amount of price.
+// @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
+// @router /api/v1/pricing/recommended/conversion [get]
 func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
-	req := &grpc.RecommendedPriceRequest{}
+	req := &billingpb.RecommendedPriceRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -58,8 +70,20 @@ func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Get recommended currency conversion prices based on based on the Steam price ranges
+// @desc Calculation of recommended currency conversion prices based on the Steam price ranges taking the regional factors into account
+// @id pricingRecommendedSteamPathGetRecommendedBySteam
+// @tag Pricing
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.RecommendedPriceResponse Returns the list of recommended currency conversion prices
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param amount query {string} true The amount of price.
+// @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
+// @router /api/v1/pricing/recommended/steam [get]
 func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
-	req := &grpc.RecommendedPriceRequest{}
+	req := &billingpb.RecommendedPriceRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -80,8 +104,19 @@ func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Get ranges of recommended currency conversion prices
+// @desc Get the table of recommended currency conversion prices ranges
+// @id pricingRecommendedTablePathGetRecommendedTable
+// @tag Pricing
+// @accept application/json
+// @produce application/json
+// @success 200 {object} grpc.RecommendedPriceTableResponse Returns the table of recommended currency conversion prices ranges
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
+// @router /api/v1/pricing/recommended/table [get]
 func (h *Pricing) getRecommendedTable(ctx echo.Context) error {
-	req := &grpc.RecommendedPriceTableRequest{}
+	req := &billingpb.RecommendedPriceTableRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {

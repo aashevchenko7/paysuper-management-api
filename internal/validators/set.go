@@ -6,10 +6,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/go-pascal/iban"
 	"github.com/google/uuid"
-	billPkg "github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/ttacon/libphonenumber"
 	"gopkg.in/go-playground/validator.v9"
 	"regexp"
@@ -33,7 +31,7 @@ var (
 		common.UserProfilePositionSupport:           true,
 	}
 
-	availableAnnualIncome = []*billing.RangeInt{
+	availableAnnualIncome = []*billingpb.RangeInt{
 		{From: 0, To: 1000},
 		{From: 1000, To: 10000},
 		{From: 10000, To: 100000},
@@ -41,7 +39,7 @@ var (
 		{From: 1000000, To: 0},
 	}
 
-	availableNumberOfEmployees = []*billing.RangeInt{
+	availableNumberOfEmployees = []*billingpb.RangeInt{
 		{From: 1, To: 10},
 		{From: 11, To: 50},
 		{From: 51, To: 100},
@@ -50,7 +48,7 @@ var (
 
 	zipUsaRegexp      = regexp.MustCompile("^[0-9]{5}(?:-[0-9]{4})?$")
 	nameRegexp        = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\']+$")
-	companyNameRegexp = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\.0-9]+$")
+	companyNameRegexp = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\.0-9\"]+$")
 	zipGeneralRegexp  = regexp.MustCompile("^\\d{0,30}$")
 	swiftRegexp       = regexp.MustCompile("^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$")
 	cityRegexp        = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\.]+$")
@@ -60,9 +58,9 @@ var (
 // ProductPriceValidator
 func (v *ValidatorSet) ProductPriceValidator(fl validator.FieldLevel) bool {
 	value := fl.Field().Interface()
-	prices, ok := value.([]*billing.ProductPrice)
+	prices, ok := value.([]*billingpb.ProductPrice)
 	if !ok {
-		price, ok := value.(*billing.ProductPrice)
+		price, ok := value.(*billingpb.ProductPrice)
 		if !ok {
 			return false
 		}
@@ -95,7 +93,7 @@ func (v *ValidatorSet) PriceRegionValidator(fl validator.FieldLevel) bool {
 		return true
 	}
 
-	resp, err := v.services.Billing.GetPriceGroupByRegion(context.TODO(), &grpc.GetPriceGroupByRegionRequest{Region: region})
+	resp, err := v.services.Billing.GetPriceGroupByRegion(context.TODO(), &billingpb.GetPriceGroupByRegionRequest{Region: region})
 	if err != nil {
 		v.L().Error("can't get price region", logger.PairArgs("method", "PriceRegionValidator"),
 			logger.PairArgs("region", region),
@@ -130,7 +128,7 @@ func (v *ValidatorSet) PositionValidator(fl validator.FieldLevel) bool {
 
 // CompanyValidator
 func (v *ValidatorSet) CompanyValidator(sl validator.StructLevel) {
-	company := sl.Current().Interface().(grpc.UserProfileCompany)
+	company := sl.Current().Interface().(billingpb.UserProfileCompany)
 	res := v.RangeIntValidator(company.AnnualIncome, availableAnnualIncome)
 
 	if res == false {
@@ -145,7 +143,7 @@ func (v *ValidatorSet) CompanyValidator(sl validator.StructLevel) {
 }
 
 // RangeIntValidator
-func (v *ValidatorSet) RangeIntValidator(in *billing.RangeInt, rng []*billing.RangeInt) bool {
+func (v *ValidatorSet) RangeIntValidator(in *billingpb.RangeInt, rng []*billingpb.RangeInt) bool {
 	for _, v := range rng {
 		if in.From == v.From && in.To == v.To {
 			return true
@@ -162,7 +160,7 @@ func (v *ValidatorSet) CompanyNameValidator(fl validator.FieldLevel) bool {
 
 // MerchantCompanyValidator
 func (v *ValidatorSet) MerchantCompanyValidator(sl validator.StructLevel) {
-	company := sl.Current().Interface().(billing.MerchantCompanyInfo)
+	company := sl.Current().Interface().(billingpb.MerchantCompanyInfo)
 
 	reg := zipGeneralRegexp
 
@@ -195,7 +193,7 @@ func (v *ValidatorSet) WorldRegionValidator(fl validator.FieldLevel) bool {
 
 // TariffRegionValidator
 func (v *ValidatorSet) TariffRegionValidator(fl validator.FieldLevel) bool {
-	_, ok := billPkg.HomeRegions[fl.Field().String()]
+	_, ok := billingpb.HomeRegions[fl.Field().String()]
 	return ok
 }
 

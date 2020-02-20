@@ -8,10 +8,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/micro/go-micro/client"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -35,8 +34,6 @@ const (
 	merchantsIdAgreementPath           = "/merchants/:merchant_id/agreement"
 	merchantsAgreementDocumentPath     = "/merchants/agreement/document"
 	merchantsIdAgreementDocumentPath   = "/merchants/:merchant_id/agreement/document"
-	merchantsAgreementSignaturePath    = "/merchants/agreement/signature"
-	merchantsIdAgreementSignaturePath  = "/merchants/:merchant_id/agreement/signature"
 	merchantsNotificationsIdPath       = "/merchants/notifications/:notification_id"
 	merchantsNotificationsMarkReadPath = "/merchants/notifications/:notification_id/mark-as-read"
 	merchantsTariffsPath               = "/merchants/tariffs"
@@ -47,7 +44,6 @@ const (
 )
 
 const (
-	agreementFileMask        = "agreement_%s.pdf"
 	agreementContentType     = "application/pdf"
 	agreementExtension       = "pdf"
 	merchantAgreementUrlMask = "%s://%s/admin/api/v1/merchants/agreement/document"
@@ -74,7 +70,7 @@ type OnboardingRoute struct {
 	provider.LMT
 }
 
-func NewOnboardingRoute(set common.HandlerSet, initial config.Initial, awsManager awsWrapper.AwsManagerInterface, globalCfg *common.Config) *OnboardingRoute {
+func NewOnboardingRoute(set common.HandlerSet, _ config.Initial, awsManager awsWrapper.AwsManagerInterface, globalCfg *common.Config) *OnboardingRoute {
 	set.AwareSet.Logger = set.AwareSet.Logger.WithFields(logger.Fields{"router": "OnboardingRoute"})
 	return &OnboardingRoute{
 		dispatch:   set,
@@ -103,8 +99,6 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(merchantsIdAgreementPath, h.getSystemAgreementData)
 	groups.AuthUser.GET(merchantsAgreementDocumentPath, h.getAgreementDocument)
 	groups.SystemUser.GET(merchantsIdAgreementDocumentPath, h.getAgreementDocument)
-	groups.AuthUser.PUT(merchantsAgreementSignaturePath, h.createMerchantAgreementSignature)
-	groups.SystemUser.PUT(merchantsIdAgreementSignaturePath, h.createSystemAgreementSignature)
 
 	groups.SystemUser.POST(merchantsIdNotificationsPath, h.createNotification)
 	groups.SystemUser.GET(merchantsIdNotificationsPath, h.listNotifications)
@@ -123,17 +117,17 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 }
 
 func (h *OnboardingRoute) getMerchant(ctx echo.Context) error {
-	req := &grpc.GetMerchantByRequest{}
+	req := &billingpb.GetMerchantByRequest{}
 	err := ctx.Bind(req)
 
 	res, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantBy", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -146,15 +140,15 @@ func (h *OnboardingRoute) getMerchantByUser(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, common.ErrorMessageAccessDenied)
 	}
 
-	req := &grpc.GetMerchantByRequest{UserId: authUser.Id}
+	req := &billingpb.GetMerchantByRequest{UserId: authUser.Id}
 	res, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantBy", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -162,7 +156,7 @@ func (h *OnboardingRoute) getMerchantByUser(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
-	req := &grpc.MerchantListingRequest{}
+	req := &billingpb.MerchantListingRequest{}
 	err := (&common.OnboardingMerchantListingBinder{
 		LimitDefault:  int64(h.cfg.LimitDefault),
 		OffsetDefault: int64(h.cfg.OffsetDefault),
@@ -181,7 +175,7 @@ func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ListMerchants(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ListMerchants", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ListMerchants", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
@@ -190,7 +184,7 @@ func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
 
 func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.MerchantChangeStatusRequest{}
+	req := &billingpb.MerchantChangeStatusRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -204,7 +198,7 @@ func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeMerchantStatus(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ChangeMerchantStatus", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchantStatus", req)
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorUnknown)
 	}
 
@@ -217,7 +211,7 @@ func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
 
 func (h *OnboardingRoute) createNotification(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.NotificationRequest{}
+	req := &billingpb.NotificationRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -231,7 +225,7 @@ func (h *OnboardingRoute) createNotification(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.CreateNotification(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "CreateNotification", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "CreateNotification", req)
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorUnknown)
 	}
 
@@ -243,7 +237,7 @@ func (h *OnboardingRoute) createNotification(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) getNotification(ctx echo.Context) error {
-	req := &grpc.GetNotificationRequest{}
+	req := &billingpb.GetNotificationRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -252,14 +246,14 @@ func (h *OnboardingRoute) getNotification(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetNotification(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetNotification")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetNotification")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *OnboardingRoute) listNotifications(ctx echo.Context) error {
-	req := &grpc.ListingNotificationRequest{}
+	req := &billingpb.ListingNotificationRequest{}
 	err := (&common.OnboardingNotificationsListBinder{
 		LimitDefault:  int64(h.cfg.LimitDefault),
 		OffsetDefault: int64(h.cfg.OffsetDefault),
@@ -278,7 +272,7 @@ func (h *OnboardingRoute) listNotifications(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ListNotifications(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ListNotifications", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ListNotifications", req)
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorUnknown)
 	}
 
@@ -286,7 +280,7 @@ func (h *OnboardingRoute) listNotifications(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) markAsReadNotification(ctx echo.Context) error {
-	req := &grpc.GetNotificationRequest{}
+	req := &billingpb.GetNotificationRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -295,14 +289,14 @@ func (h *OnboardingRoute) markAsReadNotification(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.MarkNotificationAsRead(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "MarkNotificationAsRead")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "MarkNotificationAsRead")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
-	req := &grpc.ChangeMerchantDataRequest{}
+	req := &billingpb.ChangeMerchantDataRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -311,10 +305,10 @@ func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeMerchantData(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeMerchantData")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeMerchantData")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -322,7 +316,7 @@ func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) getAgreementDocument(ctx echo.Context) error {
-	req := &grpc.GetMerchantByRequest{}
+	req := &billingpb.GetMerchantByRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -331,10 +325,10 @@ func (h *OnboardingRoute) getAgreementDocument(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetMerchantBy")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantBy")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -351,7 +345,7 @@ func (h *OnboardingRoute) getAgreementDocument(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorAgreementFileNotExist)
 	}
 
-	return ctx.File(filePath)
+	return ctx.Inline(filePath, res.Item.S3AgreementName)
 }
 
 func (h *OnboardingRoute) getAgreementStructure(
@@ -379,7 +373,7 @@ func (h *OnboardingRoute) getAgreementStructure(
 
 	url := fmt.Sprintf(systemAgreementUrlMask, h.cfg.HttpScheme, ctx.Request().Host, merchantId)
 
-	if signerType == pkg.SignerTypeMerchant {
+	if signerType == billingpb.SignerTypeMerchant {
 		url = fmt.Sprintf(merchantAgreementUrlMask, h.cfg.HttpScheme, ctx.Request().Host)
 	}
 
@@ -434,17 +428,17 @@ func (h *OnboardingRoute) validateUpload(file *multipart.FileHeader) (multipart.
 
 func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	in := &billing.MerchantCompanyInfo{}
+	in := &billingpb.MerchantCompanyInfo{}
 	err := ctx.Bind(in)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req := &grpc.OnboardingRequest{
+	req := &billingpb.OnboardingRequest{
 		Company: in,
 		Id:      ctx.Param(common.RequestParameterMerchantId),
-		User: &billing.MerchantUser{
+		User: &billingpb.MerchantUser{
 			Id:    authUser.Id,
 			Email: authUser.Email,
 		},
@@ -458,11 +452,11 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ChangeMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -471,17 +465,17 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 
 func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	in := &billing.MerchantContact{}
+	in := &billingpb.MerchantContact{}
 	err := ctx.Bind(in)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req := &grpc.OnboardingRequest{
+	req := &billingpb.OnboardingRequest{
 		Contacts: in,
 		Id:       ctx.Param(common.RequestParameterMerchantId),
-		User: &billing.MerchantUser{
+		User: &billingpb.MerchantUser{
 			Id:    authUser.Id,
 			Email: authUser.Email,
 		},
@@ -495,11 +489,11 @@ func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ChangeMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -508,17 +502,17 @@ func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 
 func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	in := &billing.MerchantBanking{}
+	in := &billingpb.MerchantBanking{}
 	err := ctx.Bind(in)
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req := &grpc.OnboardingRequest{
+	req := &billingpb.OnboardingRequest{
 		Banking: in,
 		Id:      ctx.Param(common.RequestParameterMerchantId),
-		User: &billing.MerchantUser{
+		User: &billingpb.MerchantUser{
 			Id:    authUser.Id,
 			Email: authUser.Email,
 		},
@@ -532,11 +526,11 @@ func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "ChangeMerchant", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchant", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -544,7 +538,7 @@ func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) getMerchantStatus(ctx echo.Context) error {
-	req := &grpc.SetMerchantS3AgreementRequest{}
+	req := &billingpb.SetMerchantS3AgreementRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -553,39 +547,10 @@ func (h *OnboardingRoute) getMerchantStatus(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMerchantOnboardingCompleteData(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetMerchantOnboardingCompleteData")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantOnboardingCompleteData")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
-		return echo.NewHTTPError(int(res.Status), res.Message)
-	}
-
-	return ctx.JSON(http.StatusOK, res.Item)
-}
-
-func (h *OnboardingRoute) createMerchantAgreementSignature(ctx echo.Context) error {
-	return h.createAgreementSignature(ctx, pkg.SignerTypeMerchant)
-}
-
-func (h *OnboardingRoute) createSystemAgreementSignature(ctx echo.Context) error {
-	return h.createAgreementSignature(ctx, pkg.SignerTypePs)
-}
-
-func (h *OnboardingRoute) createAgreementSignature(ctx echo.Context, signerType int32) error {
-	req := &grpc.GetMerchantAgreementSignUrlRequest{SignerType: signerType}
-
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
-	}
-
-	res, err := h.dispatch.Services.Billing.GetMerchantAgreementSignUrl(ctx.Request().Context(), req)
-
-	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetMerchantAgreementSignUrl")
-	}
-
-	if res.Status != pkg.ResponseStatusOk {
-		fmt.Println(res.Message)
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -593,7 +558,7 @@ func (h *OnboardingRoute) createAgreementSignature(ctx echo.Context, signerType 
 }
 
 func (h *OnboardingRoute) getTariffRates(ctx echo.Context) error {
-	req := &grpc.GetMerchantTariffRatesRequest{}
+	req := &billingpb.GetMerchantTariffRatesRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -609,11 +574,11 @@ func (h *OnboardingRoute) getTariffRates(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMerchantTariffRates(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantTariffRates", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantTariffRates", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -621,7 +586,7 @@ func (h *OnboardingRoute) getTariffRates(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) setTariffRates(ctx echo.Context) error {
-	req := &grpc.SetMerchantTariffRatesRequest{}
+	req := &billingpb.SetMerchantTariffRatesRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -641,11 +606,11 @@ func (h *OnboardingRoute) setTariffRates(ctx echo.Context) error {
 	)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SetMerchantTariffRates", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetMerchantTariffRates", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -653,15 +618,15 @@ func (h *OnboardingRoute) setTariffRates(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) getMerchantAgreementData(ctx echo.Context) error {
-	return h.getAgreementData(ctx, pkg.SignerTypeMerchant)
+	return h.getAgreementData(ctx, billingpb.SignerTypeMerchant)
 }
 
 func (h *OnboardingRoute) getSystemAgreementData(ctx echo.Context) error {
-	return h.getAgreementData(ctx, pkg.SignerTypePs)
+	return h.getAgreementData(ctx, billingpb.SignerTypePs)
 }
 
 func (h *OnboardingRoute) getAgreementData(ctx echo.Context, signerType int32) error {
-	req := &grpc.GetMerchantByRequest{}
+	req := &billingpb.GetMerchantByRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -670,10 +635,10 @@ func (h *OnboardingRoute) getAgreementData(ctx echo.Context, signerType int32) e
 	res, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetMerchantBy")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantBy")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -710,7 +675,7 @@ func (h *OnboardingRoute) disableMerchantManualPayout(ctx echo.Context) error {
 }
 
 func (h *OnboardingRoute) changeMerchantManualPayout(ctx echo.Context, enableManualPayout bool) error {
-	req := &grpc.ChangeMerchantManualPayoutsRequest{ManualPayoutsEnabled: enableManualPayout}
+	req := &billingpb.ChangeMerchantManualPayoutsRequest{ManualPayoutsEnabled: enableManualPayout}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -719,7 +684,7 @@ func (h *OnboardingRoute) changeMerchantManualPayout(ctx echo.Context, enableMan
 	res, err := h.dispatch.Services.Billing.ChangeMerchantManualPayouts(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeMerchantManualPayouts")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeMerchantManualPayouts")
 	}
 
 	if res.Status != http.StatusOK {
@@ -730,7 +695,7 @@ func (h *OnboardingRoute) changeMerchantManualPayout(ctx echo.Context, enableMan
 }
 
 func (h *OnboardingRoute) setOperatingCompany(ctx echo.Context) error {
-	req := &grpc.SetMerchantOperatingCompanyRequest{}
+	req := &billingpb.SetMerchantOperatingCompanyRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -747,11 +712,11 @@ func (h *OnboardingRoute) setOperatingCompany(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.SetMerchantOperatingCompany(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "SetMerchantOperatingCompany", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetMerchantOperatingCompany", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

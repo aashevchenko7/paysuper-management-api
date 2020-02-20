@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -38,7 +38,7 @@ func (h *DashboardRoute) Route(groups *common.Groups) {
 }
 
 func (h *DashboardRoute) getMainReports(ctx echo.Context) error {
-	req := &grpc.GetDashboardMainRequest{}
+	req := &billingpb.GetDashboardMainRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -54,11 +54,11 @@ func (h *DashboardRoute) getMainReports(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetDashboardMainReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetDashboardMainReport", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetDashboardMainReport", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -66,7 +66,7 @@ func (h *DashboardRoute) getMainReports(ctx echo.Context) error {
 }
 
 func (h *DashboardRoute) getRevenueDynamicsReport(ctx echo.Context) error {
-	req := &grpc.GetDashboardMainRequest{}
+	req := &billingpb.GetDashboardMainRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -82,11 +82,11 @@ func (h *DashboardRoute) getRevenueDynamicsReport(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetDashboardRevenueDynamicsReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetDashboardMainReport", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetDashboardMainReport", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -94,7 +94,7 @@ func (h *DashboardRoute) getRevenueDynamicsReport(ctx echo.Context) error {
 }
 
 func (h *DashboardRoute) getBaseReports(ctx echo.Context) error {
-	req := &grpc.GetDashboardBaseReportRequest{}
+	req := &billingpb.GetDashboardBaseReportRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -110,11 +110,11 @@ func (h *DashboardRoute) getBaseReports(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetDashboardBaseReport(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetDashboardMainReport", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetDashboardMainReport", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

@@ -1,15 +1,15 @@
 package common
 
 import (
-	"github.com/ProtocolONE/geoip-service/pkg/proto"
+	"encoding/json"
+	geoService "github.com/ProtocolONE/geoip-service/pkg/proto"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
-	"github.com/paysuper/paysuper-recurring-repository/pkg/proto/repository"
-	reporterProto "github.com/paysuper/paysuper-reporter/pkg/proto"
-	tax_service "github.com/paysuper/paysuper-tax-service/proto"
+	billingService "github.com/paysuper/paysuper-proto/go/billingpb"
+	recurringService "github.com/paysuper/paysuper-proto/go/recurringpb"
+	reporterService "github.com/paysuper/paysuper-proto/go/reporterpb"
+	taxService "github.com/paysuper/paysuper-proto/go/taxpb"
 	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 )
@@ -105,11 +105,11 @@ type Validator interface {
 
 // Services
 type Services struct {
-	Repository repository.RepositoryService
-	Geo        proto.GeoIpService
-	Billing    grpc.BillingService
-	Tax        tax_service.TaxService
-	Reporter   reporterProto.ReporterService
+	Repository recurringService.RepositoryService
+	Geo        geoService.GeoIpService
+	Billing    billingService.BillingService
+	Tax        taxService.TaxService
+	Reporter   reporterService.ReporterService
 }
 
 // Handlers
@@ -135,7 +135,7 @@ func (h HandlerSet) BindAndValidate(req interface{}, ctx echo.Context) *echo.HTT
 
 // SrvCallHandler returns error if present, otherwise response as JSON with 200 OK
 func (h HandlerSet) SrvCallHandler(req interface{}, err error, name, method string) *echo.HTTPError {
-	h.AwareSet.L().Error(pkg.ErrorGrpcServiceCallFailed,
+	h.AwareSet.L().Error(billingService.ErrorGrpcServiceCallFailed,
 		logger.PairArgs(
 			ErrorFieldService, name,
 			ErrorFieldMethod, method,
@@ -152,4 +152,35 @@ type AuthUser struct {
 	Email      string
 	Role       string
 	MerchantId string
+}
+
+func (h *HandlerSet) RequestReportFile(
+	ctx echo.Context,
+	req *reporterService.ReportFile,
+	params map[string]interface{},
+) error {
+	b, err := json.Marshal(params)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, ErrorRequestDataInvalid)
+	}
+
+	req.Params = b
+	req.SendNotification = true
+
+	if err = h.Validate.Struct(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, GetValidationError(err))
+	}
+
+	res, err := h.Services.Reporter.CreateFile(ctx.Request().Context(), req)
+
+	if err != nil {
+		return h.SrvCallHandler(req, err, reporterService.ServiceName, "CreateFile")
+	}
+
+	if res.Status != http.StatusOK {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res)
 }

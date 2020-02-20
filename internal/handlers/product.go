@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -45,7 +45,7 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 
 func (h *ProductRoute) getProductsList(ctx echo.Context) error {
 
-	req := &grpc.ListProductsRequest{}
+	req := &billingpb.ListProductsRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -53,14 +53,14 @@ func (h *ProductRoute) getProductsList(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.ListProducts(ctx.Request().Context(), req)
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ListProducts")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ListProducts")
 	}
 	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *ProductRoute) getProduct(ctx echo.Context) error {
 
-	req := &grpc.RequestProduct{}
+	req := &billingpb.RequestProduct{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -69,10 +69,10 @@ func (h *ProductRoute) getProduct(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetProduct(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetProduct")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetProduct")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -81,7 +81,7 @@ func (h *ProductRoute) getProduct(ctx echo.Context) error {
 
 func (h *ProductRoute) deleteProduct(ctx echo.Context) error {
 
-	req := &grpc.RequestProduct{}
+	req := &billingpb.RequestProduct{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -90,7 +90,7 @@ func (h *ProductRoute) deleteProduct(ctx echo.Context) error {
 	_, err := h.dispatch.Services.Billing.DeleteProduct(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "DeleteProduct")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "DeleteProduct")
 	}
 
 	return ctx.NoContent(http.StatusNoContent)
@@ -106,7 +106,7 @@ func (h *ProductRoute) updateProduct(ctx echo.Context) error {
 
 func (h *ProductRoute) createOrUpdateProduct(ctx echo.Context, binder echo.Binder) error {
 
-	req := &grpc.Product{}
+	req := &billingpb.Product{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -115,7 +115,7 @@ func (h *ProductRoute) createOrUpdateProduct(ctx echo.Context, binder echo.Binde
 	res, err := h.dispatch.Services.Billing.CreateOrUpdateProduct(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "CreateOrUpdateProduct")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "CreateOrUpdateProduct")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
@@ -123,7 +123,7 @@ func (h *ProductRoute) createOrUpdateProduct(ctx echo.Context, binder echo.Binde
 
 func (h *ProductRoute) getProductPrices(ctx echo.Context) error {
 
-	req := &grpc.RequestProduct{}
+	req := &billingpb.RequestProduct{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -132,7 +132,7 @@ func (h *ProductRoute) getProductPrices(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetProductPrices(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetProductPrices")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetProductPrices")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
@@ -140,7 +140,7 @@ func (h *ProductRoute) getProductPrices(ctx echo.Context) error {
 
 func (h *ProductRoute) updateProductPrices(ctx echo.Context) error {
 
-	req := &grpc.UpdateProductPricesRequest{}
+	req := &billingpb.UpdateProductPricesRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -149,7 +149,7 @@ func (h *ProductRoute) updateProductPrices(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.UpdateProductPrices(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "UpdateProductPrices")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "UpdateProductPrices")
 	}
 
 	return ctx.JSON(http.StatusOK, res)

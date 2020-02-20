@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -52,7 +51,7 @@ func (suite *PaymentMinLimitSystemTestSuite) TearDownTest() {}
 func (suite *PaymentMinLimitSystemTestSuite) TestPaymentMinLimitSystem_GetOperatingCompaniesList_Ok() {
 	billingService := &billMock.BillingService{}
 	billingService.On("GetOperatingCompaniesList", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.GetOperatingCompaniesListResponse{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.GetOperatingCompaniesListResponse{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	res, err := suite.caller.Builder().
@@ -69,7 +68,7 @@ func (suite *PaymentMinLimitSystemTestSuite) TestPaymentMinLimitSystem_GetOperat
 func (suite *PaymentMinLimitSystemTestSuite) TestPaymentMinLimitSystem_SetPaymentMinLimitSystem_Ok() {
 	billingService := &billMock.BillingService{}
 	billingService.On("SetPaymentMinLimitSystem", mock2.Anything, mock2.Anything, mock2.Anything).
-		Return(&grpc.EmptyResponseWithStatus{Status: pkg.ResponseStatusOk}, nil)
+		Return(&billingpb.EmptyResponseWithStatus{Status: billingpb.ResponseStatusOk}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	body := `{"currency" : "RUB", "amount" : 100500}`

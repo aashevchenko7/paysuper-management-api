@@ -3,11 +3,11 @@ package handlers
 import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/golang/protobuf/ptypes"
-	billingMocks "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -16,7 +16,7 @@ import (
 	"testing"
 )
 
-var payoutMock = &billing.PayoutDocument{
+var payoutMock = &billingpb.PayoutDocument{
 	Id:                 bson.NewObjectId().Hex(),
 	SourceId:           []string{bson.NewObjectId().Hex(), bson.NewObjectId().Hex()},
 	Transaction:        "",
@@ -25,7 +25,7 @@ var payoutMock = &billing.PayoutDocument{
 	Currency:           "EUR",
 	Status:             "pending",
 	Description:        "royalty for june-july 2019",
-	Destination:        &billing.MerchantBanking{},
+	Destination:        &billingpb.MerchantBanking{},
 	CreatedAt:          ptypes.TimestampNow(),
 	UpdatedAt:          ptypes.TimestampNow(),
 	ArrivalDate:        ptypes.TimestampNow(),
@@ -50,30 +50,30 @@ func (suite *PayoutDocumentsTestSuite) SetupTest() {
 	billingService := &billingMocks.BillingService{}
 
 	billingService.On("GetPayoutDocuments", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetPayoutDocumentsResponse{
+		Return(&billingpb.GetPayoutDocumentsResponse{
 			Status: http.StatusOK,
-			Data: &grpc.PayoutDocumentsPaginate{
+			Data: &billingpb.PayoutDocumentsPaginate{
 				Count: 1,
-				Items: []*billing.PayoutDocument{payoutMock},
+				Items: []*billingpb.PayoutDocument{payoutMock},
 			},
 		}, nil)
 
 	billingService.On("CreatePayoutDocument", mock2.Anything, mock2.Anything).
-		Return(&grpc.CreatePayoutDocumentResponse{
+		Return(&billingpb.CreatePayoutDocumentResponse{
 			Status: http.StatusOK,
-			Items:  []*billing.PayoutDocument{payoutMock},
+			Items:  []*billingpb.PayoutDocument{payoutMock},
 		}, nil)
 
 	billingService.On("UpdatePayoutDocument", mock2.Anything, mock2.Anything).
-		Return(&grpc.PayoutDocumentResponse{
+		Return(&billingpb.PayoutDocumentResponse{
 			Status: http.StatusOK,
 			Item:   payoutMock,
 		}, nil)
 
 	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).
-		Return(&grpc.GetMerchantResponse{
+		Return(&billingpb.GetMerchantResponse{
 			Status: http.StatusOK,
-			Item: &billing.Merchant{
+			Item: &billingpb.Merchant{
 				Id: bson.NewObjectId().Hex(),
 			},
 		}, nil)
@@ -84,8 +84,8 @@ func (suite *PayoutDocumentsTestSuite) SetupTest() {
 		Billing: billingService,
 	}
 	user := &common.AuthUser{
-		Id:    "ffffffffffffffffffffffff",
-		Email: "test@unit.test",
+		Id:         "ffffffffffffffffffffffff",
+		Email:      "test@unit.test",
 		MerchantId: "ffffffffffffffffffffffff",
 	}
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
@@ -243,7 +243,7 @@ func (suite *PayoutDocumentsTestSuite) TestPayoutDocuments_Ok_updatePayoutDocume
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodPost).
-		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Params(":"+common.RequestPayoutDocumentId, bson.NewObjectId().Hex()).
 		Path(common.SystemUserGroupPath + payoutsIdPath).
 		Init(test.ReqInitJSON()).
 		BodyString(bodyJson).

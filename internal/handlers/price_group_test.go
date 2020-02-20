@@ -3,12 +3,12 @@ package handlers
 import (
 	"errors"
 	"github.com/labstack/echo/v4"
-	billingMocks "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -61,7 +61,7 @@ func (suite *PriceGroupTestSuite) TestPriceGroup_getPriceGroupByCountry_BindErro
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "field validation for 'Country' failed on the 'required' tag", msg.Details)
 }
@@ -90,7 +90,7 @@ func (suite *PriceGroupTestSuite) TestPriceGroup_getPriceGroupByCountry_Ok() {
 	data := `{"country": "RU"}`
 
 	billingService := &billingMocks.BillingService{}
-	billingService.On("GetPriceGroupByCountry", mock2.Anything, mock2.Anything).Return(&billing.PriceGroup{}, nil)
+	billingService.On("GetPriceGroupByCountry", mock2.Anything, mock2.Anything).Return(&billingpb.PriceGroup{}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -124,7 +124,7 @@ func (suite *PriceGroupTestSuite) TestPriceGroup_getCurrencyList_Error_BillingSe
 func (suite *PriceGroupTestSuite) TestPriceGroup_getCurrencyList_Ok() {
 
 	billingService := &billingMocks.BillingService{}
-	billingService.On("GetPriceGroupCurrencies", mock2.Anything, mock2.Anything).Return(&grpc.PriceGroupCurrenciesResponse{}, nil)
+	billingService.On("GetPriceGroupCurrencies", mock2.Anything, mock2.Anything).Return(&billingpb.PriceGroupCurrenciesResponse{}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -152,7 +152,7 @@ func (suite *PriceGroupTestSuite) TestPriceGroup_getCurrencyByRegion_BindError_R
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "field validation for 'Region' failed on the 'required' tag", msg.Details)
 }
@@ -181,7 +181,7 @@ func (suite *PriceGroupTestSuite) TestPriceGroup_getCurrencyByRegion_Ok() {
 	data := `{"region": "RU"}`
 
 	billingService := &billingMocks.BillingService{}
-	billingService.On("GetPriceGroupCurrencyByRegion", mock2.Anything, mock2.Anything).Return(&grpc.PriceGroupCurrenciesResponse{}, nil)
+	billingService.On("GetPriceGroupCurrencyByRegion", mock2.Anything, mock2.Anything).Return(&billingpb.PriceGroupCurrenciesResponse{}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().

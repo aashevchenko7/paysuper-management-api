@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	casbinMiddleware "github.com/paysuper/echo-casbin-middleware"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -116,7 +116,7 @@ func (d *Dispatcher) CasbinMiddleware(fn func(c echo.Context) string) echo.Middl
 		Logger:           d.L(),
 		CtxUserExtractor: fn,
 	}
-	return casbinMiddleware.MiddlewareWithConfig(d.ms.Client(), cfg)
+	return casbinMiddleware.MiddlewareWithConfig(d.ms.Client("", ""), cfg)
 }
 
 // BodyDumpMiddleware
@@ -165,7 +165,7 @@ func (d *Dispatcher) AuthOneMerchantPreMiddleware() echo.MiddlewareFunc {
 
 				res, err := d.appSet.Services.Billing.GetMerchantsForUser(
 					c.Request().Context(),
-					&grpc.GetMerchantsForUserRequest{UserId: user.Id},
+					&billingpb.GetMerchantsForUserRequest{UserId: user.Id},
 				)
 
 				if err != nil {
@@ -177,26 +177,9 @@ func (d *Dispatcher) AuthOneMerchantPreMiddleware() echo.MiddlewareFunc {
 					d.L().Error(c.Path(), logger.Args("user_id", user.Id))
 					return
 				}
-				d.L().Info("[PermissionDebug] user merchants", logger.Args(res.Merchants[0].Role, res.Merchants[0].Id))
+
 				user.Role = res.Merchants[0].Role
 				user.MerchantId = res.Merchants[0].Id
-				common.SetUserContext(c, user)
-			},
-		)(next)
-		return handleFn(c)
-	})
-}
-
-// AuthOnAdminPreMiddleware
-func (d *Dispatcher) AuthOnAdminPreMiddleware() echo.MiddlewareFunc {
-	return common.ContextWrapperCallback(func(c echo.Context, next echo.HandlerFunc) error {
-		handleFn := jwtMiddleware.AuthOneJwtCallableWithConfig(
-			d.appSet.JwtVerifier,
-			func(ui *jwtverifier.UserInfo) {
-				user := common.ExtractUserContext(c)
-				user.Id = ui.UserID
-				user.Email = ui.Email
-				user.Name = "System User"
 				common.SetUserContext(c, user)
 			},
 		)(next)

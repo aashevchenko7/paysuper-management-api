@@ -6,9 +6,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	u "github.com/PuerkitoBio/purell"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/paylink"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"net/http"
 )
@@ -22,6 +22,7 @@ const (
 	paylinksIdStatReferrerPath = "/paylinks/:id/dashboard/referrer"
 	paylinksIdStatDatePath     = "/paylinks/:id/dashboard/date"
 	paylinksIdStatUtmPath      = "/paylinks/:id/dashboard/utm"
+	paylinksIdTransactionsPath = "/paylinks/:id/transactions"
 
 	paylinkUrlMask = "%s://%s/%s"
 )
@@ -53,10 +54,11 @@ func (h *PayLinkRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(paylinksIdStatReferrerPath, h.getPaylinkStatByReferrer)
 	groups.AuthUser.GET(paylinksIdStatDatePath, h.getPaylinkStatByDate)
 	groups.AuthUser.GET(paylinksIdStatUtmPath, h.getPaylinkStatByUtm)
+	groups.AuthUser.GET(paylinksIdTransactionsPath, h.getPaylinkTransactions)
 }
 
 func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
-	req := &grpc.GetPaylinksRequest{}
+	req := &billingpb.GetPaylinksRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -75,7 +77,7 @@ func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinks(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinks", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinks", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -86,7 +88,7 @@ func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
-	req := &grpc.PaylinkRequest{}
+	req := &billingpb.PaylinkRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
@@ -99,7 +101,7 @@ func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylink(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylink", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylink", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -110,17 +112,17 @@ func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
-	req := &grpc.GetPaylinkURLRequest{}
+	req := &billingpb.GetPaylinkURLRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
 	authUser := common.ExtractUserContext(ctx)
-	merchantReq := &grpc.GetMerchantByRequest{UserId: authUser.Id}
+	merchantReq := &billingpb.GetMerchantByRequest{UserId: authUser.Id}
 	merchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), merchantReq)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantBy", merchantReq)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantBy", merchantReq)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 	if merchant.Status != http.StatusOK {
@@ -129,7 +131,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 
 	req.Id = ctx.Param(common.RequestParameterId)
 	req.MerchantId = merchant.Item.Id
-	req.UrlMask = pkg.PaylinkUrlDefaultMask
+	req.UrlMask = billingpb.PaylinkUrlDefaultMask
 
 	err = h.dispatch.Validate.Struct(req)
 	if err != nil {
@@ -138,7 +140,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkURL(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkURL", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkURL", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -157,7 +159,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) deletePaylink(ctx echo.Context) error {
-	req := &grpc.PaylinkRequest{}
+	req := &billingpb.PaylinkRequest{}
 
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
@@ -169,7 +171,7 @@ func (h *PayLinkRoute) deletePaylink(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.DeletePaylink(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "DeletePaylink", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeletePaylink", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -188,7 +190,7 @@ func (h *PayLinkRoute) updatePaylink(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) createOrUpdatePaylink(ctx echo.Context, paylinkId string) error {
-	req := &paylink.CreatePaylinkRequest{}
+	req := &billingpb.CreatePaylinkRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -203,7 +205,7 @@ func (h *PayLinkRoute) createOrUpdatePaylink(ctx echo.Context, paylinkId string)
 
 	res, err := h.dispatch.Services.Billing.CreateOrUpdatePaylink(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "CreateOrUpdatePaylink", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "CreateOrUpdatePaylink", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -214,7 +216,7 @@ func (h *PayLinkRoute) createOrUpdatePaylink(ctx echo.Context, paylinkId string)
 }
 
 func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
-	req := &grpc.GetPaylinkStatCommonRequest{}
+	req := &billingpb.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -227,7 +229,7 @@ func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkStatTotal(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkStatTotal", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkStatTotal", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -238,7 +240,7 @@ func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
-	req := &grpc.GetPaylinkStatCommonRequest{}
+	req := &billingpb.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -251,7 +253,7 @@ func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkStatByCountry(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkStatByCountry", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkStatByCountry", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -262,7 +264,7 @@ func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
-	req := &grpc.GetPaylinkStatCommonRequest{}
+	req := &billingpb.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -275,7 +277,7 @@ func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkStatByReferrer(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkStatByReferrer", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkStatByReferrer", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -286,7 +288,7 @@ func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
-	req := &grpc.GetPaylinkStatCommonRequest{}
+	req := &billingpb.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -299,7 +301,7 @@ func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkStatByDate(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkStatByDate", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkStatByDate", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -310,7 +312,7 @@ func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 }
 
 func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
-	req := &grpc.GetPaylinkStatCommonRequest{}
+	req := &billingpb.GetPaylinkStatCommonRequest{}
 	err := ctx.Bind(req)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -323,7 +325,7 @@ func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkStatByUtm(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetPaylinkStatByUtm", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkStatByUtm", req)
 		return ctx.Render(http.StatusBadRequest, errorTemplateName, map[string]interface{}{})
 	}
 	if res.Status != http.StatusOK {
@@ -331,4 +333,29 @@ func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+func (h *PayLinkRoute) getPaylinkTransactions(ctx echo.Context) error {
+	req := &billingpb.GetPaylinkTransactionsRequest{}
+
+	if err := ctx.Bind(req); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
+	}
+
+	err := h.dispatch.Validate.Struct(req)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.GetPaylinkTransactions(ctx.Request().Context(), req)
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetPaylinkTransactions", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != http.StatusOK {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Data)
 }

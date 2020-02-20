@@ -3,7 +3,7 @@ os:
 language: go
 sudo: required
 go:
-- 1.12.x
+- 1.13.x
 dist: trusty
 addons:
   sonarcloud:
@@ -13,7 +13,7 @@ services:
 stages:
 - test
 - name: deploy
-  if: branch IN (develop)
+  if: branch IN (develop, feature/190525, casbin_middleware)
 env:
   global:
   - GO111MODULE=on

@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -54,7 +54,7 @@ func (h *PaymentMethodApiV1) update(ctx echo.Context) error {
 }
 
 func (h *PaymentMethodApiV1) createOrUpdatePaymentMethod(ctx echo.Context) error {
-	req := &billing.PaymentMethod{}
+	req := &billingpb.PaymentMethod{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -77,7 +77,7 @@ func (h *PaymentMethodApiV1) createOrUpdatePaymentMethod(ctx echo.Context) error
 }
 
 func (h *PaymentMethodApiV1) getProductionSettings(ctx echo.Context) error {
-	req := &grpc.GetPaymentMethodSettingsRequest{
+	req := &billingpb.GetPaymentMethodSettingsRequest{
 		PaymentMethodId: ctx.Param("id"),
 	}
 	err := ctx.Bind(req)
@@ -111,7 +111,7 @@ func (h *PaymentMethodApiV1) updateProductionSettings(ctx echo.Context) error {
 
 func (h *PaymentMethodApiV1) createOrUpdateProductionSettings(ctx echo.Context) error {
 
-	req := &grpc.ChangePaymentMethodParamsRequest{
+	req := &billingpb.ChangePaymentMethodParamsRequest{
 		PaymentMethodId: ctx.Param("id"),
 	}
 	err := ctx.Bind(req)
@@ -136,7 +136,7 @@ func (h *PaymentMethodApiV1) createOrUpdateProductionSettings(ctx echo.Context) 
 }
 
 func (h *PaymentMethodApiV1) deleteProductionSettings(ctx echo.Context) error {
-	req := &grpc.GetPaymentMethodSettingsRequest{
+	req := &billingpb.GetPaymentMethodSettingsRequest{
 		PaymentMethodId: ctx.Param("id"),
 	}
 	err := ctx.Bind(req)
@@ -161,7 +161,7 @@ func (h *PaymentMethodApiV1) deleteProductionSettings(ctx echo.Context) error {
 }
 
 func (h *PaymentMethodApiV1) getTestSettings(ctx echo.Context) error {
-	req := &grpc.GetPaymentMethodSettingsRequest{
+	req := &billingpb.GetPaymentMethodSettingsRequest{
 		PaymentMethodId: ctx.Param("id"),
 	}
 	err := ctx.Bind(req)
@@ -194,7 +194,7 @@ func (h *PaymentMethodApiV1) updateTestSettings(ctx echo.Context) error {
 }
 
 func (h *PaymentMethodApiV1) createOrUpdateTestSettings(ctx echo.Context) error {
-	req := &grpc.ChangePaymentMethodParamsRequest{
+	req := &billingpb.ChangePaymentMethodParamsRequest{
 		PaymentMethodId: ctx.Param("id"),
 	}
 	err := ctx.Bind(req)
@@ -219,7 +219,7 @@ func (h *PaymentMethodApiV1) createOrUpdateTestSettings(ctx echo.Context) error 
 }
 
 func (h *PaymentMethodApiV1) deleteTestSettings(ctx echo.Context) error {
-	req := &grpc.GetPaymentMethodSettingsRequest{
+	req := &billingpb.GetPaymentMethodSettingsRequest{
 		PaymentMethodId: ctx.Param("id"),
 	}
 	err := ctx.Bind(req)

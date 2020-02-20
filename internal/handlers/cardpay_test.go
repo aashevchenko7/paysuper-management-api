@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
@@ -51,27 +51,27 @@ func (suite *CardPayTestSuite) TearDownTest() {}
 
 func (suite *CardPayTestSuite) TestCardPay_RefundCallback_Ok() {
 
-	refundReq := &billing.CardPayRefundCallback{
-		MerchantOrder: &billing.CardPayMerchantOrder{
+	refundReq := &billingpb.CardPayRefundCallback{
+		MerchantOrder: &billingpb.CardPayMerchantOrder{
 			Id: bson.NewObjectId().Hex(),
 		},
 		PaymentMethod: "BANKCARD",
-		PaymentData: &billing.CardPayRefundCallbackPaymentData{
+		PaymentData: &billingpb.CardPayRefundCallbackPaymentData{
 			Id:              bson.NewObjectId().Hex(),
 			RemainingAmount: 0,
 		},
-		RefundData: &billing.CardPayRefundCallbackRefundData{
+		RefundData: &billingpb.CardPayRefundCallbackRefundData{
 			Amount:   100,
 			Created:  time.Now().Format("2006-01-02T15:04:05Z"),
 			Id:       bson.NewObjectId().Hex(),
 			Currency: "RUB",
-			Status:   pkg.CardPayPaymentResponseStatusCompleted,
+			Status:   billingpb.CardPayPaymentResponseStatusCompleted,
 			AuthCode: bson.NewObjectId().Hex(),
 			Is_3D:    true,
 			Rrn:      bson.NewObjectId().Hex(),
 		},
 		CallbackTime: time.Now().Format("2006-01-02T15:04:05Z"),
-		Customer: &billing.CardPayCustomer{
+		Customer: &billingpb.CardPayCustomer{
 			Email: "test@unut.test",
 			Id:    "test@unut.test",
 		},
@@ -115,23 +115,23 @@ func (suite *CardPayTestSuite) TestCardPay_RefundCallback_BindError() {
 }
 
 func (suite *CardPayTestSuite) TestCardPay_RefundCallback_ValidationError() {
-	refundReq := &billing.CardPayRefundCallback{
-		MerchantOrder: &billing.CardPayMerchantOrder{
+	refundReq := &billingpb.CardPayRefundCallback{
+		MerchantOrder: &billingpb.CardPayMerchantOrder{
 			Id: bson.NewObjectId().Hex(),
 		},
 		PaymentMethod: "BANKCARD",
-		RefundData: &billing.CardPayRefundCallbackRefundData{
+		RefundData: &billingpb.CardPayRefundCallbackRefundData{
 			Amount:   100,
 			Created:  time.Now().Format("2006-01-02T15:04:05Z"),
 			Id:       bson.NewObjectId().Hex(),
 			Currency: "RUB",
-			Status:   pkg.CardPayPaymentResponseStatusCompleted,
+			Status:   billingpb.CardPayPaymentResponseStatusCompleted,
 			AuthCode: bson.NewObjectId().Hex(),
 			Is_3D:    true,
 			Rrn:      bson.NewObjectId().Hex(),
 		},
 		CallbackTime: time.Now().Format("2006-01-02T15:04:05Z"),
-		Customer: &billing.CardPayCustomer{
+		Customer: &billingpb.CardPayCustomer{
 			Email: "test@unut.test",
 			Id:    "test@unut.test",
 		},
@@ -158,27 +158,27 @@ func (suite *CardPayTestSuite) TestCardPay_RefundCallback_ValidationError() {
 
 func (suite *CardPayTestSuite) TestCardPay_RefundCallback_BillingServerSystemError() {
 
-	refundReq := &billing.CardPayRefundCallback{
-		MerchantOrder: &billing.CardPayMerchantOrder{
+	refundReq := &billingpb.CardPayRefundCallback{
+		MerchantOrder: &billingpb.CardPayMerchantOrder{
 			Id: bson.NewObjectId().Hex(),
 		},
 		PaymentMethod: "BANKCARD",
-		PaymentData: &billing.CardPayRefundCallbackPaymentData{
+		PaymentData: &billingpb.CardPayRefundCallbackPaymentData{
 			Id:              bson.NewObjectId().Hex(),
 			RemainingAmount: 0,
 		},
-		RefundData: &billing.CardPayRefundCallbackRefundData{
+		RefundData: &billingpb.CardPayRefundCallbackRefundData{
 			Amount:   100,
 			Created:  time.Now().Format("2006-01-02T15:04:05Z"),
 			Id:       bson.NewObjectId().Hex(),
 			Currency: "RUB",
-			Status:   pkg.CardPayPaymentResponseStatusCompleted,
+			Status:   billingpb.CardPayPaymentResponseStatusCompleted,
 			AuthCode: bson.NewObjectId().Hex(),
 			Is_3D:    true,
 			Rrn:      bson.NewObjectId().Hex(),
 		},
 		CallbackTime: time.Now().Format("2006-01-02T15:04:05Z"),
-		Customer: &billing.CardPayCustomer{
+		Customer: &billingpb.CardPayCustomer{
 			Email: "test@unut.test",
 			Id:    "test@unut.test",
 		},
@@ -206,27 +206,27 @@ func (suite *CardPayTestSuite) TestCardPay_RefundCallback_BillingServerSystemErr
 }
 
 func (suite *CardPayTestSuite) TestCardPay_RefundCallback_BillingServer_Error() {
-	refundReq := &billing.CardPayRefundCallback{
-		MerchantOrder: &billing.CardPayMerchantOrder{
+	refundReq := &billingpb.CardPayRefundCallback{
+		MerchantOrder: &billingpb.CardPayMerchantOrder{
 			Id: bson.NewObjectId().Hex(),
 		},
 		PaymentMethod: "BANKCARD",
-		PaymentData: &billing.CardPayRefundCallbackPaymentData{
+		PaymentData: &billingpb.CardPayRefundCallbackPaymentData{
 			Id:              bson.NewObjectId().Hex(),
 			RemainingAmount: 0,
 		},
-		RefundData: &billing.CardPayRefundCallbackRefundData{
+		RefundData: &billingpb.CardPayRefundCallbackRefundData{
 			Amount:   100,
 			Created:  time.Now().Format("2006-01-02T15:04:05Z"),
 			Id:       bson.NewObjectId().Hex(),
 			Currency: "RUB",
-			Status:   pkg.CardPayPaymentResponseStatusCompleted,
+			Status:   billingpb.CardPayPaymentResponseStatusCompleted,
 			AuthCode: bson.NewObjectId().Hex(),
 			Is_3D:    true,
 			Rrn:      bson.NewObjectId().Hex(),
 		},
 		CallbackTime: time.Now().Format("2006-01-02T15:04:05Z"),
-		Customer: &billing.CardPayCustomer{
+		Customer: &billingpb.CardPayCustomer{
 			Email: "test@unut.test",
 			Id:    "test@unut.test",
 		},
@@ -250,31 +250,31 @@ func (suite *CardPayTestSuite) TestCardPay_RefundCallback_BillingServer_Error() 
 	httpErr, ok := err.(*echo.HTTPError)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusNotFound, httpErr.Code)
-	assert.Equal(suite.T(), echo.Map{"message" : mock.SomeError.Message}, httpErr.Message)
+	assert.Equal(suite.T(), echo.Map{"message": mock.SomeError.Message}, httpErr.Message)
 }
 
 func (suite *CardPayTestSuite) TestCardPay_RefundCallback_BillingServerTemporary_Ok() {
-	refundReq := &billing.CardPayRefundCallback{
-		MerchantOrder: &billing.CardPayMerchantOrder{
+	refundReq := &billingpb.CardPayRefundCallback{
+		MerchantOrder: &billingpb.CardPayMerchantOrder{
 			Id: bson.NewObjectId().Hex(),
 		},
 		PaymentMethod: "BANKCARD",
-		PaymentData: &billing.CardPayRefundCallbackPaymentData{
+		PaymentData: &billingpb.CardPayRefundCallbackPaymentData{
 			Id:              bson.NewObjectId().Hex(),
 			RemainingAmount: 0,
 		},
-		RefundData: &billing.CardPayRefundCallbackRefundData{
+		RefundData: &billingpb.CardPayRefundCallbackRefundData{
 			Amount:   100,
 			Created:  time.Now().Format("2006-01-02T15:04:05Z"),
 			Id:       bson.NewObjectId().Hex(),
 			Currency: "RUB",
-			Status:   pkg.CardPayPaymentResponseStatusCompleted,
+			Status:   billingpb.CardPayPaymentResponseStatusCompleted,
 			AuthCode: bson.NewObjectId().Hex(),
 			Is_3D:    true,
 			Rrn:      bson.NewObjectId().Hex(),
 		},
 		CallbackTime: time.Now().Format("2006-01-02T15:04:05Z"),
-		Customer: &billing.CardPayCustomer{
+		Customer: &billingpb.CardPayCustomer{
 			Email: "test@unut.test",
 			Id:    "test@unut.test",
 		},

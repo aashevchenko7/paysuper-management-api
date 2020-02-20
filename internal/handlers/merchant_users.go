@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -44,7 +44,7 @@ func (h *MerchantUsersRoute) Route(groups *common.Groups) {
 }
 
 func (h *MerchantUsersRoute) changeRole(ctx echo.Context) error {
-	req := &grpc.ChangeRoleForMerchantUserRequest{}
+	req := &billingpb.ChangeRoleForMerchantUserRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -53,10 +53,10 @@ func (h *MerchantUsersRoute) changeRole(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ChangeRoleForMerchantUser(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeRoleForMerchantUser")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeRoleForMerchantUser")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -64,7 +64,7 @@ func (h *MerchantUsersRoute) changeRole(ctx echo.Context) error {
 }
 
 func (h *MerchantUsersRoute) getMerchantUsers(ctx echo.Context) error {
-	req := &grpc.GetMerchantUsersRequest{}
+	req := &billingpb.GetMerchantUsersRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -73,7 +73,7 @@ func (h *MerchantUsersRoute) getMerchantUsers(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMerchantUsers(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetMerchantUsers")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantUsers")
 	}
 
 	if res.Status != http.StatusOK {
@@ -84,7 +84,7 @@ func (h *MerchantUsersRoute) getMerchantUsers(ctx echo.Context) error {
 }
 
 func (h *MerchantUsersRoute) sendInvite(ctx echo.Context) error {
-	req := &grpc.InviteUserMerchantRequest{}
+	req := &billingpb.InviteUserMerchantRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -93,10 +93,10 @@ func (h *MerchantUsersRoute) sendInvite(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.InviteUserMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "InviteUserMerchant")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "InviteUserMerchant")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -104,7 +104,7 @@ func (h *MerchantUsersRoute) sendInvite(ctx echo.Context) error {
 }
 
 func (h *MerchantUsersRoute) resendInvite(ctx echo.Context) error {
-	req := &grpc.ResendInviteMerchantRequest{}
+	req := &billingpb.ResendInviteMerchantRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -113,10 +113,10 @@ func (h *MerchantUsersRoute) resendInvite(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ResendInviteMerchant(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ResendInviteMerchant")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ResendInviteMerchant")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -124,18 +124,18 @@ func (h *MerchantUsersRoute) resendInvite(ctx echo.Context) error {
 }
 
 func (h *MerchantUsersRoute) listRoles(ctx echo.Context) error {
-	req := &grpc.GetRoleListRequest{Type: pkg.RoleTypeMerchant}
+	req := &billingpb.GetRoleListRequest{Type: billingpb.RoleTypeMerchant}
 	res, err := h.dispatch.Services.Billing.GetRoleList(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetRoleList")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetRoleList")
 	}
 
 	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *MerchantUsersRoute) deleteUser(ctx echo.Context) error {
-	req := &grpc.MerchantRoleRequest{}
+	req := &billingpb.MerchantRoleRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -144,10 +144,10 @@ func (h *MerchantUsersRoute) deleteUser(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.DeleteMerchantUser(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "DeleteMerchantUser")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "DeleteMerchantUser")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -155,7 +155,7 @@ func (h *MerchantUsersRoute) deleteUser(ctx echo.Context) error {
 }
 
 func (h *MerchantUsersRoute) getUser(ctx echo.Context) error {
-	req := &grpc.MerchantRoleRequest{}
+	req := &billingpb.MerchantRoleRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
@@ -164,10 +164,10 @@ func (h *MerchantUsersRoute) getUser(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetMerchantUserRole(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetMerchantUserRole")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantUserRole")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

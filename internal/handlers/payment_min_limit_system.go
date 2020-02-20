@@ -4,10 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -36,11 +35,11 @@ func (h *PaymentMinLimitSystemRoute) Route(groups *common.Groups) {
 }
 
 func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Context) error {
-	req := &grpc.EmptyRequest{}
+	req := &billingpb.EmptyRequest{}
 
 	res, err := h.dispatch.Services.Billing.GetOperatingCompaniesList(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetOperatingCompaniesList", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetOperatingCompaniesList", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 	if res.Status != http.StatusOK {
@@ -50,7 +49,7 @@ func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Conte
 }
 
 func (h *PaymentMinLimitSystemRoute) setPaymentMinLimitSystem(ctx echo.Context) error {
-	req := &billing.PaymentMinLimitSystem{}
+	req := &billingpb.PaymentMinLimitSystem{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -66,11 +65,11 @@ func (h *PaymentMinLimitSystemRoute) setPaymentMinLimitSystem(ctx echo.Context) 
 	res, err := h.dispatch.Services.Billing.SetPaymentMinLimitSystem(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "AddPaymentMinLimitSystem", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "AddPaymentMinLimitSystem", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

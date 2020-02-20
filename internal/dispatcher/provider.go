@@ -9,18 +9,13 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/invoker"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/google/wire"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/validators"
 	"github.com/paysuper/paysuper-management-api/pkg/micro"
-	"github.com/paysuper/paysuper-recurring-repository/pkg/constant"
-	"github.com/paysuper/paysuper-recurring-repository/pkg/proto/repository"
-	reporterPkg "github.com/paysuper/paysuper-reporter/pkg"
-	reporterProto "github.com/paysuper/paysuper-reporter/pkg/proto"
-	taxServiceConst "github.com/paysuper/paysuper-tax-service/pkg"
-	tax_service "github.com/paysuper/paysuper-tax-service/proto"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	"github.com/paysuper/paysuper-proto/go/recurringpb"
+	"github.com/paysuper/paysuper-proto/go/reporterpb"
+	"github.com/paysuper/paysuper-proto/go/taxpb"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -53,13 +48,13 @@ func ProviderJwtVerifier(cfg *common.Config) *jwtverifier.JwtVerifier {
 }
 
 // ProviderServices
-func ProviderServices(srv *micro.Micro) common.Services {
+func ProviderServices(srv *micro.Micro, cfg *micro.Config) common.Services {
 	return common.Services{
-		Repository: repository.NewRepositoryService(constant.PayOneRepositoryServiceName, srv.Client()),
-		Geo:        proto.NewGeoIpService(geoip.ServiceName, srv.Client()),
-		Billing:    grpc.NewBillingService(pkg.ServiceName, srv.Client()),
-		Tax:        tax_service.NewTaxService(taxServiceConst.ServiceName, srv.Client()),
-		Reporter:   reporterProto.NewReporterService(reporterPkg.ServiceName, srv.Client()),
+		Repository: recurringpb.NewRepositoryService(recurringpb.PayOneRepositoryServiceName, srv.Client("", "")),
+		Geo:        proto.NewGeoIpService(geoip.ServiceName, srv.Client("", "")),
+		Billing:    billingpb.NewBillingService(billingpb.ServiceName, srv.Client(cfg.BillingVersion, cfg.BillingFallbackVersion)),
+		Tax:        taxpb.NewTaxService(taxpb.ServiceName, srv.Client("", "")),
+		Reporter:   reporterpb.NewReporterService(reporterpb.ServiceName, srv.Client("", "")),
 	}
 }
 
@@ -87,8 +82,8 @@ func ProviderValidators(v *validators.ValidatorSet) (validate *validator.Validat
 	if err = validate.RegisterValidation("position", v.PositionValidator); err != nil {
 		return
 	}
-	validate.RegisterStructValidation(v.CompanyValidator, grpc.UserProfileCompany{})
-	validate.RegisterStructValidation(v.MerchantCompanyValidator, billing.MerchantCompanyInfo{})
+	validate.RegisterStructValidation(v.CompanyValidator, billingpb.UserProfileCompany{})
+	validate.RegisterStructValidation(v.MerchantCompanyValidator, billingpb.MerchantCompanyInfo{})
 	if err = validate.RegisterValidation("company_name", v.CompanyNameValidator); err != nil {
 		return
 	}

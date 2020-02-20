@@ -5,13 +5,12 @@ import (
 	"errors"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
-	billMock "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
-	"github.com/paysuper/paysuper-reporter/pkg"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -41,16 +40,16 @@ func (suite *KeyProductTestSuite) BeforeTest(suiteName, testName string) {
 func (suite *KeyProductTestSuite) SetupTestForTestProject_CreateKeyProduct_GroupPrice_Ok() {
 	billingService := &billMock.BillingService{}
 
-	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&grpc.GetMerchantResponse{
-		Status: pkg.ResponseStatusOk,
-		Item: &billing.Merchant{
+	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&billingpb.GetMerchantResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item: &billingpb.Merchant{
 			Id: bson.NewObjectId().Hex(),
 		},
 	}, nil)
 
-	billingService.On("GetPriceGroupByRegion", mock2.Anything, mock2.Anything).Return(&grpc.GetPriceGroupByRegionResponse{Status: 200, Group: &billing.PriceGroup{Id: "Some id"}}, nil)
+	billingService.On("GetPriceGroupByRegion", mock2.Anything, mock2.Anything).Return(&billingpb.GetPriceGroupByRegionResponse{Status: 200, Group: &billingpb.PriceGroup{Id: "Some id"}}, nil)
 
-	billingService.On("CreateOrUpdateKeyProduct", mock2.Anything, mock2.Anything).Return(&grpc.KeyProductResponse{Status: 200, Product: &grpc.KeyProduct{
+	billingService.On("CreateOrUpdateKeyProduct", mock2.Anything, mock2.Anything).Return(&billingpb.KeyProductResponse{Status: 200, Product: &billingpb.KeyProduct{
 		Id: "some_id",
 	}}, nil)
 
@@ -61,9 +60,9 @@ func (suite *KeyProductTestSuite) SetupTestForTestProject_CreateKeyProduct_Group
 		Geo:     mock.NewGeoIpServiceTestOk(),
 	}
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
@@ -81,18 +80,18 @@ func (suite *KeyProductTestSuite) SetupTestForTestProject_CreateKeyProduct_Group
 func (suite *KeyProductTestSuite) SetupTestForTestProject_CreateKeyProduct_GroupPrice_Error() {
 	billingService := &billMock.BillingService{}
 
-	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&grpc.GetMerchantResponse{
-		Status: pkg.ResponseStatusOk,
-		Item: &billing.Merchant{
+	billingService.On("GetMerchantBy", mock2.Anything, mock2.Anything).Return(&billingpb.GetMerchantResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item: &billingpb.Merchant{
 			Id: bson.NewObjectId().Hex(),
 		},
 	}, nil)
 
-	billingService.On("GetPriceGroupByRegion", mock2.Anything, mock2.Anything).Return(&grpc.GetPriceGroupByRegionResponse{Status: 400, Group: nil, Message: &grpc.ResponseErrorMessage{Message: "some error"}}, nil)
+	billingService.On("GetPriceGroupByRegion", mock2.Anything, mock2.Anything).Return(&billingpb.GetPriceGroupByRegionResponse{Status: 400, Group: nil, Message: &billingpb.ResponseErrorMessage{Message: "some error"}}, nil)
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 	var e error
 	settings := test.DefaultSettings()
@@ -121,9 +120,9 @@ func (suite *KeyProductTestSuite) SetupTest() {
 	}
 
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
@@ -172,7 +171,7 @@ func (suite *KeyProductTestSuite) TestUnpublishKeyProduct_InternalError() {
 	billingService.On("UnPublishKeyProduct", mock2.Anything, mock2.Anything).Return(nil, errors.New("some error"))
 	suite.router.dispatch.Services.Billing = billingService
 
-	body := &grpc.UnPublishKeyProductRequest{}
+	body := &billingpb.UnPublishKeyProductRequest{}
 
 	b, err := json.Marshal(&body)
 	assert.NoError(suite.T(), err)
@@ -190,16 +189,16 @@ func (suite *KeyProductTestSuite) TestUnpublishKeyProduct_InternalError() {
 
 func (suite *KeyProductTestSuite) TestUnpublishKeyProduct_Error() {
 	billingService := &billMock.BillingService{}
-	billingService.On("UnPublishKeyProduct", mock2.Anything, mock2.Anything).Return(&grpc.KeyProductResponse{
-		Status: pkg.ResponseStatusBadData,
-		Message: &grpc.ResponseErrorMessage{
+	billingService.On("UnPublishKeyProduct", mock2.Anything, mock2.Anything).Return(&billingpb.KeyProductResponse{
+		Status: billingpb.ResponseStatusBadData,
+		Message: &billingpb.ResponseErrorMessage{
 			Code:    "Some code",
 			Message: "Some error",
 		},
 	}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
-	body := &grpc.UnPublishKeyProductRequest{}
+	body := &billingpb.UnPublishKeyProductRequest{}
 
 	b, err := json.Marshal(&body)
 	assert.NoError(suite.T(), err)
@@ -217,13 +216,13 @@ func (suite *KeyProductTestSuite) TestUnpublishKeyProduct_Error() {
 
 func (suite *KeyProductTestSuite) TestUnpublishKeyProduct_Ok() {
 	billingService := &billMock.BillingService{}
-	billingService.On("UnPublishKeyProduct", mock2.Anything, mock2.Anything).Return(&grpc.KeyProductResponse{
-		Status:  pkg.ResponseStatusOk,
-		Product: &grpc.KeyProduct{},
+	billingService.On("UnPublishKeyProduct", mock2.Anything, mock2.Anything).Return(&billingpb.KeyProductResponse{
+		Status:  billingpb.ResponseStatusOk,
+		Product: &billingpb.KeyProduct{},
 	}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
-	body := &grpc.UnPublishKeyProductRequest{}
+	body := &billingpb.UnPublishKeyProductRequest{}
 
 	b, err := json.Marshal(&body)
 	assert.NoError(suite.T(), err)
@@ -318,7 +317,7 @@ func (suite *KeyProductTestSuite) TestProject_GetKeyProduct_Ok() {
 }
 
 func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_Ok() {
-	body := &grpc.CreateOrUpdateKeyProductRequest{
+	body := &billingpb.CreateOrUpdateKeyProductRequest{
 		MerchantId:      bson.NewObjectId().Hex(),
 		Name:            map[string]string{"en": "A", "ru": "А"},
 		Description:     map[string]string{"en": "A", "ru": "А"},
@@ -346,7 +345,7 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_Ok() {
 }
 
 func (suite *KeyProductTestSuite) TestProject_ChangeKeyProduct_ValidationError() {
-	body := &grpc.CreateOrUpdateKeyProductRequest{
+	body := &billingpb.CreateOrUpdateKeyProductRequest{
 		Id:              bson.NewObjectId().Hex(),
 		MerchantId:      bson.NewObjectId().Hex(),
 		DefaultCurrency: "RUB",
@@ -375,7 +374,7 @@ func (suite *KeyProductTestSuite) TestProject_ChangeKeyProduct_ValidationError()
 }
 
 func (suite *KeyProductTestSuite) TestProject_ChangeKeyProduct_Ok() {
-	body := &grpc.CreateOrUpdateKeyProductRequest{
+	body := &billingpb.CreateOrUpdateKeyProductRequest{
 		Id:              bson.NewObjectId().Hex(),
 		MerchantId:      bson.NewObjectId().Hex(),
 		Name:            map[string]string{"en": "A", "ru": "А"},
@@ -404,7 +403,7 @@ func (suite *KeyProductTestSuite) TestProject_ChangeKeyProduct_Ok() {
 }
 
 func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Ok() {
-	body := &grpc.CreateOrUpdateKeyProductRequest{
+	body := &billingpb.CreateOrUpdateKeyProductRequest{
 		Name:            map[string]string{"en": "A", "ru": "А"},
 		MerchantId:      bson.NewObjectId().Hex(),
 		Description:     map[string]string{"en": "A", "ru": "А"},
@@ -412,11 +411,11 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Ok() {
 		ProjectId:       bson.NewObjectId().Hex(),
 		Sku:             "some_sku",
 		Object:          "key_product",
-		Platforms: []*grpc.PlatformPrice{
+		Platforms: []*billingpb.PlatformPrice{
 			{
 				Id:   "gog",
 				Name: "Gog",
-				Prices: []*billing.ProductPrice{
+				Prices: []*billingpb.ProductPrice{
 					{
 						Currency: "RUB",
 						Region:   "RUB",
@@ -424,7 +423,7 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Ok() {
 					},
 				}},
 		},
-		Pricing:     "manual",
+		Pricing: "manual",
 	}
 
 	b, err := json.Marshal(&body)
@@ -441,7 +440,7 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Ok() {
 }
 
 func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Error() {
-	body := &grpc.CreateOrUpdateKeyProductRequest{
+	body := &billingpb.CreateOrUpdateKeyProductRequest{
 		Name:            map[string]string{"en": "A", "ru": "А"},
 		MerchantId:      bson.NewObjectId().Hex(),
 		Description:     map[string]string{"en": "A", "ru": "А"},
@@ -449,11 +448,11 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Error(
 		ProjectId:       bson.NewObjectId().Hex(),
 		Sku:             "some_sku",
 		Object:          "key_product",
-		Platforms: []*grpc.PlatformPrice{
+		Platforms: []*billingpb.PlatformPrice{
 			{
 				Id:   "gog",
 				Name: "Gog",
-				Prices: []*billing.ProductPrice{
+				Prices: []*billingpb.ProductPrice{
 					{
 						Currency: "RUB",
 						Region:   "TestRegion",
@@ -482,7 +481,7 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_GroupPrice_Error(
 }
 
 func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_ValidationError() {
-	body := &grpc.CreateOrUpdateKeyProductRequest{
+	body := &billingpb.CreateOrUpdateKeyProductRequest{
 		MerchantId:      bson.NewObjectId().Hex(),
 		Description:     map[string]string{"en": "A", "ru": "А"},
 		DefaultCurrency: "RUB",
@@ -512,7 +511,7 @@ func (suite *KeyProductTestSuite) TestProject_CreateKeyProduct_ValidationError()
 func (suite *KeyProductTestSuite) TestProject_getKeyProduct_ValidationError() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyProduct", mock2.Anything, mock2.Anything).Return(&grpc.KeyProductResponse{}, nil)
+	billingService.On("GetKeyProduct", mock2.Anything, mock2.Anything).Return(&billingpb.KeyProductResponse{}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
@@ -551,13 +550,13 @@ func (suite *KeyProductTestSuite) TestProject_getKeyProduct_BillingServer() {
 func (suite *KeyProductTestSuite) TestProject_getKeyProductWithCurrency_Ok() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyProductInfo", mock2.Anything, mock2.Anything).Return(&grpc.GetKeyProductInfoResponse{
+	billingService.On("GetKeyProductInfo", mock2.Anything, mock2.Anything).Return(&billingpb.GetKeyProductInfoResponse{
 		Status: 200,
-		KeyProduct: &grpc.KeyProductInfo{
+		KeyProduct: &billingpb.KeyProductInfo{
 			LongDescription: "Description",
 			Name:            "Name",
-			Platforms: []*grpc.PlatformPriceInfo{
-				{Name: "Steam", Id: "steam", Price: &grpc.ProductPriceInfo{Currency: "USD", Amount: 10, Region: "USD"}},
+			Platforms: []*billingpb.PlatformPriceInfo{
+				{Name: "Steam", Id: "steam", Price: &billingpb.ProductPriceInfo{Currency: "USD", Amount: 10, Region: "USD"}},
 			},
 		},
 	}, nil)
@@ -579,13 +578,13 @@ func (suite *KeyProductTestSuite) TestProject_getKeyProductWithCurrency_Ok() {
 func (suite *KeyProductTestSuite) TestProject_getKeyProductWithCountry_Ok() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyProductInfo", mock2.Anything, mock2.Anything).Return(&grpc.GetKeyProductInfoResponse{
+	billingService.On("GetKeyProductInfo", mock2.Anything, mock2.Anything).Return(&billingpb.GetKeyProductInfoResponse{
 		Status: 200,
-		KeyProduct: &grpc.KeyProductInfo{
+		KeyProduct: &billingpb.KeyProductInfo{
 			LongDescription: "Description",
 			Name:            "Name",
-			Platforms: []*grpc.PlatformPriceInfo{
-				{Name: "Steam", Id: "steam", Price: &grpc.ProductPriceInfo{Currency: "USD", Amount: 10, Region: "USD"}},
+			Platforms: []*billingpb.PlatformPriceInfo{
+				{Name: "Steam", Id: "steam", Price: &billingpb.ProductPriceInfo{Currency: "USD", Amount: 10, Region: "USD"}},
 			},
 		},
 	}, nil)
@@ -607,13 +606,13 @@ func (suite *KeyProductTestSuite) TestProject_getKeyProductWithCountry_Ok() {
 func (suite *KeyProductTestSuite) TestProject_getKeyProduct_Ok() {
 
 	billingService := &billMock.BillingService{}
-	billingService.On("GetKeyProductInfo", mock2.Anything, mock2.Anything).Return(&grpc.GetKeyProductInfoResponse{
+	billingService.On("GetKeyProductInfo", mock2.Anything, mock2.Anything).Return(&billingpb.GetKeyProductInfoResponse{
 		Status: 200,
-		KeyProduct: &grpc.KeyProductInfo{
+		KeyProduct: &billingpb.KeyProductInfo{
 			LongDescription: "Description",
 			Name:            "Name",
-			Platforms: []*grpc.PlatformPriceInfo{
-				{Name: "Steam", Id: "steam", Price: &grpc.ProductPriceInfo{Currency: "USD", Amount: 10, Region: "USD"}},
+			Platforms: []*billingpb.PlatformPriceInfo{
+				{Name: "Steam", Id: "steam", Price: &billingpb.ProductPriceInfo{Currency: "USD", Amount: 10, Region: "USD"}},
 			},
 		},
 	}, nil)

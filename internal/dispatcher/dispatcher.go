@@ -10,9 +10,9 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/paysuper/paysuper-billing-server/pkg"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/pkg/micro"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"html/template"
 	"io/ioutil"
 	"net/http"
@@ -50,9 +50,15 @@ func (d *Dispatcher) Dispatch(echoHttp *echo.Echo) error {
 			`"status":${status},"error":"${error}","latency":${latency},"latency_human":"${latency_human}"` +
 			`,"bytes_in":${bytes_in},"bytes_out":${bytes_out}}`,
 	})) // 3
+
+	allowOrigins := strings.Split(d.globalCfg.AllowOrigin, ",")
+
 	echoHttp.Use(d.RecoverMiddleware()) // 2
 	echoHttp.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowHeaders: []string{"authorization", "content-type"},
+		AllowOrigins:     allowOrigins,
+		AllowCredentials: true,
+		AllowHeaders:     []string{"authorization", "content-type"},
+		ExposeHeaders:    []string{"authorization", "content-type", "set-cookie", "cookie"},
 	})) // 1
 	// Called before routes
 	echoHttp.Use(d.RawBodyPreMiddleware)         // 2
@@ -153,8 +159,7 @@ func (d *Dispatcher) authUserGroup(grp *echo.Group) {
 		grp.Use(d.AuthOneMerchantPreMiddleware()) // 2
 		grp.Use(d.CasbinMiddleware(func(c echo.Context) string {
 			user := common.ExtractUserContext(c)
-			d.L().Info("[PermissionDebug] user merchants", logger.Args(fmt.Sprintf(pkg.CasbinMerchantUserMask, user.MerchantId, user.Id)))
-			return fmt.Sprintf(pkg.CasbinMerchantUserMask, user.MerchantId, user.Id)
+			return fmt.Sprintf(billingpb.CasbinMerchantUserMask, user.MerchantId, user.Id)
 		})) // 3
 	}
 	grp.Use(d.MerchantBinderPreMiddleware) // 3
@@ -163,12 +168,11 @@ func (d *Dispatcher) authUserGroup(grp *echo.Group) {
 func (d *Dispatcher) systemUserGroup(grp *echo.Group) {
 	// Called before routes
 	if !d.globalCfg.DisableAuthMiddleware {
-		grp.Use(d.GetUserDetailsMiddleware)   // 1
-		grp.Use(d.AuthOnAdminPreMiddleware()) // 2
+		grp.Use(d.GetUserDetailsMiddleware) // 1
 		grp.Use(d.CasbinMiddleware(func(c echo.Context) string {
 			user := common.ExtractUserContext(c)
 			return user.Id
-		})) // 3
+		})) // 2
 	}
 	grp.Use(d.SystemBinderPreMiddleware) // 3
 }

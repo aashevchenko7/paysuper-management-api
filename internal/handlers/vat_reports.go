@@ -4,17 +4,20 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"strings"
 )
 
 const (
-	vatReportsPath        = "/vat_reports"
-	vatReportsCountryPath = "/vat_reports/country/:country"
-	vatReportsDetailsPath = "/vat_reports/details/:id"
-	vatReportsStatusPath  = "/vat_reports/status/:id"
+	vatReportsPath                = "/vat_reports"
+	vatReportsCountryPath         = "/vat_reports/country/:country"
+	vatReportsCountryDownloadPath = "/vat_reports/country/:country/download"
+	vatReportsDetailsPath         = "/vat_reports/details/:id"
+	vatReportsDetailsDownloadPath = "/vat_reports/details/:id/download"
+	vatReportsStatusPath          = "/vat_reports/status/:id"
 )
 
 type VatReportsRoute struct {
@@ -35,13 +38,15 @@ func NewVatReportsRoute(set common.HandlerSet, cfg *common.Config) *VatReportsRo
 func (h *VatReportsRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(vatReportsPath, h.getVatReportsDashboard)
 	groups.SystemUser.GET(vatReportsCountryPath, h.getVatReportsForCountry)
+	groups.SystemUser.POST(vatReportsCountryDownloadPath, h.downloadVatReportsForCountry)
 	groups.SystemUser.GET(vatReportsDetailsPath, h.getVatReportTransactions)
+	groups.SystemUser.POST(vatReportsDetailsDownloadPath, h.downloadVatReportTransactions)
 	groups.SystemUser.POST(vatReportsStatusPath, h.updateVatReportStatus)
 }
 
 func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 
-	res, err := h.dispatch.Services.Billing.GetVatReportsDashboard(ctx.Request().Context(), &grpc.EmptyRequest{})
+	res, err := h.dispatch.Services.Billing.GetVatReportsDashboard(ctx.Request().Context(), &billingpb.EmptyRequest{})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -52,7 +57,7 @@ func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 }
 
 func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
-	req := &grpc.VatReportsRequest{}
+	req := &billingpb.VatReportsRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -76,8 +81,25 @@ func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Data)
 }
 
+func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
+	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	req.UserId = common.ExtractUserContext(ctx).Id
+	req.ReportType = reporterPkg.ReportTypeVat
+	params := map[string]interface{}{
+		reporterPkg.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
+	}
+
+	return h.dispatch.RequestReportFile(ctx, req, params)
+}
+
 func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
-	req := &grpc.VatTransactionsRequest{}
+	req := &billingpb.VatTransactionsRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -101,9 +123,26 @@ func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Data)
 }
 
+func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error {
+	req := &reporterPkg.ReportFile{}
+	err := ctx.Bind(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	req.UserId = common.ExtractUserContext(ctx).Id
+	req.ReportType = reporterPkg.ReportTypeVatTransactions
+	params := map[string]interface{}{
+		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterId),
+	}
+
+	return h.dispatch.RequestReportFile(ctx, req, params)
+}
+
 func (h *VatReportsRoute) updateVatReportStatus(ctx echo.Context) error {
 
-	req := &grpc.UpdateVatReportStatusRequest{}
+	req := &billingpb.UpdateVatReportStatusRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {

@@ -4,9 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -41,7 +41,7 @@ func (h *UserRoute) Route(groups *common.Groups) {
 func (h *UserRoute) checkInvite(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 
-	req := &grpc.CheckInviteTokenRequest{}
+	req := &billingpb.CheckInviteTokenRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
@@ -55,11 +55,11 @@ func (h *UserRoute) checkInvite(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.CheckInviteToken(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "CheckInviteToken", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "CheckInviteToken", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorMessageUnableToCheckInviteToken)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -69,7 +69,7 @@ func (h *UserRoute) checkInvite(ctx echo.Context) error {
 func (h *UserRoute) approveInvite(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 
-	req := &grpc.AcceptInviteRequest{}
+	req := &billingpb.AcceptInviteRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
 	}
@@ -84,11 +84,11 @@ func (h *UserRoute) approveInvite(ctx echo.Context) error {
 
 	res, err := h.dispatch.Services.Billing.AcceptInvite(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "AcceptInvite", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "AcceptInvite", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorMessageUnableToAcceptInvite)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -98,15 +98,15 @@ func (h *UserRoute) approveInvite(ctx echo.Context) error {
 func (h *UserRoute) getMerchants(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 
-	req := &grpc.GetMerchantsForUserRequest{UserId: authUser.Id}
+	req := &billingpb.GetMerchantsForUserRequest{UserId: authUser.Id}
 
 	res, err := h.dispatch.Services.Billing.GetMerchantsForUser(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetMerchantsForUser", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantsForUser", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

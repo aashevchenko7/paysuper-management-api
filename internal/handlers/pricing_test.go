@@ -3,11 +3,11 @@ package handlers
 import (
 	"errors"
 	"github.com/labstack/echo/v4"
-	billingMocks "github.com/paysuper/paysuper-billing-server/pkg/mocks"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -49,7 +49,7 @@ func (suite *PricingTestSuite) TestPricing_getRecommendedPrice_BindError_Require
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
-		Path(common.AuthProjectGroupPath + pricingRecommendedSteamPath).
+		Path(common.NoAuthGroupPath + pricingRecommendedSteamPath).
 		Init(test.ReqInitJSON()).
 		BodyString(data).
 		Exec(suite.T())
@@ -60,7 +60,7 @@ func (suite *PricingTestSuite) TestPricing_getRecommendedPrice_BindError_Require
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
 
-	msg, ok := httpErr.Message.(*grpc.ResponseErrorMessage)
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "field validation for 'Amount' failed on the 'required' tag", msg.Details)
 }
@@ -74,7 +74,7 @@ func (suite *PricingTestSuite) TestPricing_getRecommendedPrice_Error_BillingServ
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
-		Path(common.AuthProjectGroupPath + pricingRecommendedSteamPath).
+		Path(common.NoAuthGroupPath + pricingRecommendedSteamPath).
 		Init(test.ReqInitJSON()).
 		BodyString(data).
 		Exec(suite.T())
@@ -89,12 +89,12 @@ func (suite *PricingTestSuite) TestPricing_getRecommendedPrice_Ok() {
 	data := `{"amount": 1, "currency": "USD"}`
 
 	billingService := &billingMocks.BillingService{}
-	billingService.On("GetRecommendedPriceByPriceGroup", mock2.Anything, mock2.Anything).Return(&grpc.RecommendedPriceResponse{}, nil)
+	billingService.On("GetRecommendedPriceByPriceGroup", mock2.Anything, mock2.Anything).Return(&billingpb.RecommendedPriceResponse{}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
-		Path(common.AuthProjectGroupPath + pricingRecommendedSteamPath).
+		Path(common.NoAuthGroupPath + pricingRecommendedSteamPath).
 		Init(test.ReqInitJSON()).
 		BodyString(data).
 		Exec(suite.T())

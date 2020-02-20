@@ -24,7 +24,7 @@ func Test_Paylink(t *testing.T) {
 
 func (suite *PaylinkTestSuite) SetupTest() {
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
 	}
 
@@ -214,6 +214,21 @@ func (suite *PaylinkTestSuite) TestPaylink_getPaylinkStatByUtm_Ok() {
 		Method(http.MethodGet).
 		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
 		Path(common.AuthUserGroupPath + paylinksIdStatUtmPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	if assert.NoError(suite.T(), err) {
+		assert.Equal(suite.T(), http.StatusOK, res.Code)
+		assert.NotEmpty(suite.T(), res.Body.String())
+	}
+}
+
+func (suite *PaylinkTestSuite) TestPaylink_getPaylinkTransactions_Ok() {
+
+	res, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Path(common.AuthUserGroupPath + paylinksIdTransactionsPath).
 		Init(test.ReqInitJSON()).
 		Exec(suite.T())
 

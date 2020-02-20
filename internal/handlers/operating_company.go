@@ -4,10 +4,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -40,11 +39,11 @@ func (h *OperatingCompanyRoute) Route(groups *common.Groups) {
 }
 
 func (h *OperatingCompanyRoute) getOperatingCompanyList(ctx echo.Context) error {
-	req := &grpc.EmptyRequest{}
+	req := &billingpb.EmptyRequest{}
 
 	res, err := h.dispatch.Services.Billing.GetOperatingCompaniesList(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetOperatingCompaniesList", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetOperatingCompaniesList", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 	if res.Status != http.StatusOK {
@@ -54,13 +53,13 @@ func (h *OperatingCompanyRoute) getOperatingCompanyList(ctx echo.Context) error 
 }
 
 func (h *OperatingCompanyRoute) getOperatingCompany(ctx echo.Context) error {
-	req := &grpc.GetOperatingCompanyRequest{
+	req := &billingpb.GetOperatingCompanyRequest{
 		Id: ctx.Param(common.RequestParameterId),
 	}
 
 	res, err := h.dispatch.Services.Billing.GetOperatingCompany(ctx.Request().Context(), req)
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetOperatingCompaniesList", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetOperatingCompaniesList", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 	if res.Status != http.StatusOK {
@@ -78,7 +77,7 @@ func (h *OperatingCompanyRoute) updateOperatingCompany(ctx echo.Context) error {
 }
 
 func (h *OperatingCompanyRoute) addOrUpdateOperatingCompany(ctx echo.Context, operatingCompanyId string) error {
-	req := &billing.OperatingCompany{}
+	req := &billingpb.OperatingCompany{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -96,11 +95,11 @@ func (h *OperatingCompanyRoute) addOrUpdateOperatingCompany(ctx echo.Context, op
 	res, err := h.dispatch.Services.Billing.AddOperatingCompany(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "AddOperatingCompany", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "AddOperatingCompany", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 

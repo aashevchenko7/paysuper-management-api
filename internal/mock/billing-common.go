@@ -2,9 +2,8 @@ package mock
 
 import (
 	"github.com/globalsign/mgo/bson"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
+
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 )
 
 const (
@@ -14,57 +13,57 @@ const (
 )
 
 var (
-	SomeError = &grpc.ResponseErrorMessage{Message: "some error"}
+	SomeError = &billingpb.ResponseErrorMessage{Message: "some error"}
 
 	SomeMerchantId  = bson.NewObjectId().Hex()
 	SomeMerchantId1 = bson.NewObjectId().Hex()
 	SomeMerchantId2 = bson.NewObjectId().Hex()
 	SomeMerchantId3 = bson.NewObjectId().Hex()
 
-	OnboardingMerchantMock = &billing.Merchant{
+	OnboardingMerchantMock = &billingpb.Merchant{
 		Id: bson.NewObjectId().Hex(),
-		Company: &billing.MerchantCompanyInfo{
+		Company: &billingpb.MerchantCompanyInfo{
 			Name:    "merchant1",
 			Country: "RU",
 			Zip:     "190000",
 			City:    "St.Petersburg",
 		},
-		Contacts: &billing.MerchantContact{
-			Authorized: &billing.MerchantContactAuthorized{
+		Contacts: &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
 				Name:     "Unit Test",
 				Email:    "test@unit.test",
 				Phone:    "123456789",
 				Position: "Unit Test",
 			},
-			Technical: &billing.MerchantContactTechnical{
+			Technical: &billingpb.MerchantContactTechnical{
 				Name:  "Unit Test",
 				Email: "test@unit.test",
 				Phone: "123456789",
 			},
 		},
-		Banking: &billing.MerchantBanking{
+		Banking: &billingpb.MerchantBanking{
 			Currency: "RUB",
 			Name:     "Bank name",
 		},
 		IsVatEnabled:              true,
 		IsCommissionToUserEnabled: true,
-		Status:                    pkg.MerchantStatusAgreementSigning,
-		LastPayout:                &billing.MerchantLastPayout{},
+		Status:                    billingpb.MerchantStatusAgreementSigning,
+		LastPayout:                &billingpb.MerchantLastPayout{},
 		IsSigned:                  true,
-		PaymentMethods: map[string]*billing.MerchantPaymentMethod{
+		PaymentMethods: map[string]*billingpb.MerchantPaymentMethod{
 			bson.NewObjectId().Hex(): {
-				PaymentMethod: &billing.MerchantPaymentMethodIdentification{
+				PaymentMethod: &billingpb.MerchantPaymentMethodIdentification{
 					Id:   bson.NewObjectId().Hex(),
 					Name: "Bank card",
 				},
-				Commission: &billing.MerchantPaymentMethodCommissions{
+				Commission: &billingpb.MerchantPaymentMethodCommissions{
 					Fee: 2.5,
-					PerTransaction: &billing.MerchantPaymentMethodPerTransactionCommission{
+					PerTransaction: &billingpb.MerchantPaymentMethodPerTransactionCommission{
 						Fee:      30,
 						Currency: "RUB",
 					},
 				},
-				Integration: &billing.MerchantPaymentMethodIntegration{
+				Integration: &billingpb.MerchantPaymentMethodIntegration{
 					TerminalId:       "1234567890",
 					TerminalPassword: "0987654321",
 					Integrated:       true,
@@ -74,12 +73,12 @@ var (
 		},
 	}
 
-	ProductPrice = &billing.ProductPrice{
+	ProductPrice = &billingpb.ProductPrice{
 		Currency: "USD",
 		Amount:   1010.23,
 	}
 
-	Product = &grpc.Product{
+	Product = &billingpb.Product{
 		Id:              "5c99391568add439ccf0ffaf",
 		Object:          "product",
 		Type:            "simple_product",
@@ -95,14 +94,14 @@ var (
 		Metadata: map[string]string{
 			"SomeKey": "SomeValue",
 		},
-		Prices: []*billing.ProductPrice{
+		Prices: []*billingpb.ProductPrice{
 			ProductPrice,
 		},
 	}
 
-	GetProductResponse = &grpc.GetProductResponse{
+	GetProductResponse = &billingpb.GetProductResponse{
 		Status: 200,
-		Item: &grpc.Product{
+		Item: &billingpb.Product{
 			Id:              "5c99391568add439ccf0ffaf",
 			Object:          "product",
 			Type:            "simple_product",
@@ -118,7 +117,7 @@ var (
 			Metadata: map[string]string{
 				"SomeKey": "SomeValue",
 			},
-			Prices: []*billing.ProductPrice{
+			Prices: []*billingpb.ProductPrice{
 				ProductPrice,
 			},
 		},

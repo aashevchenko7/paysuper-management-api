@@ -6,9 +6,9 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/invoker"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/google/wire"
-	"github.com/paysuper/casbin-server/pkg/generated/api/proto/casbinpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/pkg/micro"
+	"github.com/paysuper/paysuper-proto/go/casbinpb"
 )
 
 // ProviderCfg
@@ -23,7 +23,7 @@ func ProviderCfg(cfg config.Configurator) (*Config, func(), error) {
 
 // ProviderCasbinService
 func ProviderCasbinService(srv *micro.Micro) casbinpb.CasbinService {
-	return casbinpb.NewCasbinService("", srv.Client())
+	return casbinpb.NewCasbinService("", srv.Client("", ""))
 }
 
 // ProviderDispatcher

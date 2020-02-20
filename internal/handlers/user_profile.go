@@ -4,10 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-billing-server/pkg"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/billing"
-	"github.com/paysuper/paysuper-billing-server/pkg/proto/grpc"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -45,7 +43,7 @@ func (h *UserProfileRoute) Route(groups *common.Groups) {
 
 func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.GetUserProfileRequest{
+	req := &billingpb.GetUserProfileRequest{
 		UserId:    authUser.Id,
 		ProfileId: ctx.Param(common.RequestParameterId),
 	}
@@ -58,11 +56,11 @@ func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetUserProfile(ctx.Request().Context(), req)
 
 	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, pkg.ServiceName, "GetUserProfile", req)
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetUserProfile", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -71,7 +69,7 @@ func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 
 func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.CommonUserProfileRequest{UserId: authUser.Id}
+	req := &billingpb.CommonUserProfileRequest{UserId: authUser.Id}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -80,10 +78,10 @@ func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetCommonUserProfile(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "GetCommonUserProfile")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetCommonUserProfile")
 	}
 
-	if res.Status != pkg.ResponseStatusOk {
+	if res.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
@@ -92,7 +90,7 @@ func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 
 func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
-	req := &grpc.UserProfile{}
+	req := &billingpb.UserProfile{}
 	err := ctx.Bind(req)
 
 	if err != nil {
@@ -100,7 +98,7 @@ func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	}
 
 	req.UserId = authUser.Id
-	req.Email = &grpc.UserProfileEmail{
+	req.Email = &billingpb.UserProfileEmail{
 		Email: authUser.Email,
 	}
 
@@ -124,8 +122,20 @@ func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Confirm the user's email
+// @desc Confirm the user's email using the user token
+// @id userProfileConfirmEmailPathConfirmEmail
+// @tag User Profile
+// @accept application/json
+// @produce application/json
+// @body grpc.ConfirmUserEmailRequest
+// @success 200 {string} Returns an empty response body if the user's email address has been successfully confirmed
+// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
+// @failure 404 {object} grpc.ResponseErrorMessage Not found
+// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @router /api/v1/user/confirm_email [put]
 func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
-	req := &grpc.ConfirmUserEmailRequest{}
+	req := &billingpb.ConfirmUserEmailRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -134,15 +144,15 @@ func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.ConfirmUserEmail(ctx.Request().Context(), req)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ConfirmUserEmail")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ConfirmUserEmail")
 	}
 
 	if res.Status != http.StatusOK {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	req2 := &grpc.OnboardingRequest{
-		User: &billing.MerchantUser{
+	req2 := &billingpb.OnboardingRequest{
+		User: &billingpb.MerchantUser{
 			ProfileId:        res.Profile.Id,
 			Id:               res.Profile.UserId,
 			Email:            res.Profile.Email.Email,
@@ -157,7 +167,7 @@ func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
 	res2, err := h.dispatch.Services.Billing.ChangeMerchant(ctx.Request().Context(), req2)
 
 	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, pkg.ServiceName, "ChangeMerchant")
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "ChangeMerchant")
 	}
 
 	if res2.Status != http.StatusOK {
@@ -174,7 +184,7 @@ func (h *UserProfileRoute) createFeedback(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, common.ErrorMessageAccessDenied)
 	}
 
-	req := &grpc.CreatePageReviewRequest{}
+	req := &billingpb.CreatePageReviewRequest{}
 	err := ctx.Bind(req)
 
 	if err != nil {
