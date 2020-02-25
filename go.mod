@@ -26,11 +26,11 @@ require (
 	github.com/paysuper/paysuper-aws-manager v0.0.1
 	github.com/paysuper/paysuper-billing-server v1.1.1-0.20200121103017-15f58f786464 // indirect
 	github.com/paysuper/paysuper-proto v0.1.72 // indirect
-	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200219080251-e61fcc689caf
+	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200225190648-1fcdf33c5679
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200210102812-9d6a3b24437d
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200201160112-2ee519914bfd
-	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200219080251-e61fcc689caf
-	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200219080251-e61fcc689caf
+	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200225190648-1fcdf33c5679
+	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200225190648-1fcdf33c5679
 	github.com/paysuper/paysuper-reporter v0.0.0-20191203194948-36a2d983f406 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/spaceavocado/apidoc v0.3.5 // indirect
