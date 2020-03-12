@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -48,12 +47,12 @@ func (h *UserProfileRoute) Route(groups *common.Groups) {
 // @tag User Profile
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.UserProfile Returns the user's personal and company data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage The user not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.UserProfile Returns the user's personal and company data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 404 {object} billingpb.ResponseErrorMessage The user not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/profile [get]
 
 // @summary Get the user profile
@@ -62,12 +61,12 @@ func (h *UserProfileRoute) Route(groups *common.Groups) {
 // @tag User Profile
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.UserProfile Returns the user's personal and company data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage The user not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.UserProfile Returns the user's personal and company data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 404 {object} billingpb.ResponseErrorMessage The user not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/user/profile [get]
 func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
@@ -101,12 +100,12 @@ func (h *UserProfileRoute) getUserProfile(ctx echo.Context) error {
 // @tag User Profile
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.CommonUserProfile Returns the user's main profile data, role and permissions
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage The user not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.CommonUserProfile Returns the user's main profile data, role and permissions
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 404 {object} billingpb.ResponseErrorMessage The user not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/profile/common [get]
 func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
@@ -135,13 +134,13 @@ func (h *UserProfileRoute) getUserCommonProfile(ctx echo.Context) error {
 // @tag User Profile
 // @accept application/json
 // @produce application/json
-// @body grpc.UserProfile
-// @success 200 {object} grpc.UserProfile Returns the user's personal and company data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage The user not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.UserProfile
+// @success 200 {object} billingpb.UserProfile Returns the user's personal and company data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 404 {object} billingpb.ResponseErrorMessage The user not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/profile [patch]
 func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
@@ -183,11 +182,11 @@ func (h *UserProfileRoute) setUserProfile(ctx echo.Context) error {
 // @tag User Profile
 // @accept application/json
 // @produce application/json
-// @body grpc.ConfirmUserEmailRequest
+// @body billingpb.ConfirmUserEmailRequest
 // @success 200 {string} Returns an empty response body if the user's email address has been successfully confirmed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage The user not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage The user not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /api/v1/user/confirm_email [put]
 func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
 	req := &billingpb.ConfirmUserEmailRequest{}
@@ -238,11 +237,11 @@ func (h *UserProfileRoute) confirmEmail(ctx echo.Context) error {
 // @tag User Profile
 // @accept application/json
 // @produce application/json
-// @body grpc.CreatePageReviewRequest
+// @body billingpb.CreatePageReviewRequest
 // @success 200 {string} Returns an empty response body if the feedback was successfully sent
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/feedback [post]
 func (h *UserProfileRoute) createFeedback(ctx echo.Context) error {
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -45,11 +44,11 @@ func (h *UserRoute) Route(groups *common.Groups) {
 // @tag User
 // @accept application/json
 // @produce application/json
-// @body grpc.CheckInviteTokenRequest
-// @success 200 {object} grpc.CheckInviteTokenResponse Returns the user's role ID and type
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.CheckInviteTokenRequest
+// @success 200 {object} billingpb.CheckInviteTokenResponse Returns the user's role ID and type
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/invite/check [post]
 func (h *UserRoute) checkInvite(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
@@ -85,11 +84,11 @@ func (h *UserRoute) checkInvite(ctx echo.Context) error {
 // @tag User
 // @accept application/json
 // @produce application/json
-// @body grpc.AcceptInviteRequest
-// @success 200 {object} grpc.AcceptInviteResponse Returns the user's role data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.AcceptInviteRequest
+// @success 200 {object} billingpb.AcceptInviteResponse Returns the user's role data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/invite/approve [post]
 func (h *UserRoute) approveInvite(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
@@ -126,11 +125,11 @@ func (h *UserRoute) approveInvite(ctx echo.Context) error {
 // @tag User
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetMerchantsForUserResponse Returns the list of merchants
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetMerchantsForUserResponse Returns the list of merchants
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /auth/api/v1/user/merchants [get]
 func (h *UserRoute) getMerchants(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)

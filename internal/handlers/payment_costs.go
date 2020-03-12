@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -75,9 +73,9 @@ func (h *PaymentCostRoute) Route(groups *common.Groups) {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.PaymentChannelCostSystemList Returns system costs for payment operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PaymentChannelCostSystemList Returns system costs for payment operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param name query {string} true The payment method's name.
 // @param region query {string} true The region name. Available values: CIS, Russia, West Asia, EU, North America, Central America, South America, United Kingdom, Worldwide, South Pacific.
 // @param country query {string} false The country code.
@@ -118,9 +116,9 @@ func (h *PaymentCostRoute) getPaymentChannelCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.PaymentChannelCostMerchant Returns system costs for payment operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PaymentChannelCostMerchant Returns system costs for payment operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param payout_currency query {string} true The payout currency.
 // @param amount query {integer} true The payout amount.
@@ -164,9 +162,9 @@ func (h *PaymentCostRoute) getPaymentChannelCostMerchant(ctx echo.Context) error
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.MoneyBackCostSystem Returns system costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MoneyBackCostSystem Returns system costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param name query {string} true The payment method's name.
 // @param undo_reason query {string} true The return reason. Available values: refund, reversal, chargeback.
 // @param payout_currency query {string} true The payout currency.
@@ -210,9 +208,9 @@ func (h *PaymentCostRoute) getMoneyBackCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.MoneyBackCostMerchant Returns merchant costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MoneyBackCostMerchant Returns merchant costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param name query {string} true The payment method's name.
 // @param undo_reason query {string} true The return reason. Available values: refund, reversal, chargeback.
@@ -259,8 +257,8 @@ func (h *PaymentCostRoute) getMoneyBackCostMerchant(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 204 {string} Returns an empty response body if the cost was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/channel/system/{id} [delete]
 func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) error {
@@ -292,8 +290,8 @@ func (h *PaymentCostRoute) deletePaymentChannelCostSystem(ctx echo.Context) erro
 // @accept application/json
 // @produce application/json
 // @success 204 {string} Returns an empty response body if the cost was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/payment_costs/channel/merchant/{merchant_id} [delete]
 func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) error {
@@ -325,8 +323,8 @@ func (h *PaymentCostRoute) deletePaymentChannelCostMerchant(ctx echo.Context) er
 // @accept application/json
 // @produce application/json
 // @success 204 {string} Returns an empty response body if the cost was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/money_back/system/{id} [delete]
 func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
@@ -358,8 +356,8 @@ func (h *PaymentCostRoute) deleteMoneyBackCostSystem(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 204 {string} Returns an empty response body if the cost was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/payment_costs/money_back/merchant/{merchant_id} [delete]
 func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
@@ -390,10 +388,10 @@ func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentChannelCostSystem
-// @success 200 {object} billing.PaymentChannelCostSystem Returns system costs for payments operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentChannelCostSystem
+// @success 200 {object} billingpb.PaymentChannelCostSystem Returns system costs for payments operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/payment_costs/channel/system [post]
 
 // @summary Update system costs for payments operations
@@ -402,10 +400,10 @@ func (h *PaymentCostRoute) deleteMoneyBackCostMerchant(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentChannelCostSystem
-// @success 200 {object} billing.PaymentChannelCostSystem Returns system costs for payments operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentChannelCostSystem
+// @success 200 {object} billingpb.PaymentChannelCostSystem Returns system costs for payments operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/channel/system/{id} [put]
 func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
@@ -446,10 +444,10 @@ func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentChannelCostMerchant
-// @success 200 {object} billing.PaymentChannelCostMerchant Returns merchant costs for payments operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentChannelCostMerchant
+// @success 200 {object} billingpb.PaymentChannelCostMerchant Returns merchant costs for payments operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/payment_costs/channel/merchant/{merchant_id} [post]
 
@@ -459,10 +457,10 @@ func (h *PaymentCostRoute) setPaymentChannelCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentChannelCostMerchant
-// @success 200 {object} billing.PaymentChannelCostMerchant Returns merchant costs for payments operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentChannelCostMerchant
+// @success 200 {object} billingpb.PaymentChannelCostMerchant Returns merchant costs for payments operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param rate_id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/channel/merchant/{merchant_id}/{rate_id} [put]
@@ -506,10 +504,10 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MoneyBackCostSystem
-// @success 200 {object} billing.MoneyBackCostSystem Returns system costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MoneyBackCostSystem
+// @success 200 {object} billingpb.MoneyBackCostSystem Returns system costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/payment_costs/money_back/system [post]
 
 // @summary Create system costs for money back operations
@@ -518,10 +516,10 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MoneyBackCostSystem
-// @success 200 {object} billing.MoneyBackCostSystem Returns system costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MoneyBackCostSystem
+// @success 200 {object} billingpb.MoneyBackCostSystem Returns system costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/money_back/system/{id} [post]
 func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
@@ -562,10 +560,10 @@ func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MoneyBackCostMerchant
-// @success 200 {object} billing.MoneyBackCostMerchant Returns merchant costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MoneyBackCostMerchant
+// @success 200 {object} billingpb.MoneyBackCostMerchant Returns merchant costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/payment_costs/money_back/merchant/{merchant_id} [post]
 
@@ -575,10 +573,10 @@ func (h *PaymentCostRoute) setMoneyBackCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MoneyBackCostMerchant
-// @success 200 {object} billing.MoneyBackCostMerchant Returns merchant costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MoneyBackCostMerchant
+// @success 200 {object} billingpb.MoneyBackCostMerchant Returns merchant costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param rate_id path {string} true The unique identifier for the cost.
 // @router /system/api/v1/payment_costs/money_back/merchant/{merchant_id}/{rate_id} [put]
@@ -622,9 +620,9 @@ func (h *PaymentCostRoute) setMoneyBackCostMerchant(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.PaymentChannelCostSystemList Returns the all system costs for payments
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PaymentChannelCostSystemList Returns the all system costs for payments
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/payment_costs/channel/system/all [get]
 func (h *PaymentCostRoute) getAllPaymentChannelCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAllPaymentChannelCostSystem(ctx.Request().Context(), &billingpb.EmptyRequest{})
@@ -647,9 +645,9 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostSystem(ctx echo.Context) erro
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.PaymentChannelCostMerchantList Returns all merchant costs for payments
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PaymentChannelCostMerchantList Returns all merchant costs for payments
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/payment_costs/channel/merchant/{merchant_id}/all [get]
 func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) error {
@@ -680,9 +678,9 @@ func (h *PaymentCostRoute) getAllPaymentChannelCostMerchant(ctx echo.Context) er
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.MoneyBackCostSystemList Returns all system costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MoneyBackCostSystemList Returns all system costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/payment_costs/money_back/system/all [get]
 func (h *PaymentCostRoute) getAllMoneyBackCostSystem(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAllMoneyBackCostSystem(ctx.Request().Context(), &billingpb.EmptyRequest{})
@@ -705,9 +703,9 @@ func (h *PaymentCostRoute) getAllMoneyBackCostSystem(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.MoneyBackCostMerchantList Returns all merchant costs for money back operations
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MoneyBackCostMerchantList Returns all merchant costs for money back operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/payment_costs/money_back/merchant/{merchant_id}/all [get]
 func (h *PaymentCostRoute) getAllMoneyBackCostMerchant(ctx echo.Context) error {

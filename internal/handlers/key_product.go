@@ -9,7 +9,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -63,10 +62,10 @@ func (h *KeyProductRoute) Route(groups *common.Groups) {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.KeyProduct Returns the key-activated product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/key-products/{key_product_id}/unpublish [post]
 func (h *KeyProductRoute) unpublishKeyProduct(ctx echo.Context) error {
@@ -100,11 +99,11 @@ func (h *KeyProductRoute) unpublishKeyProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @body grpc.PublishKeyProductRequest
-// @success 200 {object} grpc.KeyProduct Returns the key-activated product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PublishKeyProductRequest
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/key-products/{key_product_id}/publish [post]
 func (h *KeyProductRoute) publishKeyProduct(ctx echo.Context) error {
@@ -138,9 +137,9 @@ func (h *KeyProductRoute) publishKeyProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListPlatformsResponse Returns the available platforms list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListPlatformsResponse Returns the available platforms list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param limit query {integer} true The number of platforms returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/platforms [get]
@@ -182,10 +181,10 @@ func (h *KeyProductRoute) getPlatformsList(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.KeyProduct Returns the key-activated product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/key-products/{key_product_id} [delete]
 func (h *KeyProductRoute) deleteKeyProductById(ctx echo.Context) error {
@@ -219,11 +218,11 @@ func (h *KeyProductRoute) deleteKeyProductById(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @body grpc.CreateOrUpdateKeyProductRequest
-// @success 200 {object} grpc.KeyProduct Returns the key-activated product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.CreateOrUpdateKeyProductRequest
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/key-products/{key_product_id} [put]
 func (h *KeyProductRoute) changeKeyProduct(ctx echo.Context) error {
@@ -257,10 +256,10 @@ func (h *KeyProductRoute) changeKeyProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.KeyProduct Returns the key-activated product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/key-products/{key_product_id} [get]
 func (h *KeyProductRoute) getKeyProductById(ctx echo.Context) error {
@@ -294,10 +293,10 @@ func (h *KeyProductRoute) getKeyProductById(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @body grpc.CreateOrUpdateKeyProductRequest
-// @success 200 {object} grpc.KeyProduct Returns the key-activated product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.CreateOrUpdateKeyProductRequest
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/key-products [post]
 func (h *KeyProductRoute) createKeyProduct(ctx echo.Context) error {
 	req := &billingpb.CreateOrUpdateKeyProductRequest{}
@@ -330,9 +329,9 @@ func (h *KeyProductRoute) createKeyProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListKeyProductsResponse Returns the list of the key-activated products
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListKeyProductsResponse Returns the list of the key-activated products
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param name query {string} true The unique identifier for the key-activated product.
 // @param sku query {string} false The SKU of the product.
 // @param project_id query {string} false The unique identifier for the project.
@@ -380,10 +379,10 @@ func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.KeyProductInfo Returns the product data (platforms, prices and others)
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.KeyProductInfo Returns the product data (platforms, prices and others)
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the key-activated product.
 // @param country query {string} false The country code to calculate the price for.
 // @param language query {string} false The language.
@@ -434,11 +433,11 @@ func (h *KeyProductRoute) getKeyProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/octet-stream
 // @produce application/json
-// @body grpc.PlatformKeysFileRequest
-// @success 200 {object} grpc.PlatformKeysFileResponse Returns the number of the processed keys
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PlatformKeysFileRequest
+// @success 200 {object} billingpb.PlatformKeysFileResponse Returns the number of the processed keys
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the key-activated product.
 // @param platform_id path {string} true The platform's name. Available values: steam, gog, uplay, origin, psn, xbox, nintendo, itch, egs.
 // @router /admin/api/v1/key-products/{key_product_id}/platforms/{platform_id}/file [post]
@@ -504,10 +503,10 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetPlatformKeyCountResponse Returns the number of keys for the specified platform and product
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetPlatformKeyCountResponse Returns the number of keys for the specified platform and product
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the key-activated product.
 // @param platform_id path {string} true The platform's name. Available values: steam, gog, uplay, origin, psn, xbox, nintendo, itch, egs.
 // @router /auth/api/v1/key-products/{key_product_id}/platforms/{platform_id}/count [get]

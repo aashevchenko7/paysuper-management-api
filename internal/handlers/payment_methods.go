@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -53,10 +51,10 @@ func (h *PaymentMethodApiV1) Route(groups *common.Groups) {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethod
-// @success 200 {object} grpc.ChangePaymentMethodResponse Returns the status of creation
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethod
+// @success 200 {object} billingpb.ChangePaymentMethodResponse Returns the status of creation
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/payment_method [post]
 func (h *PaymentMethodApiV1) create(ctx echo.Context) error {
 	return h.createOrUpdatePaymentMethod(ctx)
@@ -68,10 +66,10 @@ func (h *PaymentMethodApiV1) create(ctx echo.Context) error {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethod
-// @success 200 {object} grpc.ChangePaymentMethodResponse Returns the status of update
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethod
+// @success 200 {object} billingpb.ChangePaymentMethodResponse Returns the status of update
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @router /system/api/v1/payment_method/{id} [put]
 func (h *PaymentMethodApiV1) update(ctx echo.Context) error {
@@ -107,9 +105,9 @@ func (h *PaymentMethodApiV1) createOrUpdatePaymentMethod(ctx echo.Context) error
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetPaymentMethodSettingsResponse Returns the production settings
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetPaymentMethodSettingsResponse Returns the production settings
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @param currency_a3 query {string} false Three-letter currency code by ISO 4217, in uppercase.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
@@ -146,10 +144,10 @@ func (h *PaymentMethodApiV1) getProductionSettings(ctx echo.Context) error {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethodParams
-// @success 200 {object} grpc.ChangePaymentMethodParamsResponse Returns the status of creation
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethodParams
+// @success 200 {object} billingpb.ChangePaymentMethodParamsResponse Returns the status of creation
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @router /system/api/v1/payment_method/{id}/production [post]
 func (h *PaymentMethodApiV1) createProductionSettings(ctx echo.Context) error {
@@ -162,10 +160,10 @@ func (h *PaymentMethodApiV1) createProductionSettings(ctx echo.Context) error {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethodParams
-// @success 200 {object} grpc.ChangePaymentMethodParamsResponse Returns the status of update
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethodParams
+// @success 200 {object} billingpb.ChangePaymentMethodParamsResponse Returns the status of update
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @router /system/api/v1/payment_method/{id}/production [put]
 func (h *PaymentMethodApiV1) updateProductionSettings(ctx echo.Context) error {
@@ -204,9 +202,9 @@ func (h *PaymentMethodApiV1) createOrUpdateProductionSettings(ctx echo.Context) 
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ChangePaymentMethodParamsResponse Returns the status of deletion
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ChangePaymentMethodParamsResponse Returns the status of deletion
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @param currency_a3 query {string} false Three-letter currency code by ISO 4217, in uppercase.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
@@ -243,9 +241,9 @@ func (h *PaymentMethodApiV1) deleteProductionSettings(ctx echo.Context) error {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetPaymentMethodSettingsResponse Returns the testing settings
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetPaymentMethodSettingsResponse Returns the testing settings
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @param currency_a3 query {string} false Three-letter currency code by ISO 4217, in uppercase.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.
@@ -282,10 +280,10 @@ func (h *PaymentMethodApiV1) getTestSettings(ctx echo.Context) error {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethodParams
-// @success 200 {object} grpc.ChangePaymentMethodParamsResponse Returns the status of creation
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethodParams
+// @success 200 {object} billingpb.ChangePaymentMethodParamsResponse Returns the status of creation
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @router /system/api/v1/payment_method/{id}/test [post]
 func (h *PaymentMethodApiV1) createTestSettings(ctx echo.Context) error {
@@ -298,10 +296,10 @@ func (h *PaymentMethodApiV1) createTestSettings(ctx echo.Context) error {
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethodParams
-// @success 200 {object} grpc.ChangePaymentMethodParamsResponse Returns the status of update
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethodParams
+// @success 200 {object} billingpb.ChangePaymentMethodParamsResponse Returns the status of update
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @router /system/api/v1/payment_method/{id}/test [put]
 func (h *PaymentMethodApiV1) updateTestSettings(ctx echo.Context) error {
@@ -339,10 +337,10 @@ func (h *PaymentMethodApiV1) createOrUpdateTestSettings(ctx echo.Context) error 
 // @tag Payment method
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMethodParams
-// @success 200 {object} grpc.ChangePaymentMethodParamsResponse Returns the status of deletion
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.PaymentMethodParams
+// @success 200 {object} billingpb.ChangePaymentMethodParamsResponse Returns the status of deletion
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment method.
 // @param currency_a3 query {string} false Three-letter currency code by ISO 4217, in uppercase.
 // @param mcc_code query {string} true The Merchant Category Code (MCC) is a four-digit number listed in ISO 18245.

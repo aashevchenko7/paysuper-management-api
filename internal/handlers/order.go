@@ -6,10 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
-	reporter "github.com/paysuper/paysuper-proto/go/reporterpb"
-	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
+	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
 
@@ -111,9 +108,9 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 // @tag Order
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.OrderViewPublic Returns the order data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.OrderViewPublic Returns the order data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id} [get]
 func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
@@ -142,9 +139,9 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 // @tag Order
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListOrdersPublicResponseItem Returns the orders list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListOrdersPublicResponseItem Returns the orders list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id query {string} false The unique identifier for the order.
 // @param project query {[]string} false The list of projects.
 // @param payment_method query {[]string} false The list of payment methods.
@@ -204,9 +201,9 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @body ListOrdersRequest
-// @success 200 {object} reporter.CreateFileResponse Returns the file ID
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} reporterpb.CreateFileResponse Returns the file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/order/download [post]
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	req := &ListOrdersRequest{}
@@ -215,16 +212,16 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 		return err
 	}
 
-	file := &reporterPkg.ReportFile{
-		ReportType: reporterPkg.ReportTypeTransactions,
+	file := &reporterpb.ReportFile{
+		ReportType: reporterpb.ReportTypeTransactions,
 		FileType:   req.FileType,
 		MerchantId: req.MerchantId,
 	}
 	params := map[string]interface{}{
-		reporterPkg.ParamsFieldStatus:        req.Status,
-		reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
-		reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
-		reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
+		reporterpb.ParamsFieldStatus:        req.Status,
+		reporterpb.ParamsFieldPaymentMethod: req.PaymentMethod,
+		reporterpb.ParamsFieldDateFrom:      req.PmDateFrom,
+		reporterpb.ParamsFieldDateTo:        req.PmDateTo,
 	}
 
 	return h.dispatch.RequestReportFile(ctx, file, params)
@@ -236,9 +233,9 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 // @tag Order
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Refund Returns the refund data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Refund Returns the refund data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @param refund_id path {string} true The unique identifier for the refund.
 // @router /admin/api/v1/order/{order_id}/refunds/{refund_id} [get]
@@ -268,9 +265,9 @@ func (h *OrderRoute) getRefund(ctx echo.Context) error {
 // @tag Order
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListRefundsResponse Returns the order's refunds list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListRefundsResponse Returns the order's refunds list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @param limit query {integer} true The number of refunds returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
@@ -301,10 +298,10 @@ func (h *OrderRoute) listRefunds(ctx echo.Context) error {
 // @tag Order
 // @accept application/json
 // @produce application/json
-// @body grpc.ChangeCodeInOrderRequest
-// @success 200 {object} billing.Order Returns the order data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.ChangeCodeInOrderRequest
+// @success 200 {object} billingpb.Order Returns the order data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /system/api/v1/order/{order_id}/replace_code [put]
 func (h *OrderRoute) replaceCode(ctx echo.Context) error {
@@ -338,10 +335,10 @@ func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 // @tag Order
 // @accept application/json
 // @produce application/json
-// @body grpc.CreateRefundRequest
-// @success 200 {object} billing.Refund Returns the refund data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.CreateRefundRequest
+// @success 200 {object} billingpb.Refund Returns the refund data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id}/refunds [post]
 func (h *OrderRoute) createRefund(ctx echo.Context) error {

@@ -5,11 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -39,9 +36,9 @@ func (h *CountryApiV1) Route(groups *common.Groups) {
 // @tag Country
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.CountriesList Returns the list of currencies
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.CountriesList Returns the list of currencies
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param name query {string} false The country's name or two-letter country code by ISO 3166-1.
 // @router /api/v1/country [get]
 func (h *CountryApiV1) get(ctx echo.Context) error {
@@ -60,9 +57,9 @@ func (h *CountryApiV1) get(ctx echo.Context) error {
 // @tag Country
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Country Returns the country data (taxes, currency, region and others)
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Country Returns the country data (taxes, currency, region and others)
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param code path {string} true Two-letter country code in ISO 3166-1
 // @router /api/v1/country/{code} [get]
 func (h *CountryApiV1) getById(ctx echo.Context) error {

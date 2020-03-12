@@ -5,9 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/taxpb"
-	tax_service "github.com/paysuper/paysuper-proto/go/taxpb"
 	"net/http"
 	"strconv"
 )
@@ -44,9 +43,9 @@ func (h *TaxesRoute) Route(groups *common.Groups) {
 // @tag Tax
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetPaymentMethodSettingsResponse Returns the production settings
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetPaymentMethodSettingsResponse Returns the production settings
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param zip query {string} false The postal code. Required for US.
 // @param country query {string} false The country code.
 // @param city query {string} false The city's name.
@@ -112,10 +111,10 @@ func (h *TaxesRoute) bindGetTaxes(ctx echo.Context) *taxpb.GetRatesRequest {
 // @tag Tax
 // @accept application/json
 // @produce application/json
-// @body tax_service.TaxRate
-// @success 200 {object} tax_service.TaxRate Returns the tax rate
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body taxpb.TaxRate
+// @success 200 {object} taxpb.TaxRate Returns the tax rate
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/taxes [post]
 func (h *TaxesRoute) setTax(ctx echo.Context) error {
 	if ctx.Request().ContentLength == 0 {
@@ -145,8 +144,8 @@ func (h *TaxesRoute) setTax(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {string} Returns an empty response body if the tax rate has been successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the tax rate.
 // @router /system/api/v1/taxes/{id} [delete]
 func (h *TaxesRoute) deleteTax(ctx echo.Context) error {

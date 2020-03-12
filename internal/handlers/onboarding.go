@@ -11,8 +11,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -130,10 +128,10 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Merchant Returns the merchant user
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Merchant Returns the merchant user
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id} [get]
 func (h *OnboardingRoute) getMerchant(ctx echo.Context) error {
@@ -181,9 +179,9 @@ func (h *OnboardingRoute) getMerchantByUser(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.MerchantListingResponse Returns the merchants list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MerchantListingResponse Returns the merchants list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param name query {string} false The merchant's name.
 // @param last_payout_date_from query {integer} false The start date of the payout to the merchant.
 // @param last_payout_date_to query {integer} false The end date of the payout to the merchant.
@@ -231,11 +229,11 @@ func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body grpc.MerchantChangeStatusRequest
-// @success 200 {object} billing.Merchant Returns the merchant user
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantChangeStatusRequest
+// @success 200 {object} billingpb.Merchant Returns the merchant user
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/change-status [put]
 func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
@@ -271,11 +269,11 @@ func (h *OnboardingRoute) changeMerchantStatus(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body grpc.NotificationRequest
-// @success 200 {object} billing.Notification Returns the notification
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.NotificationRequest
+// @success 200 {object} billingpb.Notification Returns the notification
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/notifications [post]
 func (h *OnboardingRoute) createNotification(ctx echo.Context) error {
@@ -311,10 +309,10 @@ func (h *OnboardingRoute) createNotification(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Notification Returns the notification data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Notification Returns the notification data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param notification_id path {string} true The unique identifier for the notification.
 // @router /admin/api/v1/merchants/notifications/{notification_id} [get]
 func (h *OnboardingRoute) getNotification(ctx echo.Context) error {
@@ -339,10 +337,10 @@ func (h *OnboardingRoute) getNotification(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.Notifications Returns the list of notifications
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Notifications Returns the list of notifications
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param user query {string} false The unique identifier for the user who is the sender of the notification.
 // @param is_system query {integer} false Available values: 1 - the notifications between the merchant's owner and the PaySuper admin, 2 - the notifications generated automatically.
 // @param limit query {integer} false The number of notifications returned in one page. Default value is 100.
@@ -356,10 +354,10 @@ func (h *OnboardingRoute) getNotification(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.Notifications Returns the list of notifications
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Notifications Returns the list of notifications
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param user query {string} false The unique identifier for the user who is the sender of the notification.
 // @param is_system query {integer} false Available values: 1 - the notifications between the merchant's owner and the PaySuper admin, 2 - the notifications generated automatically.
@@ -400,10 +398,10 @@ func (h *OnboardingRoute) listNotifications(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Notification Returns the notification data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Notification Returns the notification data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param notification_id path {string} true The unique identifier for the notification.
 // @router /admin/api/v1/merchants/notifications/{notification_id}/mark-as-read [put]
 func (h *OnboardingRoute) markAsReadNotification(ctx echo.Context) error {
@@ -428,11 +426,11 @@ func (h *OnboardingRoute) markAsReadNotification(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body grpc.ChangeMerchantDataRequest
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.ChangeMerchantDataRequest
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the project.
 // @router /admin/api/v1/merchants [patch]
 func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
@@ -462,9 +460,9 @@ func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
 // @accept application/json
 // @produce application/pdf
 // @success 200 {string} Returns the merchant's agreement file
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/agreement/document [get]
 
 // @summary Download the merchant's agreement document
@@ -474,9 +472,9 @@ func (h *OnboardingRoute) changeAgreement(ctx echo.Context) error {
 // @accept application/json
 // @produce application/pdf
 // @success 200 {string} Returns the merchant's agreement file
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/agreement/document [get]
 func (h *OnboardingRoute) getAgreementDocument(ctx echo.Context) error {
@@ -596,11 +594,11 @@ func (h *OnboardingRoute) validateUpload(file *multipart.FileHeader) (multipart.
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MerchantCompanyInfo
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantCompanyInfo
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/company [put]
 
 // @summary Update the merchant's company information
@@ -609,10 +607,10 @@ func (h *OnboardingRoute) validateUpload(file *multipart.FileHeader) (multipart.
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MerchantCompanyInfo
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantCompanyInfo
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/company [put]
 func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
@@ -658,11 +656,11 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MerchantContact
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantContact
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/contacts [put]
 
 // @summary Update the merchant's contacts
@@ -671,11 +669,11 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MerchantContact
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantContact
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/contacts [put]
 func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
@@ -721,11 +719,11 @@ func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MerchantBanking
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantBanking
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/banking [put]
 
 // @summary Update the merchant's banking data
@@ -734,11 +732,11 @@ func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body billing.MerchantBanking
-// @success 200 {object} billing.Merchant Returns the merchant data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.MerchantBanking
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/banking [put]
 func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
@@ -784,10 +782,10 @@ func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetMerchantOnboardingCompleteDataResponseItem Returns the merchant profile filling out status
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetMerchantOnboardingCompleteDataResponseItem Returns the merchant profile filling out status
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/status [get]
 func (h *OnboardingRoute) getMerchantStatus(ctx echo.Context) error {
 	req := &billingpb.SetMerchantS3AgreementRequest{}
@@ -815,10 +813,10 @@ func (h *OnboardingRoute) getMerchantStatus(ctx echo.Context) error {
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetMerchantTariffRatesResponseItems Returns the tariff rates for the specified region
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetMerchantTariffRatesResponseItems Returns the tariff rates for the specified region
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param region query {string} true The merchant's home region name. Available values: asia, europe, latin_america, russia_and_cis, worldwide.
 // @param payer_region query {string} false The payer's region name. Available values: asia, europe, latin_america, russia_and_cis, worldwide.
 // @param min_amount query {integer} false The minimum payment amount.
@@ -860,9 +858,9 @@ func (h *OnboardingRoute) getTariffRates(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {string} Returns an empty response body if the tariff was successfully set
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_operations_type query {string} true The merchant's operations type. Available values: low-risk, high-risk.
 // @router /admin/api/v1/merchants/tariffs [post]
 
@@ -873,9 +871,9 @@ func (h *OnboardingRoute) getTariffRates(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {string} Returns an empty response body if the tariff was successfully set
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param merchant_operations_type query {string} true The merchant's operations type. Available values: low-risk, high-risk.
 // @router /system/api/v1/merchants/{merchant_id}/tariffs [post]
@@ -918,9 +916,9 @@ func (h *OnboardingRoute) setTariffRates(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {object} OnboardingFileData Returns the printable agreement document
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/agreement [get]
 func (h *OnboardingRoute) getMerchantAgreementData(ctx echo.Context) error {
 	return h.getAgreementData(ctx, billingpb.SignerTypeMerchant)
@@ -933,9 +931,9 @@ func (h *OnboardingRoute) getMerchantAgreementData(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {object} OnboardingFileData Returns the printable agreement document
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/agreement [get]
 func (h *OnboardingRoute) getSystemAgreementData(ctx echo.Context) error {
@@ -990,9 +988,9 @@ func (h *OnboardingRoute) getAgreementData(ctx echo.Context, signerType int32) e
 // @accept application/json
 // @produce application/json
 // @success 200 {string} Returns an empty response body if the manual payouts was enabled
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/manual_payout/enable [put]
 func (h *OnboardingRoute) enableMerchantManualPayout(ctx echo.Context) error {
 	return h.changeMerchantManualPayout(ctx, true)
@@ -1005,9 +1003,9 @@ func (h *OnboardingRoute) enableMerchantManualPayout(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {string} Returns an empty response body if the manual payouts was disabled
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/manual_payout/disable [put]
 func (h *OnboardingRoute) disableMerchantManualPayout(ctx echo.Context) error {
 	return h.changeMerchantManualPayout(ctx, false)
@@ -1039,11 +1037,11 @@ func (h *OnboardingRoute) changeMerchantManualPayout(ctx echo.Context, enableMan
 // @tag Onboarding
 // @accept application/json
 // @produce application/json
-// @body grpc.SetMerchantOperatingCompanyRequest
-// @success 200 {object} billing.Merchant Returns the merchant user
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.SetMerchantOperatingCompanyRequest
+// @success 200 {object} billingpb.Merchant Returns the merchant user
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/set_operating_company [post]
 func (h *OnboardingRoute) setOperatingCompany(ctx echo.Context) error {

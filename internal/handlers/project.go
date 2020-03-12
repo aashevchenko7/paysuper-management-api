@@ -6,8 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -47,11 +45,11 @@ func (h *ProjectRoute) Route(groups *common.Groups) {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @body billing.Project
-// @success 201 {object} billing.Project Returns the project data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.Project
+// @success 201 {object} billingpb.Project Returns the project data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/projects [post]
 func (h *ProjectRoute) createProject(ctx echo.Context) error {
 	req := &billingpb.Project{}
@@ -96,11 +94,11 @@ func (h *ProjectRoute) createProject(ctx echo.Context) error {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @body billing.Project
-// @success 200 {object} billing.Project Returns the project data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.Project
+// @success 200 {object} billingpb.Project Returns the project data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the project.
 // @router /admin/api/v1/projects/{project_id} [patch]
 func (h *ProjectRoute) updateProject(ctx echo.Context) error {
@@ -140,9 +138,9 @@ func (h *ProjectRoute) updateProject(ctx echo.Context) error {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ChangeProjectResponse Returns the project data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ChangeProjectResponse Returns the project data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the project.
 // @router /admin/api/v1/projects/{project_id} [get]
 func (h *ProjectRoute) getProject(ctx echo.Context) error {
@@ -176,10 +174,10 @@ func (h *ProjectRoute) getProject(ctx echo.Context) error {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListProjectsResponse Returns the list of projects. The list can be filtered by the project's name, status, and sorted by the project's fields.
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListProjectsResponse Returns the list of projects. The list can be filtered by the project's name, status, and sorted by the project's fields.
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param limit query {integer} true The number of projects returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @param quick_search query {string} false The quick search by the project's name.
@@ -217,10 +215,10 @@ func (h *ProjectRoute) listProjects(ctx echo.Context) error {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ChangeProjectResponse Returns the project data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ChangeProjectResponse Returns the project data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the project.
 // @router /admin/api/v1/projects/{project_id} [delete]
 func (h *ProjectRoute) deleteProject(ctx echo.Context) error {
@@ -254,10 +252,10 @@ func (h *ProjectRoute) deleteProject(ctx echo.Context) error {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @body grpc.CheckSkuAndKeyProjectRequest
+// @body billingpb.CheckSkuAndKeyProjectRequest
 // @success 200 {string} Returns an empty response body if the SKU was found in this project
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the project.
 // @router /admin/api/v1/projects/{project_id}/sku [post]
 func (h *ProjectRoute) checkSku(ctx echo.Context) error {

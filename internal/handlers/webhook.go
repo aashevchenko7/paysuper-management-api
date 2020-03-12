@@ -6,8 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -38,11 +36,11 @@ func (h *WebHookRoute) Route(groups *common.Groups) {
 // @tag Project
 // @accept application/json
 // @produce application/json
-// @body billing.OrderCreateRequest
-// @success 200 {object} grpc.SendWebhookToMerchantResponse Returns the unique identifier for the order
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.OrderCreateRequest
+// @success 200 {object} billingpb.SendWebhookToMerchantResponse Returns the unique identifier for the order
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param project_id path {string} true The unique identifier for the Project found in the merchant account in the PaySuper Dashboard.
 // @router /admin/api/v1/projects/{project_id}/webhook/testing [post]
 func (h *WebHookRoute) sendWebhookTest(ctx echo.Context) error {

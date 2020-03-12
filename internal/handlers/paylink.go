@@ -9,8 +9,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
-	paylink "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -64,10 +62,10 @@ func (h *PayLinkRoute) Route(groups *common.Groups) {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.PaylinksPaginate Returns the list of payment links
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PaylinksPaginate Returns the list of payment links
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param limit query {integer} false The number of payment links returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/paylinks [get]
@@ -107,9 +105,9 @@ func (h *PayLinkRoute) getPaylinksList(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} paylink.Paylink Returns the payment link data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Paylink Returns the payment link data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @router /admin/api/v1/paylinks/{id} [get]
 func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
@@ -143,9 +141,9 @@ func (h *PayLinkRoute) getPaylink(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 200 {string} Returns the payment link URL with UTM parameters (if any)
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param utm_source query {string} false The UTM-tag of the advertising system, for example: Bing Ads, Google Adwords.
 // @param utm_medium query {string} false The UTM-tag of the traffic type, e.g.: cpc, cpm, email newsletter.
@@ -205,10 +203,10 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 204 {string} Returns an empty response body if the payment link was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 404 {object} grpc.ResponseErrorMessage The payment link not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 404 {object} billingpb.ResponseErrorMessage The payment link not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @router /admin/api/v1/paylinks/{id} [delete]
 func (h *PayLinkRoute) deletePaylink(ctx echo.Context) error {
@@ -240,11 +238,11 @@ func (h *PayLinkRoute) deletePaylink(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @body paylink.CreatePaylinkRequest
-// @success 200 {object} paylink.Paylink Returns the created payment link data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.CreatePaylinkRequest
+// @success 200 {object} billingpb.Paylink Returns the created payment link data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/paylinks [post]
 func (h *PayLinkRoute) createPaylink(ctx echo.Context) error {
 	return h.createOrUpdatePaylink(ctx, "")
@@ -256,11 +254,11 @@ func (h *PayLinkRoute) createPaylink(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @body paylink.CreatePaylinkRequest
-// @success 200 {object} paylink.Paylink Returns the created payment link data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.CreatePaylinkRequest
+// @success 200 {object} billingpb.Paylink Returns the created payment link data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @router /admin/api/v1/paylinks/{id} [put]
 func (h *PayLinkRoute) updatePaylink(ctx echo.Context) error {
@@ -299,9 +297,9 @@ func (h *PayLinkRoute) createOrUpdatePaylink(ctx echo.Context, paylinkId string)
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} paylink.StatCommon Returns the payment link summary
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.StatCommon Returns the payment link summary
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
 // @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
@@ -336,9 +334,9 @@ func (h *PayLinkRoute) getPaylinkStatSummary(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
 // @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
@@ -373,9 +371,9 @@ func (h *PayLinkRoute) getPaylinkStatByCountry(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
 // @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
@@ -410,9 +408,9 @@ func (h *PayLinkRoute) getPaylinkStatByReferrer(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
 // @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
@@ -447,9 +445,9 @@ func (h *PayLinkRoute) getPaylinkStatByDate(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} paylink.GroupStatCommon Returns the payment link summary
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GroupStatCommon Returns the payment link summary
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param period_from query {integer} false The first date of the period for which the statistical results are calculated.
 // @param period_to query {integer} false The last date of the period for which the statistical results are calculated.
@@ -484,9 +482,9 @@ func (h *PayLinkRoute) getPaylinkStatByUtm(ctx echo.Context) error {
 // @tag Payment link
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.TransactionsPaginate Returns the list of payment link's transactions
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.TransactionsPaginate Returns the list of payment link's transactions
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the payment link.
 // @param limit query {integer} false The number of transactions returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.

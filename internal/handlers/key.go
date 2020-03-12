@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -41,9 +39,9 @@ func (h *KeyRoute) Route(groups *common.Groups) {
 // @tag Key, Onboarding
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.Key Returns the key data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.Key Returns the key data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_id path {string} true The unique identifier for the key.
 // @router /admin/api/v1/keys/{key_id} [get]
 func (h *KeyRoute) getKeyInfo(ctx echo.Context) error {

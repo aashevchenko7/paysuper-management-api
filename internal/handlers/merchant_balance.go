@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -43,9 +41,9 @@ func (h *BalanceRoute) Route(groups *common.Groups) {
 // @tag Balance
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.MerchantBalance Returns the merchant's balance data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MerchantBalance Returns the merchant's balance data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/balance [get]
 
 // @summary Get the merchant's balance using the merchant ID
@@ -54,9 +52,9 @@ func (h *BalanceRoute) Route(groups *common.Groups) {
 // @tag Balance
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.MerchantBalance Returns the merchant's balance data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.MerchantBalance Returns the merchant's balance data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/balance/{merchant_id} [get]
 func (h *BalanceRoute) getBalance(ctx echo.Context) error {

@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -43,9 +42,9 @@ func (h *Pricing) Route(groups *common.Groups) {
 // @tag Pricing
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.RecommendedPriceResponse Returns the list of recommended currency conversion prices
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.RecommendedPriceResponse Returns the list of recommended currency conversion prices
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param amount query {string} true The amount of price.
 // @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
 // @router /api/v1/pricing/recommended/conversion [get]
@@ -77,9 +76,9 @@ func (h *Pricing) getRecommendedByConversion(ctx echo.Context) error {
 // @tag Pricing
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.RecommendedPriceResponse Returns the list of recommended currency conversion prices
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.RecommendedPriceResponse Returns the list of recommended currency conversion prices
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param amount query {string} true The amount of price.
 // @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
 // @router /api/v1/pricing/recommended/steam [get]
@@ -111,9 +110,9 @@ func (h *Pricing) getRecommendedBySteam(ctx echo.Context) error {
 // @tag Pricing
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.RecommendedPriceTableResponse Returns the table of recommended currency conversion prices ranges
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.RecommendedPriceTableResponse Returns the table of recommended currency conversion prices ranges
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param currency query {string} true Three-letter currency code by ISO 4217, in uppercase.
 // @router /api/v1/pricing/recommended/table [get]
 func (h *Pricing) getRecommendedTable(ctx echo.Context) error {

@@ -7,7 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -47,11 +46,11 @@ func (h *TokenRoute) Route(groups *common.Groups) {
 // @tag Token
 // @accept application/json
 // @produce application/json
-// @body grpc.TokenRequest
+// @body billingpb.TokenRequest
 // @success 200 {object} TokenCreationResponse Returns the payment token string and the PaySuper-hosted URL for a payment form
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /api/v1/tokens [post]
 func (h *TokenRoute) createToken(ctx echo.Context) error {
 	req := &billingpb.TokenRequest{}

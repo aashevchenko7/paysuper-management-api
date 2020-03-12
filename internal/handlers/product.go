@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -51,9 +49,9 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListProductsResponse Returns the list of products for the authorized user. This list can be filtered by the product's name, SKU, status and the project ID.
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListProductsResponse Returns the list of products for the authorized user. This list can be filtered by the product's name, SKU, status and the project ID.
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param name query {string} false The product's name.
 // @param sku query {string} false The SKU of the product.
 // @param project_id query {string} false The unique identifier for the project.
@@ -68,9 +66,9 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ListProductsResponse Returns the list of merchant's products. This list can be filtered by the product's name, SKU, status and the project ID.
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ListProductsResponse Returns the list of merchant's products. This list can be filtered by the product's name, SKU, status and the project ID.
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @param name query {string} false The product's name.
 // @param sku query {string} false The SKU of the product.
@@ -100,9 +98,9 @@ func (h *ProductRoute) getProductsList(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetProductResponse Returns the product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetProductResponse Returns the product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id} [get]
 func (h *ProductRoute) getProduct(ctx echo.Context) error {
@@ -133,11 +131,11 @@ func (h *ProductRoute) getProduct(ctx echo.Context) error {
 // @accept application/json
 // @produce application/json
 // @success 204 {string} Returns an empty response body if the product was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 401 {object} grpc.ResponseErrorMessage Unauthorized request
-// @failure 403 {object} grpc.ResponseErrorMessage Access denied
-// @failure 404 {object} grpc.ResponseErrorMessage The product not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 404 {object} billingpb.ResponseErrorMessage The product not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id} [delete]
 func (h *ProductRoute) deleteProduct(ctx echo.Context) error {
@@ -163,10 +161,10 @@ func (h *ProductRoute) deleteProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @body grpc.Product
-// @success 200 {object} grpc.Product Returns the created product data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.Product
+// @success 200 {object} billingpb.Product Returns the created product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/products [post]
 func (h *ProductRoute) createProduct(ctx echo.Context) error {
 	return h.createOrUpdateProduct(ctx, &common.ProductsCreateProductBinder{})
@@ -178,10 +176,10 @@ func (h *ProductRoute) createProduct(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @body grpc.Product
-// @success 200 {object} grpc.Product Returns the updated product
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.Product
+// @success 200 {object} billingpb.Product Returns the updated product
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id} [put]
 func (h *ProductRoute) updateProduct(ctx echo.Context) error {
@@ -211,9 +209,9 @@ func (h *ProductRoute) createOrUpdateProduct(ctx echo.Context, binder echo.Binde
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.ProductPricesResponse Returns the list of the product's prices
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.ProductPricesResponse Returns the list of the product's prices
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id}/prices [get]
 func (h *ProductRoute) getProductPrices(ctx echo.Context) error {
@@ -239,10 +237,10 @@ func (h *ProductRoute) getProductPrices(ctx echo.Context) error {
 // @tag Product
 // @accept application/json
 // @produce application/json
-// @body []billing.ProductPrice
+// @body []billingpb.ProductPrice
 // @success 200 {string} Returns an empty response body if the product's price was successfully set
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id}/prices [put]
 func (h *ProductRoute) updateProductPrices(ctx echo.Context) error {

@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -51,10 +49,10 @@ func (h *AdminUsersRoute) Route(groups *common.Groups) {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @body grpc.ChangeRoleForAdminUserRequest
+// @body billingpb.ChangeRoleForAdminUserRequest
 // @success 200 {string} Returns an empty response body if the user's role was successfully changed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param role_id path {string} true The unique identifier for the role.
 // @router /system/api/v1/users/roles/{role_id} [put]
 func (h *AdminUsersRoute) changeRole(ctx echo.Context) error {
@@ -83,9 +81,9 @@ func (h *AdminUsersRoute) changeRole(ctx echo.Context) error {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @success 200 {object} []billing.UserRole Returns the admin users list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} []billingpb.UserRole Returns the admin users list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/users [get]
 func (h *AdminUsersRoute) listUsers(ctx echo.Context) error {
 	res, err := h.dispatch.Services.Billing.GetAdminUsers(ctx.Request().Context(), &billingpb.EmptyRequest{})
@@ -107,10 +105,10 @@ func (h *AdminUsersRoute) listUsers(ctx echo.Context) error {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @body grpc.InviteUserAdminRequest
-// @success 200 {object} grpc.InviteUserAdminResponse Returns the admin user role data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.InviteUserAdminRequest
+// @success 200 {object} billingpb.InviteUserAdminResponse Returns the admin user role data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/users/roles/invite [post]
 func (h *AdminUsersRoute) sendInvite(ctx echo.Context) error {
 	req := &billingpb.InviteUserAdminRequest{}
@@ -138,10 +136,10 @@ func (h *AdminUsersRoute) sendInvite(ctx echo.Context) error {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @body grpc.ResendInviteAdminRequest
-// @success 200 {object} grpc.EmptyResponseWithStatus Returns an empty response body if the user's invitation was successfully send
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body billingpb.ResendInviteAdminRequest
+// @success 200 {object} billingpb.EmptyResponseWithStatus Returns an empty response body if the user's invitation was successfully send
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/users/roles/resend [post]
 func (h *AdminUsersRoute) resendInvite(ctx echo.Context) error {
 	req := &billingpb.ResendInviteAdminRequest{}
@@ -169,9 +167,9 @@ func (h *AdminUsersRoute) resendInvite(ctx echo.Context) error {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.GetRoleListResponse Returns the admin roles data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.GetRoleListResponse Returns the admin roles data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/roles [get]
 func (h *AdminUsersRoute) listRoles(ctx echo.Context) error {
 	req := &billingpb.GetRoleListRequest{Type: billingpb.RoleTypeSystem}
@@ -190,9 +188,9 @@ func (h *AdminUsersRoute) listRoles(ctx echo.Context) error {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.EmptyResponseWithStatus Returns an empty response body if the user was successfully removed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.EmptyResponseWithStatus Returns an empty response body if the user was successfully removed
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param role_id path {string} true The unique identifier for the role.
 // @router /system/api/v1/users/roles/{role_id} [delete]
 func (h *AdminUsersRoute) deleteUser(ctx echo.Context) error {
@@ -221,9 +219,9 @@ func (h *AdminUsersRoute) deleteUser(ctx echo.Context) error {
 // @tag Admin user roles
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.UserRoleResponse Returns the admin user role data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.UserRoleResponse Returns the admin user role data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param role_id path {string} true The unique identifier for the role.
 // @router /system/api/v1/users/roles/{role_id} [get]
 func (h *AdminUsersRoute) getUser(ctx echo.Context) error {

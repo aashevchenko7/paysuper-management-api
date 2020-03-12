@@ -7,8 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	billing "github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -42,9 +40,9 @@ func (h *PaymentMinLimitSystemRoute) Route(groups *common.Groups) {
 // @tag Limits
 // @accept application/json
 // @produce application/json
-// @success 200 {object} []billing.OperatingCompany Returns the operating company's payment system limits
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} []billingpb.OperatingCompany Returns the operating company's payment system limits
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/payment_min_limit_system [get]
 func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Context) error {
 	req := &billingpb.EmptyRequest{}
@@ -66,10 +64,10 @@ func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Conte
 // @tag Limits
 // @accept application/json
 // @produce application/json
-// @body billing.PaymentMinLimitSystem
+// @body billingpb.PaymentMinLimitSystem
 // @success 204 {string} Returns an empty response body if the system limits were successfully set
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/payment_min_limit_system [post]
 func (h *PaymentMinLimitSystemRoute) setPaymentMinLimitSystem(ctx echo.Context) error {
 	req := &billingpb.PaymentMinLimitSystem{}

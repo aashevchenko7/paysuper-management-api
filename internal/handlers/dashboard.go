@@ -7,7 +7,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -44,9 +43,9 @@ func (h *DashboardRoute) Route(groups *common.Groups) {
 // @tag Dashboard
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.DashboardMainReport Returns the main reports data for the Dashboard
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.DashboardMainReport Returns the main reports data for the Dashboard
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param period query {string} false The fixed period. Available values: current_month, previous_month, current_quarter, previous_quarter, current_year, previous_year.
 // @router /admin/api/v1/merchants/dashboard/main [get]
 func (h *DashboardRoute) getMainReports(ctx echo.Context) error {
@@ -83,9 +82,9 @@ func (h *DashboardRoute) getMainReports(ctx echo.Context) error {
 // @tag Dashboard
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.DashboardRevenueDynamicReport Returns the revenue dynamic report data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.DashboardRevenueDynamicReport Returns the revenue dynamic report data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param period query {string} false The fixed period. Available values: current_month, previous_month, current_quarter, previous_quarter, current_year, previous_year.
 // @router /admin/api/v1/merchants/dashboard/revenue_dynamics [get]
 func (h *DashboardRoute) getRevenueDynamicsReport(ctx echo.Context) error {
@@ -122,9 +121,9 @@ func (h *DashboardRoute) getRevenueDynamicsReport(ctx echo.Context) error {
 // @tag Dashboard
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.DashboardBaseReports Returns the base report data
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.DashboardBaseReports Returns the base report data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param period query {string} false The fixed period. Available values: current_day, previous_day, current_week, previous_week, current_month, previous_month, current_quarter, previous_quarter, current_year, previous_year.
 // @router /admin/api/v1/merchants/dashboard/base [get]
 func (h *DashboardRoute) getBaseReports(ctx echo.Context) error {

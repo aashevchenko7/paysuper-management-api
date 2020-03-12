@@ -6,9 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	grpc "github.com/paysuper/paysuper-proto/go/billingpb"
-	reporter "github.com/paysuper/paysuper-proto/go/reporterpb"
-	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
+	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"strings"
 )
@@ -52,9 +50,9 @@ func (h *VatReportsRoute) Route(groups *common.Groups) {
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.VatReportsPaginate Returns the the VAT reports list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.VatReportsPaginate Returns the the VAT reports list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /system/api/v1/vat_reports [get]
 func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 
@@ -74,9 +72,9 @@ func (h *VatReportsRoute) getVatReportsDashboard(ctx echo.Context) error {
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.VatReportsPaginate Returns the the VAT reports list
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.VatReportsPaginate Returns the the VAT reports list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param country path {string} true The country code.
 // @param sort query {[]string} false The list of VAT fields for sorting.
 // @param limit query {integer} true The number of reports returned in one page. Default value is 100.
@@ -113,22 +111,22 @@ func (h *VatReportsRoute) getVatReportsForCountry(ctx echo.Context) error {
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
-// @body reporter.ReportFile
-// @success 200 {object} reporter.CreateFileResponse Returns the file ID
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @body reporterpb.ReportFile
+// @success 200 {object} reporterpb.CreateFileResponse Returns the file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param country path {string} true The country code.
 // @router /system/api/v1/vat_reports/country/{country}/download [post]
 func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
-	req := &reporterPkg.ReportFile{}
+	req := &reporterpb.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
-	req.ReportType = reporterPkg.ReportTypeVat
+	req.ReportType = reporterpb.ReportTypeVat
 	params := map[string]interface{}{
-		reporterPkg.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
+		reporterpb.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
 	}
 
 	return h.dispatch.RequestReportFile(ctx, req, params)
@@ -140,9 +138,9 @@ func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.PrivateTransactionsPaginate Returns the VAT report transactions
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PrivateTransactionsPaginate Returns the VAT report transactions
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the VAT report.
 // @param sort query {[]string} false The list of transaction fields for sorting.
 // @param limit query {integer} true The number of transactions returned in one page. Default value is 100.
@@ -179,21 +177,21 @@ func (h *VatReportsRoute) getVatReportTransactions(ctx echo.Context) error {
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
-// @success 200 {object} reporter.CreateFileResponse Returns the file ID
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} reporterpb.CreateFileResponse Returns the file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the VAT report.
 // @router /system/api/v1/vat_reports/details/{id}/download [post]
 func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error {
-	req := &reporterPkg.ReportFile{}
+	req := &reporterpb.ReportFile{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return err
 	}
 
-	req.ReportType = reporterPkg.ReportTypeVatTransactions
+	req.ReportType = reporterpb.ReportTypeVatTransactions
 	params := map[string]interface{}{
-		reporterPkg.ParamsFieldId: ctx.Param(common.RequestParameterId),
+		reporterpb.ParamsFieldId: ctx.Param(common.RequestParameterId),
 	}
 
 	return h.dispatch.RequestReportFile(ctx, req, params)
@@ -205,10 +203,10 @@ func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error 
 // @tag VAT reports
 // @accept application/json
 // @produce application/json
-// @body grpc.UpdateVatReportStatusRequest
+// @body billingpb.UpdateVatReportStatusRequest
 // @success 204 {string} Returns an empty response body if the VAT report status was successfully changed
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param id path {string} true The unique identifier for the VAT report.
 // @router /system/api/v1/vat_reports/status/{id} [post]
 func (h *VatReportsRoute) updateVatReportStatus(ctx echo.Context) error {
