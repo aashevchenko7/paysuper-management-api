@@ -165,7 +165,6 @@ func (h *HandlerSet) RequestReportFile(
 		return echo.NewHTTPError(http.StatusInternalServerError, ErrorRequestDataInvalid)
 	}
 
-	req.UserId = ExtractUserContext(ctx).Id
 	req.Params = b
 	req.SendNotification = true
 

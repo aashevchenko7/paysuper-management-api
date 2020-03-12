@@ -123,11 +123,13 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 // @router /admin/api/v1/payout_documents/{payout_document_id}/download [post]
 func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypePayout
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldId: ctx.Param(common.RequestPayoutDocumentId),

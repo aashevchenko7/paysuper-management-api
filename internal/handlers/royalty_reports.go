@@ -140,11 +140,13 @@ func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 // @router /admin/api/v1/royalty_reports/{report_id}/download [post]
 func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypeRoyalty
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldId: ctx.Param(common.RequestParameterReportId),
@@ -207,11 +209,13 @@ func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 // @router /admin/api/v1/royalty_reports/{report_id}/transactions/download [post]
 func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypeRoyaltyTransactions
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldId: ctx.Param(common.RequestParameterReportId),

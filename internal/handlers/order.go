@@ -207,12 +207,14 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 // @router /admin/api/v1/order/download [post]
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	req := &ListOrdersRequest{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
 	file := &reporterpb.ReportFile{
+		UserId:     common.ExtractUserContext(ctx).Id,
 		ReportType: reporterpb.ReportTypeTransactions,
 		FileType:   req.FileType,
 		MerchantId: req.MerchantId,
