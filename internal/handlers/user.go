@@ -38,6 +38,18 @@ func (h *UserRoute) Route(groups *common.Groups) {
 
 }
 
+// @summary Check the invitation token
+// @desc Check the invitation token
+// @id inviteCheckCheckInvite
+// @tag User
+// @accept application/json
+// @produce application/json
+// @body billingpb.CheckInviteTokenRequest
+// @success 200 {object} billingpb.CheckInviteTokenResponse Returns the user's role ID and type
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/invite/check [post]
 func (h *UserRoute) checkInvite(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 
@@ -66,6 +78,18 @@ func (h *UserRoute) checkInvite(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Approve the user invitation
+// @desc Approve the user invitation
+// @id inviteApproveApproveInvite
+// @tag User
+// @accept application/json
+// @produce application/json
+// @body billingpb.AcceptInviteRequest
+// @success 200 {object} billingpb.AcceptInviteResponse Returns the user's role data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/invite/approve [post]
 func (h *UserRoute) approveInvite(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 
@@ -95,6 +119,18 @@ func (h *UserRoute) approveInvite(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Get the list of merchants for this user
+// @desc Get the list of merchants for this user
+// @id getMerchantsGetMerchants
+// @tag User
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.GetMerchantsForUserResponse Returns the list of merchants
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 403 {object} billingpb.ResponseErrorMessage Access denied
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /auth/api/v1/user/merchants [get]
 func (h *UserRoute) getMerchants(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 

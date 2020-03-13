@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	reporterPkg "github.com/paysuper/paysuper-proto/go/reporterpb"
+	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 )
 
@@ -30,16 +30,26 @@ type CreateOrderJsonProjectResponse struct {
 }
 
 type ListOrdersRequest struct {
-	MerchantId    string   `json:"merchant_id" validate:"required,hexadecimal,len=24"`
-	FileType      string   `json:"file_type" validate:"required"`
-	Template      string   `json:"template" validate:"omitempty,hexadecimal"`
-	Id            string   `json:"id" validate:"omitempty,uuid"`
-	Project       []string `json:"project" validate:"omitempty,dive,hexadecimal,len=24"`
+	// The unique identifier for the merchant.
+	MerchantId string `json:"merchant_id" validate:"required,hexadecimal,len=24"`
+	// The supported file format. Available values: PDF, CSV, XLSX.
+	FileType string `json:"file_type" validate:"required"`
+	// The file template.
+	Template string `json:"template" validate:"omitempty,hexadecimal"`
+	// The unique identifier for the order.
+	Id string `json:"id" validate:"omitempty,uuid"`
+	// The list of projects.
+	Project []string `json:"project" validate:"omitempty,dive,hexadecimal,len=24"`
+	// The list of payment methods.
 	PaymentMethod []string `json:"payment_method" validate:"omitempty,dive,hexadecimal,len=24"`
-	Country       []string `json:"country" validate:"omitempty,dive,alpha,len=2"`
-	Status        []string `json:"status," validate:"omitempty,dive,alpha,oneof=created processed canceled rejected refunded chargeback pending"`
-	PmDateFrom    int64    `json:"pm_date_from" validate:"omitempty,numeric,gt=0"`
-	PmDateTo      int64    `json:"pm_date_to" validate:"omitempty,numeric,gt=0"`
+	// The list of the payer's countries.
+	Country []string `json:"country" validate:"omitempty,dive,alpha,len=2"`
+	// The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
+	Status []string `json:"status," validate:"omitempty,dive,alpha,oneof=created processed canceled rejected refunded chargeback pending"`
+	// The start date when the payment was created.
+	PmDateFrom int64 `json:"pm_date_from" validate:"omitempty,numeric,gt=0"`
+	// The end date when the payment was closed.
+	PmDateTo int64 `json:"pm_date_to" validate:"omitempty,numeric,gt=0"`
 }
 
 type OrderListRefundsBinder struct {
@@ -92,6 +102,17 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 	groups.SystemUser.PUT(orderReplaceCodePath, h.replaceCode)
 }
 
+// @summary Get the full data about the order
+// @desc Get the full data about the order using the order ID
+// @id orderIdPathGetOrderPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.OrderViewPublic Returns the order data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /admin/api/v1/order/{order_id} [get]
 func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 	req := &billingpb.GetOrderRequest{}
 
@@ -112,6 +133,32 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the orders list
+// @desc Get the orders list. This list can be filtered by the order's parameters.
+// @id orderPathListOrdersPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListOrdersPublicResponseItem Returns the orders list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param id query {string} false The unique identifier for the order.
+// @param project query {[]string} false The list of projects.
+// @param payment_method query {[]string} false The list of payment methods.
+// @param country query {[]string} false The list of the payer's countries.
+// @param status query {[]string} false The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
+// @param account query {string} false The payer account (for instance an account in the merchant's project, the account in the payment system, the payer email, etc.)
+// @param pm_date_from query {integer} false The start date when the payment was created.
+// @param pm_date_to query {integer} false The end date when the payment was closed.
+// @param project_date_from query {integer} false The end date when the payment was created in the project.
+// @param project_date_to query {integer} false The end date when the payment was closed in the project.
+// @param quick_search query {string} false The search string that contains multiple fields - the unique identifier for the order, the user external identifier, the project order identifier, the project's name, the payment method's name.
+// @param limit query {integer} true The number of orders returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @param sort query {[]string} false The list of the order's fields for sorting.
+// @param type query {string} false The sales type. Available values: simple, product, key.
+// @param hide_test query {boolean} false Has a true value for getting only production orders.
+// @router /admin/api/v1/order [get]
 func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	req := &billingpb.ListOrdersRequest{}
 	err := ctx.Bind(req)
@@ -147,6 +194,17 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Export the orders list
+// @desc Export the orders list
+// @id orderDownloadPathDownloadOrdersPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @body ListOrdersRequest
+// @success 200 {object} reporterpb.CreateFileResponse Returns the file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/order/download [post]
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	req := &ListOrdersRequest{}
 	err := ctx.Bind(req)
@@ -155,22 +213,34 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	file := &reporterPkg.ReportFile{
+	file := &reporterpb.ReportFile{
 		UserId:     common.ExtractUserContext(ctx).Id,
-		ReportType: reporterPkg.ReportTypeTransactions,
+		ReportType: reporterpb.ReportTypeTransactions,
 		FileType:   req.FileType,
 		MerchantId: req.MerchantId,
 	}
 	params := map[string]interface{}{
-		reporterPkg.ParamsFieldStatus:        req.Status,
-		reporterPkg.ParamsFieldPaymentMethod: req.PaymentMethod,
-		reporterPkg.ParamsFieldDateFrom:      req.PmDateFrom,
-		reporterPkg.ParamsFieldDateTo:        req.PmDateTo,
+		reporterpb.ParamsFieldStatus:        req.Status,
+		reporterpb.ParamsFieldPaymentMethod: req.PaymentMethod,
+		reporterpb.ParamsFieldDateFrom:      req.PmDateFrom,
+		reporterpb.ParamsFieldDateTo:        req.PmDateTo,
 	}
 
 	return h.dispatch.RequestReportFile(ctx, file, params)
 }
 
+// @summary Get the refund data
+// @desc Get the refund data using the order and refund IDs
+// @id orderRefundsIdsPathGetRefund
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.Refund Returns the refund data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @param refund_id path {string} true The unique identifier for the refund.
+// @router /admin/api/v1/order/{order_id}/refunds/{refund_id} [get]
 func (h *OrderRoute) getRefund(ctx echo.Context) error {
 	req := &billingpb.GetRefundRequest{}
 
@@ -191,6 +261,19 @@ func (h *OrderRoute) getRefund(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Item)
 }
 
+// @summary Get the order's refunds list
+// @desc Get the order's refunds list using the order ID
+// @id orderRefundsPathListRefunds
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListRefundsResponse Returns the order's refunds list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @param limit query {integer} true The number of refunds returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /admin/api/v1/order/{order_id}/refunds [get]
 func (h *OrderRoute) listRefunds(ctx echo.Context) error {
 	req := &billingpb.ListRefundsRequest{}
 
@@ -211,6 +294,18 @@ func (h *OrderRoute) listRefunds(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
+// @summary Replaces the activation code in the order
+// @desc Replaces the activation code in the order
+// @id orderReplaceCodePathReplaceCode
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @body billingpb.ChangeCodeInOrderRequest
+// @success 200 {object} billingpb.Order Returns the order data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /system/api/v1/order/{order_id}/replace_code [put]
 func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 	req := &billingpb.ChangeCodeInOrderRequest{}
 	if err := ctx.Bind(req); err != nil {
@@ -236,6 +331,18 @@ func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Order)
 }
 
+// @summary Create a refund
+// @desc Create a refund using the order ID
+// @id orderRefundsPathCreateRefund
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @body billingpb.CreateRefundRequest
+// @success 200 {object} billingpb.Refund Returns the refund data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /admin/api/v1/order/{order_id}/refunds [post]
 func (h *OrderRoute) createRefund(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &billingpb.CreateRefundRequest{}

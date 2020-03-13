@@ -34,6 +34,16 @@ func (h *PaymentMinLimitSystemRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(paymentMinLimitSystemPath, h.setPaymentMinLimitSystem)
 }
 
+// @summary Get the list of the payment system limits
+// @desc Get the list of the payment system limits
+// @id paymentMinLimitSystemPathGetPaymentMinLimitSystemList
+// @tag Limits
+// @accept application/json
+// @produce application/json
+// @success 200 {object} []billingpb.OperatingCompany Returns the operating company's payment system limits
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/payment_min_limit_system [get]
 func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Context) error {
 	req := &billingpb.EmptyRequest{}
 
@@ -48,6 +58,17 @@ func (h *PaymentMinLimitSystemRoute) getPaymentMinLimitSystemList(ctx echo.Conte
 	return ctx.JSON(http.StatusOK, res.Items)
 }
 
+// @summary Set the payment system limits
+// @desc Set the payment system limits
+// @id paymentMinLimitSystemPathSetPaymentMinLimitSystem
+// @tag Limits
+// @accept application/json
+// @produce application/json
+// @body billingpb.PaymentMinLimitSystem
+// @success 204 {string} Returns an empty response body if the system limits were successfully set
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/payment_min_limit_system [post]
 func (h *PaymentMinLimitSystemRoute) setPaymentMinLimitSystem(ctx echo.Context) error {
 	req := &billingpb.PaymentMinLimitSystem{}
 	err := ctx.Bind(req)
