@@ -21,8 +21,6 @@ const (
 	paylinksIdStatDatePath     = "/paylinks/:id/dashboard/date"
 	paylinksIdStatUtmPath      = "/paylinks/:id/dashboard/utm"
 	paylinksIdTransactionsPath = "/paylinks/:id/transactions"
-
-	paylinkUrlMask = "%s://%s/%s"
 )
 
 type PayLinkRoute struct {
@@ -156,7 +154,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 	}
 
 	req.Id = ctx.Param(common.RequestParameterId)
-	req.UrlMask = h.cfg.PaylinkPaymentFormUrlMask
+	req.UrlMask = h.cfg.OrderInlineFormUrlMask + "paylink_id=%s"
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkURL(ctx.Request().Context(), req)
 
