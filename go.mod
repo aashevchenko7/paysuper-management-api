@@ -37,6 +37,7 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-plugins/broker/rabbitmq v0.0.0-20200119172437-4fe21aa238fd
 	github.com/micro/go-plugins/client/selector/static v0.0.0-20200119172437-4fe21aa238fd
+	github.com/micro/go-plugins/registry/etcd v0.0.0-20200119172437-4fe21aa238fd // indirect
 	github.com/micro/go-plugins/registry/kubernetes v0.0.0-20200119172437-4fe21aa238fd
 	github.com/micro/go-plugins/transport/grpc v0.0.0-20200119172437-4fe21aa238fd
 	github.com/mitchellh/gox v1.0.1 // indirect

@@ -38,14 +38,14 @@ func (h *ZipCodeRoute) Route(groups *common.Groups) {
 // @tag Country
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.FindByZipCodeResponse Returns the country data (region, city, and others)
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-// @param country query {string} true The country's name.
+// @success 200 {object} billingpb.FindByZipCodeResponse Returns the country data (region, city, and others)
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage The country not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param country query {string} true The country code.
 // @param zip query {string} false The postal code. It's required for US.
-// @param limit query {string} false The number of objects returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} false The number of objects returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /api/v1/zip [get]
 func (h *ZipCodeRoute) checkZip(ctx echo.Context) error {
 	req := &billingpb.FindByZipCodeRequest{}
