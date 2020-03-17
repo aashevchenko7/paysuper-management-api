@@ -25,8 +25,7 @@ type Config struct {
 	LimitMax              int32 `default:"1000"`
 	DisableAuthMiddleware bool
 
-	OrderInlineFormUrlMask    string `envconfig:"ORDER_INLINE_FORM_URL_MASK" required:"true"`
-	PaylinkPaymentFormUrlMask string `envconfig:"PAYLINK_PAYMENT_FORM_URL_MASK" required:"true"`
+	OrderInlineFormUrlMask string `envconfig:"ORDER_INLINE_FORM_URL_MASK" required:"true"`
 
 	AllowOrigin string `envconfig:"ALLOW_ORIGIN" default:"*"`
 	HttpScheme  string `envconfig:"HTTP_SCHEME" default:"https"`

@@ -50,7 +50,6 @@ backend:
     - AWS_BUCKET_REPORTER
     - ORDER_INLINE_FORM_URL_MASK
     - ALLOW_ORIGIN
-    - PAYLINK_PAYMENT_FORM_URL_MASK
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
