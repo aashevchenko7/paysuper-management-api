@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	u "github.com/PuerkitoBio/purell"
@@ -157,7 +156,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 	}
 
 	req.Id = ctx.Param(common.RequestParameterId)
-	req.UrlMask = billingpb.PaylinkUrlDefaultMask
+	req.UrlMask = h.cfg.PaylinkPaymentFormUrlMask
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkURL(ctx.Request().Context(), req)
 
@@ -170,9 +169,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	url := fmt.Sprintf(paylinkUrlMask, h.cfg.HttpScheme, ctx.Request().Host, res.Url)
-
-	url, err = u.NormalizeURLString(url, u.FlagsUsuallySafeGreedy|u.FlagRemoveDuplicateSlashes)
+	url, err := u.NormalizeURLString(res.Url, u.FlagsUsuallySafeGreedy|u.FlagRemoveDuplicateSlashes)
 
 	if err != nil {
 		h.L().Error("NormalizeURLString failed", logger.PairArgs("err", err.Error()))

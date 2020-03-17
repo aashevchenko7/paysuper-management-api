@@ -266,6 +266,7 @@ func DefaultSettings() map[string]interface{} {
 				"customerTokenCookiesLifetime": "2592000s",
 				"CookieDomain":                 "localhost",
 				"orderInlineFormUrlMask":       "http://localhost",
+				"paylinkPaymentFormUrlMask":    "http://localhost/paylink=%s",
 				"auth1": map[string]interface{}{
 					"clientId":     "unknown",
 					"clientSecret": "unknown",
