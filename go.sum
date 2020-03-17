@@ -521,11 +521,15 @@ github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200218084528-e9b12146c9
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200218084528-e9b12146c9c6/go.mod h1:25YtpqFQHFrt5xQAT76dduEcKblxoTEwge0czg/rq4Q=
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200218084741-4dee284b77de h1:P5Tk7KfdF7JHHsfqr2wqxnMHhOYTHhWE5uiiK2cuhZU=
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200218084741-4dee284b77de/go.mod h1:25YtpqFQHFrt5xQAT76dduEcKblxoTEwge0czg/rq4Q=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200303091345-2cee0f7f84c1 h1:KekpLhxYHnGq7FNiMy2BcAlGv7SFdzGwhfvDiuGuAMQ=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200303091345-2cee0f7f84c1/go.mod h1:iNCQ8EF9lK8L/AFybizvo5T1Lny6J1TCitY7w5qfTYM=
 github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7 h1:q8mNBBuf3lHX/YCHC6B7cpspJRqoVshtRAQpywBUY0s=
 github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7/go.mod h1:U81Y1A3gMvE6Fl4LJEJC/yKwMJCqljkwH3e+3qI8LsA=
 github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200201160112-2ee519914bfd/go.mod h1:k5rhou4lCJDF6NGBcQYiPqGSpfLNfSuDUEVShzF3ZcA=
 github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200203130641-45056764a1d7 h1:ZSAkMDL0hvmh7qJSn+e/3eL9Z4TWaSysnd//HANDNkc=
 github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200203130641-45056764a1d7/go.mod h1:+oZxwRQrhwtRKikxnDQoBb3Ke4FcFJKQeenGtaecNuM=
+github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc h1:Dh6/7CS/y2rgGjFUrAF147M+J+C1Hae5YAbTYnVO5kM=
+github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc/go.mod h1:u48GCpSgBmO9VhSSRiAzv3dReqvB7pKjFmFHkvpB8wM=
 github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200211080654-935ed390e2e5 h1:LCpUoO353fSVQ+xAav0RqeRVMlnOGOEQgHPABSLJ1Ks=
 github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200211080654-935ed390e2e5/go.mod h1:n8BYT2YbTxWQDatuCZ27XJ0eDgASJUI4NFGWmHueLUI=
 github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200218090503-e603ee3997a4 h1:SedGpaU5Ds74iGrpQLiLgDKYPMwPPymwV6TCUI7vRk0=
