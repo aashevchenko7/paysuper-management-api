@@ -149,7 +149,6 @@ func (suite *RoyaltyReportsTestSuite) TestRoyaltyReports_merchantDeclineRoyaltyR
 }
 
 func (suite *RoyaltyReportsTestSuite) TestRoyaltyReports_changeRoyaltyReport() {
-
 	bodyJson := `{"merchant_id": "5bdc39a95d1e1100019fb7df", "status": "accepted", "correction": {"amount": 100500, "reason": "just for fun :)"}, "payout_id": "5bdc39a95d1e1100019fb7df"}`
 
 	res, err := suite.caller.Builder().
