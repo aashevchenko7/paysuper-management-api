@@ -154,7 +154,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 	}
 
 	req.Id = ctx.Param(common.RequestParameterId)
-	req.UrlMask = h.cfg.OrderInlineFormUrlMask + `\/?paylink_id=%s`
+	req.UrlMask = h.cfg.OrderInlineFormUrlMask + `?paylink_id=%s`
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkURL(ctx.Request().Context(), req)
 
@@ -167,7 +167,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	url, err := u.NormalizeURLString(res.Url, u.FlagsUsuallySafeGreedy|u.FlagRemoveDuplicateSlashes)
+	url, err := u.NormalizeURLString(res.Url, u.FlagsUsuallySafeGreedy)
 
 	if err != nil {
 		h.L().Error("NormalizeURLString failed", logger.PairArgs("err", err.Error()))
