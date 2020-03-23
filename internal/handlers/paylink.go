@@ -154,7 +154,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 	}
 
 	req.Id = ctx.Param(common.RequestParameterId)
-	req.UrlMask = h.cfg.OrderInlineFormUrlMask + `/?paylink_id=%s`
+	req.UrlMask = h.cfg.OrderInlineFormUrlMask + `\/?paylink_id=%s`
 
 	res, err := h.dispatch.Services.Billing.GetPaylinkURL(ctx.Request().Context(), req)
 
