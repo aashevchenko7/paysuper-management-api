@@ -3,9 +3,7 @@ package handlers
 import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
-	u "github.com/PuerkitoBio/purell"
 	"github.com/labstack/echo/v4"
-
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
@@ -167,14 +165,7 @@ func (h *PayLinkRoute) getPaylinkUrl(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	url, err := u.NormalizeURLString(res.Url, u.FlagsUsuallySafeGreedy)
-
-	if err != nil {
-		h.L().Error("NormalizeURLString failed", logger.PairArgs("err", err.Error()))
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-
-	return ctx.JSON(http.StatusOK, url)
+	return ctx.JSON(http.StatusOK, res.Url)
 }
 
 // @summary Delete the payment link
