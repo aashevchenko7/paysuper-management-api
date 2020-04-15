@@ -93,8 +93,11 @@ func NewOrderRoute(set common.HandlerSet, cfg *common.Config) *OrderRoute {
 
 func (h *OrderRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(orderPath, h.listOrdersPublic)
+	groups.SystemUser.GET(orderPath, h.listOrdersPublic)
+	groups.AuthUser.GET(orderIdPath, h.getOrderPublic)
+	groups.SystemUser.GET(orderIdPath, h.getOrderPublic)
+
 	groups.AuthUser.POST(orderDownloadPath, h.downloadOrdersPublic)
-	groups.AuthUser.GET(orderIdPath, h.getOrderPublic) // TODO: Need a test
 
 	groups.AuthUser.GET(orderRefundsPath, h.listRefunds)
 	groups.AuthUser.GET(orderRefundsIdsPath, h.getRefund)
@@ -104,7 +107,7 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 
 // @summary Get the full data about the order
 // @desc Get the full data about the order using the order ID
-// @id orderIdPathGetOrderPublic
+// @id adminOrderIdPathGetOrderPublic
 // @tag Order
 // @accept application/json
 // @produce application/json
@@ -113,6 +116,18 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id} [get]
+//
+// @summary Get the full data about the order
+// @desc Get the full data about the order using the order ID
+// @id systemOrderIdPathGetOrderPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.OrderViewPublic Returns the order data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /system/api/v1/order/{order_id} [get]
 func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 	req := &billingpb.GetOrderRequest{}
 
@@ -135,7 +150,7 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 
 // @summary Get the orders list
 // @desc Get the orders list. This list can be filtered by the order's parameters.
-// @id orderPathListOrdersPublic
+// @id adminOrderPathListOrdersPublic
 // @tag Order
 // @accept application/json
 // @produce application/json
@@ -159,6 +174,33 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 // @param type query {string} false The sales type. Available values: simple, product, key.
 // @param hide_test query {boolean} false Has a true value for getting only production orders.
 // @router /admin/api/v1/order [get]
+//
+// @summary Get the orders list
+// @desc Get the orders list. This list can be filtered by the order's parameters.
+// @id systemOrderPathListOrdersPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListOrdersPublicResponseItem Returns the orders list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param id query {string} false The unique identifier for the order.
+// @param project query {[]string} false The list of projects.
+// @param payment_method query {[]string} false The list of payment methods.
+// @param country query {[]string} false The list of the payer's countries.
+// @param status query {[]string} false The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
+// @param account query {string} false The payer account (for instance an account in the merchant's project, the account in the payment system, the payer email, etc.)
+// @param pm_date_from query {integer} false The start date when the payment was created.
+// @param pm_date_to query {integer} false The end date when the payment was closed.
+// @param project_date_from query {integer} false The end date when the payment was created in the project.
+// @param project_date_to query {integer} false The end date when the payment was closed in the project.
+// @param quick_search query {string} false The search string that contains multiple fields - the unique identifier for the order, the user external identifier, the project order identifier, the project's name, the payment method's name.
+// @param limit query {integer} true The number of orders returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @param sort query {[]string} false The list of the order's fields for sorting.
+// @param type query {string} false The sales type. Available values: simple, product, key.
+// @param hide_test query {boolean} false Has a true value for getting only production orders.
+// @router /system/api/v1/order [get]
 func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	req := &billingpb.ListOrdersRequest{}
 	err := ctx.Bind(req)
@@ -372,3 +414,21 @@ func (h *OrderRoute) createRefund(ctx echo.Context) error {
 
 	return ctx.JSON(http.StatusCreated, res.Item)
 }
+
+/*func (h *OrderRoute) getOrderLogs(ctx echo.Context) error {
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
+
+	svc := cloudwatchlogs.New(sess)
+
+	// Get up to the last 100 log events for LOG-STREAM-NAME
+	// in LOG-GROUP-NAME:
+	resp, err := svc.FilterLogEventsWithContext(&cloudwatchlogs.GetLogEventsInput{
+		Limit:         aws.Int64(100),
+		LogGroupName:  aws.String("LOG-GROUP-NAME"),
+		LogStreamName: aws.String("LOG-STREAM-NAME"),
+	})
+
+	return ctx.NoContent(http.StatusAccepted)
+}*/

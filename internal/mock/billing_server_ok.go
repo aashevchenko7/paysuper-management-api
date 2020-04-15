@@ -1033,7 +1033,10 @@ func (s *BillingServerOkMock) GetOrderPublic(
 	in *billingpb.GetOrderRequest,
 	opts ...client.CallOption,
 ) (*billingpb.GetOrderPublicResponse, error) {
-	return &billingpb.GetOrderPublicResponse{}, nil
+	return &billingpb.GetOrderPublicResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item:   &billingpb.OrderViewPublic{},
+	}, nil
 }
 
 func (s *BillingServerOkMock) GetOrderPrivate(
@@ -1376,5 +1379,9 @@ func (s *BillingServerOkMock) SendWebhookToMerchant(ctx context.Context, in *bil
 }
 
 func (s *BillingServerOkMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
 	panic("implement me")
 }

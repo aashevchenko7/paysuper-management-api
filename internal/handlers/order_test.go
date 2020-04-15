@@ -505,3 +505,83 @@ func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ValidationError() {
 	b, err = json.Marshal(changeOrderRequest)
 	assert.NoError(suite.T(), err)
 }
+
+func (suite *OrderTestSuite) TestOrder_GetOrderPublic_Ok() {
+	res, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
+		Path(common.AuthUserGroupPath + orderIdPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+}
+
+func (suite *OrderTestSuite) TestOrder_GetOrderPublic_InvalidOrderId_Error() {
+	_, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Params(":order_id", "1234567890").
+		Path(common.AuthUserGroupPath + orderIdPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.EqualValues(suite.T(), http.StatusBadRequest, httpErr.Code)
+	message, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), message.Message, common.ErrorValidationFailed.Message)
+	assert.Regexp(suite.T(), "OrderId", message.Details)
+}
+
+func (suite *OrderTestSuite) TestOrder_GetOrderPublic_GetOrderPublic_BadResult_Error() {
+	billingMock := &billMock.BillingService{}
+	billingMock.On("GetOrderPublic", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(
+			&billingpb.GetOrderPublicResponse{
+				Status:  billingpb.ResponseStatusNotFound,
+				Message: &billingpb.ResponseErrorMessage{Code: "000", Message: "some error"},
+			},
+			nil,
+		)
+	suite.router.dispatch.Services.Billing = billingMock
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
+		Path(common.AuthUserGroupPath + orderIdPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.EqualValues(suite.T(), http.StatusNotFound, httpErr.Code)
+	message, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), "some error", message.Message)
+	assert.Equal(suite.T(), "000", message.Code)
+}
+
+func (suite *OrderTestSuite) TestOrder_GetOrderPublic_GetOrderPublic_Error() {
+	billingMock := &billMock.BillingService{}
+	billingMock.On("GetOrderPublic", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(nil, errors.New("some error"))
+	suite.router.dispatch.Services.Billing = billingMock
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
+		Path(common.AuthUserGroupPath + orderIdPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.EqualValues(suite.T(), http.StatusInternalServerError, httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorInternal, httpErr.Message)
+}
