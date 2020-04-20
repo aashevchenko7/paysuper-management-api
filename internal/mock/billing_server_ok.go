@@ -1035,7 +1035,7 @@ func (s *BillingServerOkMock) GetOrderPublic(
 ) (*billingpb.GetOrderPublicResponse, error) {
 	return &billingpb.GetOrderPublicResponse{
 		Status: billingpb.ResponseStatusOk,
-		Item:   &billingpb.OrderViewPublic{},
+		Item:   &billingpb.OrderViewPublic{CreatedAt: ptypes.TimestampNow()},
 	}, nil
 }
 

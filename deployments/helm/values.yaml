@@ -50,6 +50,11 @@ backend:
     - AWS_BUCKET_REPORTER
     - ORDER_INLINE_FORM_URL_MASK
     - ALLOW_ORIGIN
+    - AWS_CLOUDWATCH_ACCESS_KEY_ID
+    - AWS_CLOUDWATCH_SECRET_ACCESS_KEY
+    - AWS_CLOUDWATCH_LOG_GROUP_BILLING_SERVER
+    - AWS_CLOUDWATCH_LOG_GROUP_MANAGEMENT_API
+    - AWS_CLOUDWATCH_LOG_GROUP_WEBHOOK_NOTIFIER
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
