@@ -40,6 +40,12 @@ func ProviderHandlers(initial config.Initial, srv common.Services, validator *va
 		return nil, func() {}, err
 	}
 
+	awsCloudWatchLogs, err := common.NewCloudWatch(cfg.LogsSettings)
+
+	if err != nil {
+		return nil, func() {}, err
+	}
+
 	return []common.Handler{
 		NewCardPayWebHook(hSet, &copyCfg),
 		NewCountryApiV1(hSet, &copyCfg),
@@ -47,7 +53,7 @@ func ProviderHandlers(initial config.Initial, srv common.Services, validator *va
 		NewKeyRoute(hSet, &copyCfg),
 		NewKeyProductRoute(hSet, &copyCfg),
 		NewOnboardingRoute(hSet, initial, awsManagerAgreement, &copyCfg),
-		NewOrderRoute(hSet, &copyCfg),
+		NewOrderRoute(hSet, awsCloudWatchLogs, &copyCfg),
 		NewPayLinkRoute(hSet, &copyCfg),
 		NewPaymentCostRoute(hSet, &copyCfg),
 		NewPaymentMethodApiV1(hSet, &copyCfg),

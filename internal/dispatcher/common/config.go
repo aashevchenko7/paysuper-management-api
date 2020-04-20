@@ -7,8 +7,18 @@ type Auth1 struct {
 	RedirectUrl  string `envconfig:"AUTH1_REDIRECTURL" required:"true"`
 }
 
+type LogsSettings struct {
+	AwsCloudWatchAccessKeyId             string `envconfig:"AWS_CLOUDWATCH_ACCESS_KEY_ID" required:"true"`
+	AwsCloudWatchSecretAccessKey         string `envconfig:"AWS_CLOUDWATCH_SECRET_ACCESS_KEY" required:"true"`
+	AwsCloudWatchRegion                  string `envconfig:"AWS_CLOUDWATCH_REGION" default:"eu-west-1"`
+	AwsCloudWatchLogGroupBillingServer   string `envconfig:"AWS_CLOUDWATCH_LOG_GROUP_BILLING_SERVER" required:"true"`
+	AwsCloudWatchLogGroupManagementApi   string `envconfig:"AWS_CLOUDWATCH_LOG_GROUP_MANAGEMENT_API" required:"true"`
+	AwsCloudWatchLogGroupWebhookNotifier string `envconfig:"AWS_CLOUDWATCH_LOG_GROUP_WEBHOOK_NOTIFIER" required:"true"`
+}
+
 type Config struct {
 	Auth1
+	*LogsSettings
 
 	AwsAccessKeyIdAgreement     string `envconfig:"AWS_ACCESS_KEY_ID_AGREEMENT" required:"true"`
 	AwsSecretAccessKeyAgreement string `envconfig:"AWS_SECRET_ACCESS_KEY_AGREEMENT" required:"true"`

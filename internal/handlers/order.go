@@ -1,13 +1,18 @@
 package handlers
 
 import (
+	"encoding/json"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
+	"time"
 )
 
 const (
@@ -17,6 +22,7 @@ const (
 	orderRefundsPath     = "/order/:order_id/refunds"
 	orderRefundsIdsPath  = "/order/:order_id/refunds/:refund_id"
 	orderReplaceCodePath = "/order/:order_id/replace_code"
+	orderGetLogsPath     = "/order/:order_id/logs"
 )
 
 const (
@@ -52,6 +58,43 @@ type ListOrdersRequest struct {
 	PmDateTo int64 `json:"pm_date_to" validate:"omitempty,numeric,gt=0"`
 }
 
+type cloudWatchLogSettings struct {
+	group   string
+	pattern func(order *billingpb.OrderViewPublic) string
+	setter  func(result *GetOrderLogsResponse, value *LogOrder)
+}
+
+type cloudWatch struct {
+	logSettings []*cloudWatchLogSettings
+	instance    common.CloudWatchInterface
+}
+
+type LogRequest struct {
+	Headers interface{} `json:"headers"`
+	Body    interface{} `json:"body"`
+}
+
+type LogResponse struct {
+	HttpStatus interface{} `json:"http_status"`
+	LogRequest
+}
+
+type LogOrder struct {
+	Date     time.Time    `json:"date"`
+	Uri      interface{}  `json:"uri"`
+	Request  *LogRequest  `json:"request"`
+	Response *LogResponse `json:"response"`
+}
+
+type GetOrderLogsResponse struct {
+	// The order's logs list for payment create process
+	Create []*LogOrder `json:"create"`
+	// The order's logs list for payment callback notification process received from payment system
+	Callback []*LogOrder `json:"callback"`
+	// The order's logs list for notification about payment status sent to project
+	Notify []*LogOrder `json:"notify"`
+}
+
 type OrderListRefundsBinder struct {
 	dispatch common.HandlerSet
 	provider.LMT
@@ -80,21 +123,64 @@ type OrderRoute struct {
 	dispatch common.HandlerSet
 	cfg      common.Config
 	provider.LMT
+	*cloudWatch
 }
 
-func NewOrderRoute(set common.HandlerSet, cfg *common.Config) *OrderRoute {
+func NewOrderRoute(
+	set common.HandlerSet,
+	cloudWatchLog common.CloudWatchInterface,
+	cfg *common.Config,
+) *OrderRoute {
 	set.AwareSet.Logger = set.AwareSet.Logger.WithFields(logger.Fields{"router": "OrderRoute"})
+	cloudWatch := &cloudWatch{
+		logSettings: []*cloudWatchLogSettings{
+			{
+				group: cfg.AwsCloudWatchLogGroupBillingServer,
+				pattern: func(order *billingpb.OrderViewPublic) string {
+					return order.Id + " cardpay"
+				},
+				setter: func(result *GetOrderLogsResponse, value *LogOrder) {
+					result.Create = append(result.Create, value)
+				},
+			},
+			{
+				group: cfg.AwsCloudWatchLogGroupManagementApi,
+				pattern: func(order *billingpb.OrderViewPublic) string {
+					return order.Id + " webhook"
+				},
+				setter: func(result *GetOrderLogsResponse, value *LogOrder) {
+					result.Callback = append(result.Callback, value)
+				},
+			},
+			{
+				group: cfg.AwsCloudWatchLogGroupWebhookNotifier,
+				pattern: func(order *billingpb.OrderViewPublic) string {
+					return order.Uuid + " delivery_try"
+				},
+				setter: func(result *GetOrderLogsResponse, value *LogOrder) {
+					result.Notify = append(result.Notify, value)
+				},
+			},
+		},
+		instance: cloudWatchLog,
+	}
+
 	return &OrderRoute{
-		dispatch: set,
-		LMT:      &set.AwareSet,
-		cfg:      *cfg,
+		dispatch:   set,
+		LMT:        &set.AwareSet,
+		cloudWatch: cloudWatch,
+		cfg:        *cfg,
 	}
 }
 
 func (h *OrderRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(orderPath, h.listOrdersPublic)
+	groups.SystemUser.GET(orderPath, h.listOrdersPublic)
+	groups.AuthUser.GET(orderIdPath, h.getOrderPublic)
+	groups.SystemUser.GET(orderIdPath, h.getOrderPublic)
+	groups.SystemUser.GET(orderGetLogsPath, h.getOrderLogs)
+
 	groups.AuthUser.POST(orderDownloadPath, h.downloadOrdersPublic)
-	groups.AuthUser.GET(orderIdPath, h.getOrderPublic) // TODO: Need a test
 
 	groups.AuthUser.GET(orderRefundsPath, h.listRefunds)
 	groups.AuthUser.GET(orderRefundsIdsPath, h.getRefund)
@@ -104,7 +190,7 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 
 // @summary Get the full data about the order
 // @desc Get the full data about the order using the order ID
-// @id orderIdPathGetOrderPublic
+// @id adminOrderIdPathGetOrderPublic
 // @tag Order
 // @accept application/json
 // @produce application/json
@@ -113,29 +199,31 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id} [get]
+//
+// @summary Get the full data about the order
+// @desc Get the full data about the order using the order ID
+// @id systemOrderIdPathGetOrderPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.OrderViewPublic Returns the order data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /system/api/v1/order/{order_id} [get]
 func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
-	req := &billingpb.GetOrderRequest{}
+	order, err := h.getOrder(ctx)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+	if err != nil {
 		return err
 	}
 
-	res, err := h.dispatch.Services.Billing.GetOrderPublic(ctx.Request().Context(), req)
-
-	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetOrderPublic")
-	}
-
-	if res.Status != billingpb.ResponseStatusOk {
-		return echo.NewHTTPError(int(res.Status), res.Message)
-	}
-
-	return ctx.JSON(http.StatusOK, res.Item)
+	return ctx.JSON(http.StatusOK, order)
 }
 
 // @summary Get the orders list
 // @desc Get the orders list. This list can be filtered by the order's parameters.
-// @id orderPathListOrdersPublic
+// @id adminOrderPathListOrdersPublic
 // @tag Order
 // @accept application/json
 // @produce application/json
@@ -159,6 +247,33 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 // @param type query {string} false The sales type. Available values: simple, product, key.
 // @param hide_test query {boolean} false Has a true value for getting only production orders.
 // @router /admin/api/v1/order [get]
+//
+// @summary Get the orders list
+// @desc Get the orders list. This list can be filtered by the order's parameters.
+// @id systemOrderPathListOrdersPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListOrdersPublicResponseItem Returns the orders list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param id query {string} false The unique identifier for the order.
+// @param project query {[]string} false The list of projects.
+// @param payment_method query {[]string} false The list of payment methods.
+// @param country query {[]string} false The list of the payer's countries.
+// @param status query {[]string} false The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
+// @param account query {string} false The payer account (for instance an account in the merchant's project, the account in the payment system, the payer email, etc.)
+// @param pm_date_from query {integer} false The start date when the payment was created.
+// @param pm_date_to query {integer} false The end date when the payment was closed.
+// @param project_date_from query {integer} false The end date when the payment was created in the project.
+// @param project_date_to query {integer} false The end date when the payment was closed in the project.
+// @param quick_search query {string} false The search string that contains multiple fields - the unique identifier for the order, the user external identifier, the project order identifier, the project's name, the payment method's name.
+// @param limit query {integer} true The number of orders returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @param sort query {[]string} false The list of the order's fields for sorting.
+// @param type query {string} false The sales type. Available values: simple, product, key.
+// @param hide_test query {boolean} false Has a true value for getting only production orders.
+// @router /system/api/v1/order [get]
 func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	req := &billingpb.ListOrdersRequest{}
 	err := ctx.Bind(req)
@@ -371,4 +486,106 @@ func (h *OrderRoute) createRefund(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusCreated, res.Item)
+}
+
+// @summary Get the order's logs list
+// @desc Get the order's logs list using the order ID
+// @id orderLogsPathListLogs
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} GetOrderLogsResponse Returns the order's logs list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /system/api/v1/order/{order_id}/logs [get]
+func (h *OrderRoute) getOrderLogs(ctx echo.Context) error {
+	order, err := h.getOrder(ctx)
+
+	if err != nil {
+		return err
+	}
+
+	createdAt, err := ptypes.Timestamp(order.CreatedAt)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
+	}
+
+	result := new(GetOrderLogsResponse)
+
+	for _, val := range h.cloudWatch.logSettings {
+		pattern := val.pattern(order)
+
+		rsp, err := h.cloudWatch.instance.FilterLogEventsWithContext(
+			ctx.Request().Context(),
+			&cloudwatchlogs.FilterLogEventsInput{
+				Limit:         aws.Int64(100),
+				LogGroupName:  aws.String(val.group),
+				StartTime:     aws.Int64(aws.TimeUnixMilli(createdAt)),
+				EndTime:       aws.Int64(aws.TimeUnixMilli(createdAt.AddDate(0, 0, 7))),
+				FilterPattern: aws.String(pattern),
+			},
+		)
+
+		if err != nil {
+			h.dispatch.AwareSet.L().Error(
+				"get logs form amazon cloudwatch failed",
+				logger.PairArgs(
+					"group", val.group,
+					"pattern", pattern,
+				),
+				logger.WithPrettyFields(logger.Fields{"err": err}),
+			)
+			continue
+		}
+
+		for _, event := range rsp.Events {
+			log := make(map[string]interface{})
+			err = json.Unmarshal([]byte(*event.Message), &log)
+
+			if err != nil {
+				continue
+			}
+
+			logOrder := &LogOrder{
+				Date: aws.MillisecondsTimeValue(event.Timestamp),
+				Uri:  log["msg"],
+				Request: &LogRequest{
+					Headers: log["request_headers"],
+					Body:    log["request_body"],
+				},
+				Response: &LogResponse{
+					HttpStatus: log["response_status"],
+					LogRequest: LogRequest{
+						Headers: log["response_headers"],
+						Body:    log["response_body"],
+					},
+				},
+			}
+			val.setter(result, logOrder)
+		}
+	}
+
+	return ctx.JSON(http.StatusOK, result)
+}
+
+func (h *OrderRoute) getOrder(ctx echo.Context) (*billingpb.OrderViewPublic, error) {
+	req := &billingpb.GetOrderRequest{}
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return nil, err
+	}
+
+	rsp, err := h.dispatch.Services.Billing.GetOrderPublic(ctx.Request().Context(), req)
+
+	if err != nil {
+		return nil, h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetOrderPublic")
+	}
+
+	if rsp.Status != billingpb.ResponseStatusOk {
+		return nil, echo.NewHTTPError(int(rsp.Status), rsp.Message)
+	}
+
+	return rsp.Item, nil
 }

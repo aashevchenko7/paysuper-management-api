@@ -207,7 +207,6 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 	}
 
 	params, err := ctx.FormParams()
-	addParams := make(map[string]string)
 	rawParams := make(map[string]string)
 
 	if err != nil {
@@ -217,14 +216,9 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 	o := i.(*billingpb.OrderCreateRequest)
 
 	for key, value := range params {
-		if _, ok := OrderReservedWords[key]; !ok {
-			addParams[key] = value[0]
-		}
-
 		rawParams[key] = value[0]
 	}
 
-	o.Other = addParams
 	o.RawParams = rawParams
 
 	return
