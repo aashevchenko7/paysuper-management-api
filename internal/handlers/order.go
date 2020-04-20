@@ -27,10 +27,6 @@ const (
 
 const (
 	errorTemplateName = "error.html"
-
-	orderLogsPaymentCreate   = "create"
-	orderLogsPaymentCallback = "callback"
-	orderLogsPaymentNotify   = "notify"
 )
 
 type CreateOrderJsonProjectResponse struct {
