@@ -23,6 +23,7 @@ const (
 	RequestParameterSku                      = "sku"
 	RequestParameterIsSigned                 = "is_signed"
 	RequestParameterMerchantId               = "merchant_id"
+	RequestParameterMerchant                 = "merchant[]"
 	RequestParameterProject                  = "project[]"
 	RequestParameterPaymentMethod            = "payment_method[]"
 	RequestParameterCountry                  = "country"
