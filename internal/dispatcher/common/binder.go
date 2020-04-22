@@ -69,10 +69,18 @@ func (b *SystemBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 			if tf.Type.Kind() != reflect.Slice {
 				return ErrorInternal
 			}
+
 			if rv.Type().Elem().Kind() == reflect.String {
 				mId := ctx.Param(RequestParameterMerchantId)
+
 				if mId != "" {
 					rv.Set(reflect.ValueOf([]string{mId}))
+				} else {
+					params := ctx.QueryParams()
+
+					if val, ok := params[RequestParameterMerchant]; ok {
+						rv.Set(reflect.ValueOf(val))
+					}
 				}
 			}
 		}
@@ -207,7 +215,6 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 	}
 
 	params, err := ctx.FormParams()
-	addParams := make(map[string]string)
 	rawParams := make(map[string]string)
 
 	if err != nil {
@@ -217,14 +224,9 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 	o := i.(*billingpb.OrderCreateRequest)
 
 	for key, value := range params {
-		if _, ok := OrderReservedWords[key]; !ok {
-			addParams[key] = value[0]
-		}
-
 		rawParams[key] = value[0]
 	}
 
-	o.Other = addParams
 	o.RawParams = rawParams
 
 	return

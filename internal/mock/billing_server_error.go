@@ -1137,3 +1137,7 @@ func (s *BillingServerErrorMock) SendWebhookToMerchant(ctx context.Context, in *
 func (s *BillingServerErrorMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerErrorMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
+	panic("implement me")
+}

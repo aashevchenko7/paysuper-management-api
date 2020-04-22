@@ -1074,3 +1074,7 @@ func (s *BillingServerOkTemporaryMock) GetCountriesListForOrder(ctx context.Cont
 func (s *BillingServerOkTemporaryMock) GetPaylinkTransactions(ctx context.Context, in *billingpb.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*billingpb.TransactionsResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerOkTemporaryMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
+	panic("implement me")
+}

@@ -22,6 +22,11 @@ env:
   - AWS_REGION_AGREEMENT=eu-west-1
   - AWS_BUCKET_AGREEMENT=bucket
   - ORDER_INLINE_FORM_URL_MASK=https://paysupermgmt.tst.protocol.one/order
+  - AWS_CLOUDWATCH_ACCESS_KEY_ID=aws_cloudwatch_access_key_id
+  - AWS_CLOUDWATCH_SECRET_ACCESS_KEY=aws_cloudwatch_secret_access_key
+  - AWS_CLOUDWATCH_LOG_GROUP_BILLING_SERVER=aws_cloudwatch_log_group_billing_server
+  - AWS_CLOUDWATCH_LOG_GROUP_MANAGEMENT_API=aws_cloudwatch_log_group_management_api
+  - AWS_CLOUDWATCH_LOG_GROUP_WEBHOOK_NOTIFIER=aws_cloudwatch_log_group_webhook_notifier
 jobs:
   include:
   - stage: test
