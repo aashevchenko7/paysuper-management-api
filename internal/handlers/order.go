@@ -184,7 +184,9 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 
 	groups.AuthUser.GET(orderRefundsPath, h.listRefunds)
 	groups.AuthUser.GET(orderRefundsIdsPath, h.getRefund)
+	groups.SystemUser.GET(orderRefundsIdsPath, h.getRefund)
 	groups.AuthUser.POST(orderRefundsPath, h.createRefund)
+	groups.SystemUser.POST(orderRefundsPath, h.createRefund)
 	groups.SystemUser.PUT(orderReplaceCodePath, h.replaceCode)
 }
 
@@ -356,6 +358,19 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 // @param order_id path {string} true The unique identifier for the order.
 // @param refund_id path {string} true The unique identifier for the refund.
 // @router /admin/api/v1/order/{order_id}/refunds/{refund_id} [get]
+//
+// @summary Get the refund data
+// @desc Get the refund data using the order and refund IDs
+// @id orderRefundsIdsPathGetRefundSystem
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.Refund Returns the refund data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @param refund_id path {string} true The unique identifier for the refund.
+// @router /system/api/v1/order/{order_id}/refunds/{refund_id} [get]
 func (h *OrderRoute) getRefund(ctx echo.Context) error {
 	req := &billingpb.GetRefundRequest{}
 
@@ -458,6 +473,19 @@ func (h *OrderRoute) replaceCode(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id}/refunds [post]
+//
+// @summary Create a refund
+// @desc Create a refund using the order ID
+// @id orderRefundsPathCreateRefundSystem
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @body billingpb.CreateRefundRequest
+// @success 200 {object} billingpb.Refund Returns the refund data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param order_id path {string} true The unique identifier for the order.
+// @router /system/api/v1/order/{order_id}/refunds [post]
 func (h *OrderRoute) createRefund(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	req := &billingpb.CreateRefundRequest{}
