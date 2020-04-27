@@ -87,11 +87,11 @@ type LogOrder struct {
 }
 
 type GetOrderLogsResponse struct {
-	// The order's logs list for payment create process
+	// The order's logs list of the payment creation process.
 	Create []*LogOrder `json:"create"`
-	// The order's logs list for payment callback notification process received from payment system
+	// The order's logs list of the payment callback notification process received from the payment system.
 	Callback []*LogOrder `json:"callback"`
-	// The order's logs list for notification about payment status sent to project
+	// The order's logs list of the notification about the payment status sent to the project.
 	Notify []*LogOrder `json:"notify"`
 }
 
