@@ -5,6 +5,7 @@ enableCertIssuer: true
 
 ingress:
   hostname: p1payapi.tst.protocol.one
+  stgHostname: api.stg.pay.super.com
   path: /
   hostnamePrefix:
 
