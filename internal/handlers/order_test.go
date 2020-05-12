@@ -316,7 +316,6 @@ func (suite *OrderTestSuite) TestOrder_CreateRefund_BillingServer_CreateError() 
 }
 
 func (suite *OrderTestSuite) TestOrder_GetOrders_Ok() {
-
 	bs := &billMock.BillingService{}
 	bs.On("FindAllOrdersPublic", mock2.Anything, mock2.Anything, mock2.Anything).
 		Return(
@@ -342,8 +341,40 @@ func (suite *OrderTestSuite) TestOrder_GetOrders_Ok() {
 	assert.NotEmpty(suite.T(), res.Body.String())
 }
 
-func (suite *OrderTestSuite) TestOrder_GetOrders_BillingServerError() {
+func (suite *OrderTestSuite) TestOrder_ListOrdersPublic_DateValidationError() {
+	bs := &billMock.BillingService{}
+	bs.On("FindAllOrdersPublic", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(
+			&billingpb.ListOrdersPublicResponse{
+				Status: billingpb.ResponseStatusOk,
+				Item: &billingpb.ListOrdersPublicResponseItem{
+					Count: 1,
+					Items: []*billingpb.OrderViewPublic{},
+				},
+			},
+			nil,
+		)
+	suite.router.dispatch.Services.Billing = bs
 
+	_, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Path(common.AuthUserGroupPath+orderPath).
+		SetQueryParam("project_date_from", "a1b2c3").
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
+
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), common.ErrorMessageListOrdersRequestPmDateFrom.Code, msg.Code)
+	assert.Equal(suite.T(), common.ErrorMessageListOrdersRequestPmDateFrom.Message, msg.Message)
+}
+
+func (suite *OrderTestSuite) TestOrder_GetOrders_BillingServerError() {
 	bs := &billMock.BillingService{}
 	bs.On("FindAllOrdersPublic", mock2.Anything, mock2.Anything, mock2.Anything).
 		Return(nil, errors.New("some error"))
@@ -385,7 +416,6 @@ func (suite *OrderTestSuite) TestOrder_GetOrders_BindError_Country() {
 }
 
 func (suite *OrderTestSuite) testGetOrdersBindError(q url.Values, error string) {
-
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		SetQueryParams(q).

@@ -50,6 +50,10 @@ const (
 	ErrorNamespaceGetDashboardBaseReportRequestMerchantId = "GetDashboardBaseReportRequest.MerchantId"
 	ErrorNamespaceProjectRequestRedirectSettingsMode      = "Project.RedirectSettings.Mode"
 	ErrorNamespaceProjectRequestRedirectSettingsUsage     = "Project.RedirectSettings.Usage"
+	ErrorNamespaceListOrdersRequestPmDateFrom             = "ListOrdersRequest.PmDateFrom"
+	ErrorNamespaceListOrdersRequestPmDateTo               = "ListOrdersRequest.PmDateTo"
+	ErrorNamespaceListOrdersRequestProjectDateFrom        = "ListOrdersRequest.ProjectDateFrom"
+	ErrorNamespaceListOrdersRequestProjectDateTo          = "ListOrdersRequest.ProjectDateTo"
 )
 
 var (
@@ -164,6 +168,10 @@ var (
 	ErrorMessageUnableToDeleteUser                           = NewManagementApiResponseError("ma000109", "unable to delete user")
 	ErrorMessageNamespaceProjectRequestRedirectSettingsMode  = NewManagementApiResponseError("ma000110", "redirect mode is incorrect")
 	ErrorMessageNamespaceProjectRequestRedirectSettingsUsage = NewManagementApiResponseError("pr000111", "type of redirect usage is incorrect")
+	ErrorMessageListOrdersRequestPmDateFrom                  = NewManagementApiResponseError("ma000111", "date filter is incorrect")
+	ErrorMessageListOrdersRequestPmDateTo                    = NewManagementApiResponseError("ma000111", "date filter is incorrect")
+	ErrorMessageListOrdersRequestProjectDateFrom             = NewManagementApiResponseError("ma000111", "date filter is incorrect")
+	ErrorMessageListOrdersRequestProjectDateTo               = NewManagementApiResponseError("ma000111", "date filter is incorrect")
 
 	ValidationErrors = map[string]*billingpb.ResponseErrorMessage{
 		UserProfileFieldNumberOfEmployees: ErrorMessageIncorrectNumberOfEmployees,
@@ -208,5 +216,9 @@ var (
 		ErrorNamespaceGetDashboardBaseReportRequestMerchantId: ErrorIncorrectMerchantId,
 		ErrorNamespaceProjectRequestRedirectSettingsMode:      ErrorMessageNamespaceProjectRequestRedirectSettingsMode,
 		ErrorNamespaceProjectRequestRedirectSettingsUsage:     ErrorMessageNamespaceProjectRequestRedirectSettingsUsage,
+		ErrorNamespaceListOrdersRequestPmDateFrom:             ErrorMessageListOrdersRequestPmDateFrom,
+		ErrorNamespaceListOrdersRequestPmDateTo:               ErrorMessageListOrdersRequestPmDateTo,
+		ErrorNamespaceListOrdersRequestProjectDateFrom:        ErrorMessageListOrdersRequestProjectDateFrom,
+		ErrorNamespaceListOrdersRequestProjectDateTo:          ErrorMessageListOrdersRequestProjectDateTo,
 	}
 )
