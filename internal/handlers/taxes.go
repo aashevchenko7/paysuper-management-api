@@ -5,7 +5,7 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	"github.com/paysuper/paysuper-proto/go/billingpb"
+	_ "github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/taxpb"
 	"net/http"
 	"strconv"

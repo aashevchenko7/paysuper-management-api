@@ -11,6 +11,7 @@ import (
 	"github.com/ttacon/libphonenumber"
 	"gopkg.in/go-playground/validator.v9"
 	"regexp"
+	"time"
 )
 
 type ValidatorSet struct {
@@ -206,6 +207,24 @@ func (v *ValidatorSet) IBANValidator(fl validator.FieldLevel) bool {
 // User locale validator
 func (v *ValidatorSet) UserLocaleValidator(fl validator.FieldLevel) bool {
 	return localeRegexp.MatchString(fl.Field().String())
+}
+
+// Date validator
+func (v *ValidatorSet) DateValidator(fl validator.FieldLevel) bool {
+	_, err := time.Parse("2006-01-02", fl.Field().String())
+	return err == nil
+}
+
+// DateTime validator
+func (v *ValidatorSet) DateTimeValidator(fl validator.FieldLevel) bool {
+	_, err := time.Parse("2006-01-02T15:04:05", fl.Field().String())
+	return err == nil
+}
+
+// DateTimeRFC3339 validator
+func (v *ValidatorSet) DateTimeRFC3339Validator(fl validator.FieldLevel) bool {
+	_, err := time.Parse(time.RFC3339, fl.Field().String())
+	return err == nil
 }
 
 // New

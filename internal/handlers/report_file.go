@@ -7,7 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	"github.com/paysuper/paysuper-proto/go/billingpb"
+	_ "github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"os"

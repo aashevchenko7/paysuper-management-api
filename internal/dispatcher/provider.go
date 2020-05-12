@@ -105,6 +105,15 @@ func ProviderValidators(v *validators.ValidatorSet) (validate *validator.Validat
 	if err = validate.RegisterValidation("locale", v.UserLocaleValidator); err != nil {
 		return
 	}
+	if err = validate.RegisterValidation("date", v.DateValidator); err != nil {
+		return
+	}
+	if err = validate.RegisterValidation("datetime", v.DateTimeValidator); err != nil {
+		return
+	}
+	if err = validate.RegisterValidation("datetime_rfc3339", v.DateTimeRFC3339Validator); err != nil {
+		return
+	}
 	return validate, func() {}, nil
 }
 
