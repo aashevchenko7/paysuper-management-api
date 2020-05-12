@@ -211,13 +211,13 @@ func (v *ValidatorSet) UserLocaleValidator(fl validator.FieldLevel) bool {
 
 // Date validator
 func (v *ValidatorSet) DateValidator(fl validator.FieldLevel) bool {
-	_, err := time.Parse("2006-01-02", fl.Field().String())
+	_, err := time.Parse(billingpb.FilterDateFormat, fl.Field().String())
 	return err == nil
 }
 
 // DateTime validator
 func (v *ValidatorSet) DateTimeValidator(fl validator.FieldLevel) bool {
-	_, err := time.Parse("2006-01-02T15:04:05", fl.Field().String())
+	_, err := time.Parse(billingpb.FilterDatetimeFormat, fl.Field().String())
 	return err == nil
 }
 
