@@ -1078,3 +1078,11 @@ func (s *BillingServerOkTemporaryMock) GetPaylinkTransactions(ctx context.Contex
 func (s *BillingServerOkTemporaryMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerOkTemporaryMock) RoyaltyReportFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) PayoutFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}

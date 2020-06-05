@@ -1024,3 +1024,11 @@ func (s *BillingServerSystemErrorMock) NotifyWebhookTestResults(ctx context.Cont
 func (s *BillingServerSystemErrorMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerSystemErrorMock) RoyaltyReportFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) PayoutFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}

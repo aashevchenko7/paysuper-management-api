@@ -223,7 +223,7 @@ var (
 		"HR": regexp.MustCompile("^\\d{5}$"),
 		"CU": regexp.MustCompile("^\\d{5}$"),
 		"CY": regexp.MustCompile("^\\d{4}$"),
-		"CZ": regexp.MustCompile("^\\d{5}\\s\\(\\d{3}\\s\\d{2}\\)$"),
+		"CZ": regexp.MustCompile("^\\d{5}$|(\\d{3}\\ \\d{2})$"),
 		"DK": regexp.MustCompile("^\\d{4}$"),
 		"DO": regexp.MustCompile("^\\d{5}$"),
 		"EC": regexp.MustCompile("^\\d{6}$"),
