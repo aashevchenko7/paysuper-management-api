@@ -9,6 +9,7 @@ import (
 	_ "github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const (
@@ -65,7 +66,7 @@ func (h *ReportFileRoute) Route(groups *common.Groups) {
 // @param file_type path {string} true The supported file format (PDF, CSV, XLSX).
 // @router /admin/api/v1/report_file/download/{file_id}.{file_type} [get]
 func (h *ReportFileRoute) download(ctx echo.Context) error {
-	fileName := ctx.Param("file")
+	fileName := strings.TrimSpace(ctx.Param("file"))
 
 	if fileName == "" {
 		h.L().Error("unable to find the file")
