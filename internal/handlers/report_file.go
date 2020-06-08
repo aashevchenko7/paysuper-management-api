@@ -1,17 +1,14 @@
 package handlers
 
 import (
-	"fmt"
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	_ "github.com/paysuper/paysuper-proto/go/billingpb"
-	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
 	"os"
-	"strings"
 )
 
 const (
@@ -68,21 +65,13 @@ func (h *ReportFileRoute) Route(groups *common.Groups) {
 // @param file_type path {string} true The supported file format (PDF, CSV, XLSX).
 // @router /admin/api/v1/report_file/download/{file_id}.{file_type} [get]
 func (h *ReportFileRoute) download(ctx echo.Context) error {
-	file := ctx.Param("file")
+	fileName := ctx.Param("file")
 
-	if file == "" {
+	if fileName == "" {
 		h.L().Error("unable to find the file")
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	params := strings.Split(file, ".")
-
-	if len(params) != 2 {
-		h.L().Error("incorrect of file string")
-		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
-	}
-
-	fileName := fmt.Sprintf(reporterpb.FileMask, common.ExtractUserContext(ctx).Id, params[0], params[1])
 	filePath := os.TempDir() + string(os.PathSeparator) + fileName
 	_, err := h.awsManager.Download(ctx.Request().Context(), filePath, &awsWrapper.DownloadInput{FileName: fileName})
 
@@ -92,5 +81,5 @@ func (h *ReportFileRoute) download(ctx echo.Context) error {
 	}
 
 	defer os.Remove(filePath)
-	return ctx.File(filePath)
+	return ctx.Inline(filePath, fileName)
 }
