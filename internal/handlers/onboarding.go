@@ -373,9 +373,6 @@ func (h *OnboardingRoute) listNotifications(ctx echo.Context) error {
 	}).Bind(req, ctx)
 
 	if err != nil {
-		h.L().Info("ListNotifications",
-			logger.WithPrettyFields(logger.Fields{"err": err}),
-		)
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
