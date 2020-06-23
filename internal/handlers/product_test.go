@@ -23,9 +23,9 @@ func Test_Product(t *testing.T) {
 
 func (suite *ProductTestSuite) SetupTest() {
 	user := &common.AuthUser{
-		Id: "ffffffffffffffffffffffff",
+		Id:         "ffffffffffffffffffffffff",
 		MerchantId: "ffffffffffffffffffffffff",
-		Role: "owner",
+		Role:       "owner",
 	}
 
 	var e error

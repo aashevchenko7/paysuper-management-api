@@ -10,8 +10,6 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/gurukami/typ/v2"
 	"github.com/labstack/echo/v4"
-
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"reflect"
@@ -71,10 +69,18 @@ func (b *SystemBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 			if tf.Type.Kind() != reflect.Slice {
 				return ErrorInternal
 			}
+
 			if rv.Type().Elem().Kind() == reflect.String {
 				mId := ctx.Param(RequestParameterMerchantId)
+
 				if mId != "" {
 					rv.Set(reflect.ValueOf([]string{mId}))
+				} else {
+					params := ctx.QueryParams()
+
+					if val, ok := params[RequestParameterMerchant]; ok {
+						rv.Set(reflect.ValueOf(val))
+					}
 				}
 			}
 		}
@@ -209,7 +215,6 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 	}
 
 	params, err := ctx.FormParams()
-	addParams := make(map[string]string)
 	rawParams := make(map[string]string)
 
 	if err != nil {
@@ -219,14 +224,9 @@ func (cb *OrderFormBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 	o := i.(*billingpb.OrderCreateRequest)
 
 	for key, value := range params {
-		if _, ok := OrderReservedWords[key]; !ok {
-			addParams[key] = value[0]
-		}
-
 		rawParams[key] = value[0]
 	}
 
-	o.Other = addParams
 	o.RawParams = rawParams
 
 	return
@@ -533,6 +533,7 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 	structure.VirtualCurrency = pRsp.Item.VirtualCurrency
 	structure.VatPayer = pRsp.Item.VatPayer
 	structure.RedirectSettings = pRsp.Item.RedirectSettings
+	structure.WebhookMode = pRsp.Item.WebhookMode
 
 	if v, ok := req[RequestParameterName]; ok {
 		tv, ok := v.(map[string]interface{})
@@ -766,6 +767,10 @@ func (b *ChangeProjectRequestBinder) Bind(i interface{}, ctx echo.Context) error
 
 	if _, ok := req[RequestParameterRedirectSettings]; ok {
 		structure.RedirectSettings = projectReq.RedirectSettings
+	}
+
+	if _, ok := req[RequestParameterWebhookMode]; ok {
+		structure.WebhookMode = projectReq.WebhookMode
 	}
 
 	return nil

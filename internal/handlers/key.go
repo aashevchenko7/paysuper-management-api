@@ -5,8 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -33,6 +33,17 @@ func (h *KeyRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(keysIdPath, h.getKeyInfo)
 }
 
+// @summary Get the key data
+// @desc Get the key data
+// @id keysIdPathGetKeyInfo
+// @tag Key, Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.Key Returns the key data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param key_id path {string} true The unique identifier for the key.
+// @router /admin/api/v1/keys/{key_id} [get]
 func (h *KeyRoute) getKeyInfo(ctx echo.Context) error {
 	req := &billingpb.KeyForOrderRequest{
 		KeyId: ctx.Param("key_id"),

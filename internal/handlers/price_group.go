@@ -4,8 +4,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -42,10 +42,10 @@ func (h *PriceGroup) Route(groups *common.Groups) {
 // @tag Price group
 // @accept application/json
 // @produce application/json
-// @success 200 {object} billing.PriceGroup Returns the country's region and currency
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-// @param country query {string} true The country's name.
+// @success 200 {object} billingpb.PriceGroup Returns the country's region and currency
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param country query {string} true The country code.
 // @router /api/v1/price_group/country [get]
 func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
 	req := &billingpb.PriceGroupByCountryRequest{}
@@ -75,14 +75,14 @@ func (h *PriceGroup) getPriceGroupByCountry(ctx echo.Context) error {
 // @tag Price group
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.PriceGroupCurrenciesResponse Returns a full list of currencies with information about regions and countries
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 404 {object} grpc.ResponseErrorMessage Not found
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
-// @param country query {string} true The country's name.
+// @success 200 {object} billingpb.PriceGroupCurrenciesResponse Returns a full list of currencies with information about regions and countries
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage The country not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param country query {string} true The country code.
 // @param zip query {string} true The postal code. Required for US.
-// @param limit query {string} false The number of objects returned in one page. Default value is 100.
-// @param offset query {string} false The ranking number of the first item on the page.
+// @param limit query {integer} false The number of objects returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
 // @router /api/v1/price_group/currencies [get]
 func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
 	req := &billingpb.EmptyRequest{}
@@ -112,9 +112,9 @@ func (h *PriceGroup) getCurrencyList(ctx echo.Context) error {
 // @tag Price group
 // @accept application/json
 // @produce application/json
-// @success 200 {object} grpc.PriceGroupCurrenciesResponse Returns the currency and the list of countries
-// @failure 400 {object} grpc.ResponseErrorMessage Invalid request data
-// @failure 500 {object} grpc.ResponseErrorMessage Internal Server Error
+// @success 200 {object} billingpb.PriceGroupCurrenciesResponse Returns the currency and the list of countries
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param region query {string} true The country region's name.
 // @router /api/v1/price_group/region [get]
 func (h *PriceGroup) getCurrencyByRegion(ctx echo.Context) error {

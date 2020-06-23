@@ -5,9 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -39,6 +38,16 @@ func (h *OperatingCompanyRoute) Route(groups *common.Groups) {
 
 }
 
+// @summary Get the operating companies list
+// @desc Get the operating companies list
+// @id operatingCompanyPathGetOperatingCompanyList
+// @tag Operating company
+// @accept application/json
+// @produce application/json
+// @success 200 {object} []billingpb.OperatingCompany Returns the operating companies list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /system/api/v1/operating_company [get]
 func (h *OperatingCompanyRoute) getOperatingCompanyList(ctx echo.Context) error {
 	req := &billingpb.EmptyRequest{}
 
@@ -53,6 +62,17 @@ func (h *OperatingCompanyRoute) getOperatingCompanyList(ctx echo.Context) error 
 	return ctx.JSON(http.StatusOK, res.Items)
 }
 
+// @summary Get the operating company
+// @desc Get the operating company data using the operating company ID
+// @id operatingCompanyIdPathGetOperatingCompany
+// @tag Operating company
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.OperatingCompany Returns the operating company data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the operating company.
+// @router /system/api/v1/operating_company/{id} [get]
 func (h *OperatingCompanyRoute) getOperatingCompany(ctx echo.Context) error {
 	req := &billingpb.GetOperatingCompanyRequest{
 		Id: ctx.Param(common.RequestParameterId),
@@ -69,10 +89,33 @@ func (h *OperatingCompanyRoute) getOperatingCompany(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Company)
 }
 
+// @summary Create a new operating company
+// @desc Create a new operating company
+// @id operatingCompanyPathAddOperatingCompany
+// @tag Operating company
+// @accept application/json
+// @produce application/json
+// @body billingpb.OperatingCompany
+// @success 204 {string} Returns an empty response body if the operating company has been successfully added
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /system/api/v1/operating_company [post]
 func (h *OperatingCompanyRoute) addOperatingCompany(ctx echo.Context) error {
 	return h.addOrUpdateOperatingCompany(ctx, "")
 }
 
+// @summary Update the operating company
+// @desc Update the operating company
+// @id operatingCompanyIdPathUpdateOperatingCompany
+// @tag Operating company
+// @accept application/json
+// @produce application/json
+// @body billingpb.OperatingCompany
+// @success 204 {string} Returns an empty response body if the operating company has been successfully updated
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param id path {string} true The unique identifier for the operating company.
+// @router /system/api/v1/operating_company/{id} [post]
 func (h *OperatingCompanyRoute) updateOperatingCompany(ctx echo.Context) error {
 	return h.addOrUpdateOperatingCompany(ctx, ctx.Param(common.RequestParameterId))
 }

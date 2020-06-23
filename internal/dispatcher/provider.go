@@ -48,13 +48,13 @@ func ProviderJwtVerifier(cfg *common.Config) *jwtverifier.JwtVerifier {
 }
 
 // ProviderServices
-func ProviderServices(srv *micro.Micro) common.Services {
+func ProviderServices(srv *micro.Micro, cfg *micro.Config) common.Services {
 	return common.Services{
-		Repository: recurringpb.NewRepositoryService(recurringpb.PayOneRepositoryServiceName, srv.Client()),
-		Geo:        proto.NewGeoIpService(geoip.ServiceName, srv.Client()),
-		Billing:    billingpb.NewBillingService(billingpb.ServiceName, srv.Client()),
-		Tax:        taxpb.NewTaxService(taxpb.ServiceName, srv.Client()),
-		Reporter:   reporterpb.NewReporterService(reporterpb.ServiceName, srv.Client()),
+		Repository: recurringpb.NewRepositoryService(recurringpb.PayOneRepositoryServiceName, srv.Client("", "")),
+		Geo:        proto.NewGeoIpService(geoip.ServiceName, srv.Client("", "")),
+		Billing:    billingpb.NewBillingService(billingpb.ServiceName, srv.Client(cfg.BillingVersion, cfg.BillingFallbackVersion)),
+		Tax:        taxpb.NewTaxService(taxpb.ServiceName, srv.Client("", "")),
+		Reporter:   reporterpb.NewReporterService(reporterpb.ServiceName, srv.Client("", "")),
 	}
 }
 
@@ -103,6 +103,15 @@ func ProviderValidators(v *validators.ValidatorSet) (validate *validator.Validat
 		return
 	}
 	if err = validate.RegisterValidation("locale", v.UserLocaleValidator); err != nil {
+		return
+	}
+	if err = validate.RegisterValidation("date", v.DateValidator); err != nil {
+		return
+	}
+	if err = validate.RegisterValidation("datetime", v.DateTimeValidator); err != nil {
+		return
+	}
+	if err = validate.RegisterValidation("datetime_rfc3339", v.DateTimeRFC3339Validator); err != nil {
 		return
 	}
 	return validate, func() {}, nil

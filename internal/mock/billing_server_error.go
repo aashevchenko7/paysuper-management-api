@@ -1129,3 +1129,23 @@ func (s *BillingServerErrorMock) GetCountriesListForOrder(ctx context.Context, i
 func (s *BillingServerErrorMock) GetPaylinkTransactions(ctx context.Context, in *billingpb.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*billingpb.TransactionsResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerErrorMock) SendWebhookToMerchant(ctx context.Context, in *billingpb.OrderCreateRequest, opts ...client.CallOption) (*billingpb.SendWebhookToMerchantResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) RoyaltyReportFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) PayoutFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}

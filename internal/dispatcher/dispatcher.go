@@ -10,10 +10,9 @@ import (
 	"github.com/alexeyco/simpletable"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/paysuper/paysuper-proto/go/billingpb"
-
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/pkg/micro"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"html/template"
 	"io/ioutil"
 	"net/http"

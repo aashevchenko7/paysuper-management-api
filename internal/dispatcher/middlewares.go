@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	casbinMiddleware "github.com/paysuper/echo-casbin-middleware"
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -116,7 +116,7 @@ func (d *Dispatcher) CasbinMiddleware(fn func(c echo.Context) string) echo.Middl
 		Logger:           d.L(),
 		CtxUserExtractor: fn,
 	}
-	return casbinMiddleware.MiddlewareWithConfig(d.ms.Client(), cfg)
+	return casbinMiddleware.MiddlewareWithConfig(d.ms.Client("", ""), cfg)
 }
 
 // BodyDumpMiddleware

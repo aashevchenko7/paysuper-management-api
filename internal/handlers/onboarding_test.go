@@ -13,10 +13,10 @@ import (
 	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -2140,4 +2140,71 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetOperatingCompany_Ok() {
 	assert.NoError(suite.T(), err)
 	assert.Equal(suite.T(), http.StatusOK, res.Code)
 	assert.NotEmpty(suite.T(), res.Body.String())
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_CzechRepublicZip_Ok() {
+	company := &billingpb.MerchantCompanyInfo{
+		Name:               mock.OnboardingMerchantMock.Company.Name,
+		AlternativeName:    mock.OnboardingMerchantMock.Company.Name,
+		Website:            "http://localhost",
+		Country:            "CZ",
+		State:              "Prague",
+		Zip:                "12000",
+		City:               "Prague",
+		Address:            "Prague",
+		RegistrationNumber: "1234567890",
+	}
+	b, err := json.Marshal(company)
+	assert.NoError(suite.T(), err)
+
+	res, err := suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
+		Path(common.AuthUserGroupPath + merchantsCompanyPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+
+	merchant := new(billingpb.Merchant)
+	err = json.Unmarshal(res.Body.Bytes(), merchant)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), merchant.Company, company)
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_CzechRepublicZip_Error() {
+	company := &billingpb.MerchantCompanyInfo{
+		Name:               mock.OnboardingMerchantMock.Company.Name,
+		AlternativeName:    mock.OnboardingMerchantMock.Company.Name,
+		Website:            "http://localhost",
+		Country:            "CZ",
+		State:              "Prague",
+		Zip:                "190000",
+		City:               "Prague",
+		Address:            "Prague",
+		RegistrationNumber: "1234567890",
+	}
+	b, err := json.Marshal(company)
+	assert.NoError(suite.T(), err)
+
+	_, err = suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
+		Path(common.AuthUserGroupPath + merchantsCompanyPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
+
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
+	assert.True(suite.T(), ok)
+	assert.Regexp(suite.T(), "Zip", msg.Details)
 }
