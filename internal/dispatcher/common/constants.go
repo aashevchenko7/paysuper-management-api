@@ -23,6 +23,7 @@ const (
 	RequestParameterSku                      = "sku"
 	RequestParameterIsSigned                 = "is_signed"
 	RequestParameterMerchantId               = "merchant_id"
+	RequestParameterMerchant                 = "merchant[]"
 	RequestParameterProject                  = "project[]"
 	RequestParameterPaymentMethod            = "payment_method[]"
 	RequestParameterCountry                  = "country"
@@ -84,6 +85,7 @@ const (
 	RequestRoleId                            = "role_id"
 	RequestPayoutDocumentId                  = "payout_document_id"
 	RequestParameterRedirectSettings         = "redirect_settings"
+	RequestParameterWebhookMode              = "webhook_mode"
 
 	ImageCollectionImagesField  = "images"
 	ImageCollectionUseOneForAll = "use_one_for_all"
@@ -153,6 +155,8 @@ const (
 	ErrorFieldRequest = "request"
 
 	InternalErrorTemplate = "internal error"
+	ServiceErrorTemplate  = "service error"
+	BindingErrorTemplate  = "bind error"
 )
 
 var (
@@ -219,7 +223,7 @@ var (
 		"HR": regexp.MustCompile("^\\d{5}$"),
 		"CU": regexp.MustCompile("^\\d{5}$"),
 		"CY": regexp.MustCompile("^\\d{4}$"),
-		"CZ": regexp.MustCompile("^\\d{5}\\s\\(\\d{3}\\s\\d{2}\\)$"),
+		"CZ": regexp.MustCompile("^\\d{5}$|(\\d{3}\\ \\d{2})$"),
 		"DK": regexp.MustCompile("^\\d{4}$"),
 		"DO": regexp.MustCompile("^\\d{5}$"),
 		"EC": regexp.MustCompile("^\\d{6}$"),

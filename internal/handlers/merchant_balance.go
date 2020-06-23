@@ -5,8 +5,8 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 
-	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
+	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
@@ -35,6 +35,28 @@ func (h *BalanceRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(balanceMerchantPath, h.getBalance)
 }
 
+// @summary Get the merchant's balance
+// @desc Get the merchant's balance
+// @id balancePathGetBalance
+// @tag Balance
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.MerchantBalance Returns the merchant's balance data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/balance [get]
+
+// @summary Get the merchant's balance using the merchant ID
+// @desc Get the merchant's balance using the merchant ID
+// @id balanceMerchantPathGetBalance
+// @tag Balance
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.MerchantBalance Returns the merchant's balance data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/balance/{merchant_id} [get]
 func (h *BalanceRoute) getBalance(ctx echo.Context) error {
 	req := &billingpb.GetMerchantBalanceRequest{}
 	err := ctx.Bind(req)

@@ -5,9 +5,7 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"github.com/micro/go-micro/client"
 
-
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-
 )
 
 type BillingServerOkTemporaryMock struct{}
@@ -1062,10 +1060,29 @@ func (s *BillingServerOkTemporaryMock) GetOperatingCompany(ctx context.Context, 
 	panic("implement me")
 }
 
+func (s *BillingServerOkTemporaryMock) SendWebhookToMerchant(ctx context.Context, in *billingpb.OrderCreateRequest, opts ...client.CallOption) (*billingpb.SendWebhookToMerchantResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) NotifyWebhookTestResults(ctx context.Context, in *billingpb.NotifyWebhookTestResultsRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
 func (s *BillingServerOkTemporaryMock) GetCountriesListForOrder(ctx context.Context, in *billingpb.GetCountriesListForOrderRequest, opts ...client.CallOption) (*billingpb.GetCountriesListForOrderResponse, error) {
 	panic("implement me")
 }
 
 func (s *BillingServerOkTemporaryMock) GetPaylinkTransactions(ctx context.Context, in *billingpb.GetPaylinkTransactionsRequest, opts ...client.CallOption) (*billingpb.TransactionsResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) GetAdminByUserId(ctx context.Context, in *billingpb.CommonUserProfileRequest, opts ...client.CallOption) (*billingpb.UserRoleResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) RoyaltyReportFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) PayoutFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }

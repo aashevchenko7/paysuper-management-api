@@ -5,6 +5,7 @@ enableCertIssuer: true
 
 ingress:
   hostname: p1payapi.tst.protocol.one
+  stgHostname: api.stg.pay.super.com
   path: /
   hostnamePrefix:
 
@@ -26,6 +27,11 @@ backend:
     name: p1payapi
     protocol: TCP
   env:
+    - MICRO_REGISTRY
+    - MICRO_REGISTRY_ADDRESS
+    - MICRO_TRANSPORT
+    - MICRO_BILLING_VERSION
+    - MICRO_BILLING_VERSION_FALLBACK 
     - JWT_SIGNATURE_SECRET
     - AUTH1_ISSUER
     - AUTH1_CLIENTID
@@ -45,6 +51,11 @@ backend:
     - AWS_BUCKET_REPORTER
     - ORDER_INLINE_FORM_URL_MASK
     - ALLOW_ORIGIN
+    - AWS_CLOUDWATCH_ACCESS_KEY_ID
+    - AWS_CLOUDWATCH_SECRET_ACCESS_KEY
+    - AWS_CLOUDWATCH_LOG_GROUP_BILLING_SERVER
+    - AWS_CLOUDWATCH_LOG_GROUP_MANAGEMENT_API
+    - AWS_CLOUDWATCH_LOG_GROUP_WEBHOOK_NOTIFIER
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

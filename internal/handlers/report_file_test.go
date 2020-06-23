@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/labstack/echo/v4"
 	awsWrapper "github.com/paysuper/paysuper-aws-manager"
@@ -92,22 +93,7 @@ func (suite *ReportFileTestSuite) SetupTest() {
 	}
 }
 
-func (suite *ReportFileTestSuite) TestReportFile_download_Error_EmptyId() {
-
-	_, err := suite.caller.Builder().
-		Method(http.MethodGet).
-		Path(common.AuthProjectGroupPath + reportFileDownloadPath).
-		Init(test.ReqInitJSON()).
-		Exec(suite.T())
-
-	httpErr, ok := err.(*echo.HTTPError)
-	assert.True(suite.T(), ok)
-	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
-	assert.Regexp(suite.T(), common.ErrorRequestParamsIncorrect.Message, httpErr.Message)
-}
-
 func (suite *ReportFileTestSuite) TestReportFile_download_Error_ValidationFileEmpty() {
-
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":"+common.RequestParameterFile, " ").
@@ -122,6 +108,12 @@ func (suite *ReportFileTestSuite) TestReportFile_download_Error_ValidationFileEm
 }
 
 func (suite *ReportFileTestSuite) TestReportFile_download_Error_ValidationFileIncorrect() {
+	awsManagerMock := &awsWrapperMocks.AwsManagerInterface{}
+	awsManagerMock.On("Upload", mock2.Anything, mock2.Anything, mock2.Anything).Return(&s3manager.UploadOutput{}, nil)
+	awsManagerMock.On("Download", mock2.Anything, mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(int64(0), errors.New("Download_Error"))
+
+	suite.router.awsManager = awsManagerMock
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
@@ -132,8 +124,8 @@ func (suite *ReportFileTestSuite) TestReportFile_download_Error_ValidationFileIn
 
 	httpErr, ok := err.(*echo.HTTPError)
 	assert.True(suite.T(), ok)
-	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
-	assert.Regexp(suite.T(), common.ErrorRequestParamsIncorrect, httpErr.Message)
+	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
+	assert.Regexp(suite.T(), common.ErrorMessageDownloadReportFile, httpErr.Message)
 }
 
 func (suite *ReportFileTestSuite) TestReportFile_download_Ok() {
