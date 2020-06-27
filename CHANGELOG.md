@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 - Method to download a report file . ([a925fdc](https://github.com/paysuper/paysuper-management-api/commit/a925fdc953de1d32afff41c9bb88c56cc2750480)) ([1e92585](https://github.com/paysuper/paysuper-management-api/commit/1e92585167920fff659a01f454d58c13085a79b9))
 
 ### Fixed
-- Buq with validation in the reports' download requests. ([7a50d1f](https://github.com/paysuper/paysuper-management-api/commit/7a50d1f08b1f6bdfb5839e3c8f98c9a33a781edd))
+- Buq with validation in the report download requests. ([7a50d1f](https://github.com/paysuper/paysuper-management-api/commit/7a50d1f08b1f6bdfb5839e3c8f98c9a33a781edd))
 - Check merchant permission for the getPaylinkUrl method. ([#228](https://github.com/paysuper/paysuper-management-api/issues/228)) ([7dccf89](https://github.com/paysuper/paysuper-management-api/commit/7dccf8950e2ae08a6014789c21100036fe03cf1d))
 - Fix a paylink URL. ([c43f85f](https://github.com/paysuper/paysuper-management-api/commit/c43f85fa147974e37b737c9cfd12d8026451c4ae)) ([39f79bb](https://github.com/paysuper/paysuper-management-api/commit/39f79bb6dd3e545e9e66baf57534b1527438f5c9)) ([c47756a](https://github.com/paysuper/paysuper-management-api/commit/c47756ac883c0a8be4050f44bc3aef1eab474b41)) ([8c35859](https://github.com/paysuper/paysuper-management-api/commit/8c35859be72ca4c7106450bf920b59d211cb3a89))
 - Fix a transaction logs filter for a system administrator. ([1e1719b](https://github.com/paysuper/paysuper-management-api/commit/1e1719b946af72c64582e7ea5acc3a64ccbf5587))
