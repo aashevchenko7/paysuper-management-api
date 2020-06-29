@@ -353,7 +353,7 @@ var (
 		"TM": regexp.MustCompile("^\\d{6}$"),
 		"TC": regexp.MustCompile("^[Tt][Kk][Cc][Aa]\\s{0,1}[1][Zz]{2}$"),
 		"UA": regexp.MustCompile("^\\d{5}$"),
-		"GB": regexp.MustCompile("^[A-Z]{1,2}[0-9R][0-9A-Z]?\\s*[0-9][A-Z-[CIKMOV]]{2}"),
+		"GB": regexp.MustCompile("^(([A-Z]{1,2}[0-9][A-Z0-9]?|ASCN|STHL|TDCU|BBND|[BFS]IQQ|PCRN|TKCA) ?[0-9][A-Z]{2}|BFPO ?[0-9]{1,4}|(KY[0-9]|MSR|VG|AI)[ -]?[0-9]{4}|[A-Z]{2} ?[0-9]{2}|GE ?CX|GIR ?0A{2}|SAN ?TA1)$"),
 		"US": regexp.MustCompile("^\\b\\d{5}\\b(?:[- ]{1}\\d{4})?$"),
 		"UY": regexp.MustCompile("^\\d{5}$"),
 		"VI": regexp.MustCompile("^\\d{5}$"),
