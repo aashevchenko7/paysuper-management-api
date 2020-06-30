@@ -33,6 +33,12 @@ const (
 type SystemBinder struct{}
 
 func (b *SystemBinder) Bind(i interface{}, ctx echo.Context) (err error) {
+	m := make(map[string]interface{})
+
+	if err := EchoBinderDefault.Bind(&m, ctx); err != nil {
+		return err
+	}
+
 	rv := reflect.ValueOf(i)
 
 	if rv.Type().Kind() != reflect.Ptr || rv.IsNil() {
@@ -61,6 +67,10 @@ func (b *SystemBinder) Bind(i interface{}, ctx echo.Context) (err error) {
 			}
 			mId := ctx.Param(RequestParameterMerchantId)
 			if mId != "" {
+				rv.Set(reflect.ValueOf(mId))
+			}
+
+			if mId, ok := m[RequestParameterMerchantId]; ok && mId != "" {
 				rv.Set(reflect.ValueOf(mId))
 			}
 		}
@@ -142,6 +152,18 @@ type Binder struct {
 }
 
 func (b *Binder) Bind(i interface{}, ctx echo.Context) (err error) {
+	var buf []byte
+
+	if ctx.Request().Body != nil {
+		buf, err = ioutil.ReadAll(ctx.Request().Body)
+
+		if err != nil {
+			return err
+		}
+
+		ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+	}
+
 	if err := EchoBinderDefault.Bind(i, ctx); err != nil {
 		return err
 	}
@@ -164,7 +186,9 @@ func (b *Binder) Bind(i interface{}, ctx echo.Context) (err error) {
 			return ta.Err()
 		}
 	}
-	//
+
+	ctx.Request().Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+
 	if binder := ExtractBinderContext(ctx); binder != nil {
 		return binder.Bind(i, ctx)
 	}

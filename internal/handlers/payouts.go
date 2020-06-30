@@ -43,7 +43,7 @@ func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(payoutsPath, h.getPayoutDocumentsList)
 	groups.SystemUser.GET(payoutsIdPath, h.getPayoutDocument)
 	groups.SystemUser.GET(payoutsIdReportsPath, h.getPayoutRoyaltyReports)
-
+	groups.SystemUser.POST(payoutsIdDownloadPath, h.downloadPayoutDocument)
 }
 
 // @summary Get the list of payout documents
@@ -153,6 +153,19 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id}/download [post]
+//
+// @summary Export the payout document
+// @desc Export the payout document using the payout document ID
+// @id payoutsIdDownloadPathDownloadPayoutDocument
+// @tag Payouts
+// @accept application/json
+// @produce application/json
+// @body reporterpb.ReportFile
+// @success 200 {object} reporterpb.CreateFileResponse Returns the payout document file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param payout_document_id path {string} true The unique identifier for the payout document.
+// @router /system/api/v1/payout_documents/{payout_document_id}/download [post]
 func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
 	err := ctx.Bind(req)

@@ -51,6 +51,10 @@ func (h *RoyaltyReportsRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(royaltyReportsAcceptPath, h.merchantReviewRoyaltyReport)
 	groups.AuthUser.POST(royaltyReportsDeclinePath, h.merchantDeclineRoyaltyReport)
 	groups.SystemUser.POST(royaltyReportsChangePath, h.changeRoyaltyReport)
+	groups.SystemUser.GET(royaltyReportsIdPath, h.getRoyaltyReport)
+	groups.SystemUser.GET(royaltyReportsTransactionsPath, h.listRoyaltyReportOrders)
+	groups.SystemUser.POST(royaltyReportsIdDownloadPath, h.downloadRoyaltyReport)
+	groups.SystemUser.POST(royaltyReportsTransactionsDownloadPath, h.downloadRoyaltyReportOrders)
 }
 
 // @summary Get the royalty reports list
@@ -105,6 +109,19 @@ func (h *RoyaltyReportsRoute) getRoyaltyReportsList(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param report_id path {string} true The unique identifier for the royalty report.
 // @router /admin/api/v1/royalty_reports/{report_id} [get]
+//
+// @summary Get the royalty report
+// @desc Get the royalty report using the report ID
+// @id royaltyReportsIdPathGetRoyaltyReport
+// @tag Royalty reports
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.RoyaltyReport Returns the royalty report
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param report_id path {string} true The unique identifier for the royalty report.
+// @router /system/api/v1/royalty_reports/{report_id} [get]
 func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 	req := &billingpb.GetRoyaltyReportRequest{}
 
@@ -138,6 +155,20 @@ func (h *RoyaltyReportsRoute) getRoyaltyReport(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param report_id path {string} true The unique identifier for the royalty report.
 // @router /admin/api/v1/royalty_reports/{report_id}/download [post]
+//
+// @summary Export the royalty report
+// @desc Export the royalty report using the report ID
+// @id royaltyReportsIdDownloadPathDownloadRoyaltyReport
+// @tag Royalty reports
+// @accept application/json
+// @produce application/json
+// @body reporterpb.ReportFile
+// @success 200 {object} reporterpb.CreateFileResponse Returns the report file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param report_id path {string} true The unique identifier for the royalty report.
+// @router /system/api/v1/royalty_reports/{report_id}/download [post]
 func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
 	err := ctx.Bind(req)
@@ -169,6 +200,21 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 // @param limit query {integer} false The number of transactions returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/royalty_reports/{report_id}/transactions [get]
+//
+// @summary Get the transactions list included in the royalty report
+// @desc Get the transactions list included in the royalty report
+// @id royaltyReportsTransactionsPathListRoyaltyReportOrders
+// @tag Royalty reports
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.TransactionsPaginate Returns the transactions list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param report_id path {string} true The unique identifier for the royalty report.
+// @param limit query {integer} false The number of transactions returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /system/api/v1/royalty_reports/{report_id}/transactions [get]
 func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 	req := &billingpb.ListRoyaltyReportOrdersRequest{}
 
@@ -207,6 +253,20 @@ func (h *RoyaltyReportsRoute) listRoyaltyReportOrders(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param report_id path {string} true The unique identifier for the royalty report.
 // @router /admin/api/v1/royalty_reports/{report_id}/transactions/download [post]
+//
+// @summary Export the file of the transactions list included in the royalty report
+// @desc Export the file of the transactions list included in the royalty report
+// @id royaltyReportsTransactionsDownloadPathDownloadRoyaltyReportOrders
+// @tag Royalty reports
+// @accept application/json
+// @produce application/json
+// @body reporterpb.ReportFile
+// @success 200 {object} reporterpb.CreateFileResponse Returns the file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param report_id path {string} true The unique identifier for the royalty report.
+// @router /system/api/v1/royalty_reports/{report_id}/transactions/download [post]
 func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
 	err := ctx.Bind(req)
