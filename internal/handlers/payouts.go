@@ -40,7 +40,10 @@ func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(payoutsIdReportsPath, h.getPayoutRoyaltyReports)
 	groups.AuthUser.POST(payoutsPath, h.createPayoutDocument)
 	groups.SystemUser.POST(payoutsIdPath, h.updatePayoutDocument)
-
+	groups.SystemUser.GET(payoutsPath, h.getPayoutDocumentsList)
+	groups.SystemUser.GET(payoutsIdPath, h.getPayoutDocument)
+	groups.SystemUser.GET(payoutsIdReportsPath, h.getPayoutRoyaltyReports)
+	groups.SystemUser.POST(payoutsIdDownloadPath, h.downloadPayoutDocument)
 }
 
 // @summary Get the list of payout documents
@@ -59,6 +62,23 @@ func (h *PayoutDocumentsRoute) Route(groups *common.Groups) {
 // @param limit query {integer} true The number of documents returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/payout_documents [get]
+//
+// @summary Get the list of payout documents
+// @desc Get the list of payout documents. This list can be filtered.
+// @id payoutsPathGetPayoutDocumentsList
+// @tag Payouts
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.PayoutDocumentsPaginate Returns the list of the payout documents
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param payout_document_id query {string} false The unique identifier for the payout document.
+// @param status query {[]string} false The list of documents' statuses. Available values: skip, pending, in_progress, paid, canceled, failed.
+// @param date_from query {integer} false The payout period start date.
+// @param date_to query {integer} false The payout period end date.
+// @param limit query {integer} true The number of documents returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /system/api/v1/payout_documents [get]
 func (h *PayoutDocumentsRoute) getPayoutDocumentsList(ctx echo.Context) error {
 	req := &billingpb.GetPayoutDocumentsRequest{}
 
@@ -89,6 +109,18 @@ func (h *PayoutDocumentsRoute) getPayoutDocumentsList(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id} [get]
+//
+// @summary Get the payout document
+// @desc Get the payout document using the payout document ID
+// @id payoutsIdPathGetPayoutDocument
+// @tag Payouts
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.PayoutDocument Returns the payout document
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param payout_document_id path {string} true The unique identifier for the payout document.
+// @router /system/api/v1/payout_documents/{payout_document_id} [get]
 func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 	req := &billingpb.GetPayoutDocumentRequest{}
 
@@ -121,6 +153,19 @@ func (h *PayoutDocumentsRoute) getPayoutDocument(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id}/download [post]
+//
+// @summary Export the payout document
+// @desc Export the payout document using the payout document ID
+// @id payoutsIdDownloadPathDownloadPayoutDocument
+// @tag Payouts
+// @accept application/json
+// @produce application/json
+// @body reporterpb.ReportFile
+// @success 200 {object} reporterpb.CreateFileResponse Returns the payout document file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param payout_document_id path {string} true The unique identifier for the payout document.
+// @router /system/api/v1/payout_documents/{payout_document_id}/download [post]
 func (h *PayoutDocumentsRoute) downloadPayoutDocument(ctx echo.Context) error {
 	req := &reporterpb.ReportFile{}
 	err := ctx.Bind(req)
@@ -220,6 +265,18 @@ func (h *PayoutDocumentsRoute) updatePayoutDocument(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param payout_document_id path {string} true The unique identifier for the payout document.
 // @router /admin/api/v1/payout_documents/{payout_document_id}/reports [get]
+//
+// @summary Get the royalty reports in the payout documents
+// @desc Get the royalty reports in the payout documents
+// @id payoutsIdReportsPathGetPayoutRoyaltyReports
+// @tag Payouts
+// @accept application/json
+// @produce application/json
+// @success 200 {object} []billingpb.RoyaltyReport Returns the list of the payout documents
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param payout_document_id path {string} true The unique identifier for the payout document.
+// @router /system/api/v1/payout_documents/{payout_document_id}/reports [get]
 func (h *PayoutDocumentsRoute) getPayoutRoyaltyReports(ctx echo.Context) error {
 	req := &billingpb.GetPayoutDocumentRequest{}
 	req.PayoutDocumentId = ctx.Param(common.RequestParameterId)
