@@ -331,7 +331,6 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	}
 
 	file := &reporterpb.ReportFile{
-		UserId:     common.ExtractUserContext(ctx).Id,
 		ReportType: reporterpb.ReportTypeTransactions,
 		FileType:   req.FileType,
 		MerchantId: req.MerchantId,
