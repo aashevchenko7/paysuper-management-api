@@ -177,7 +177,6 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReport(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypeRoyalty
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldId: ctx.Param(common.RequestParameterReportId),
@@ -275,7 +274,6 @@ func (h *RoyaltyReportsRoute) downloadRoyaltyReportOrders(ctx echo.Context) erro
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypeRoyaltyTransactions
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldId: ctx.Param(common.RequestParameterReportId),

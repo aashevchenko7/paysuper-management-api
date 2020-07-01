@@ -152,6 +152,7 @@ type AuthUser struct {
 	Email      string
 	Role       string
 	MerchantId string
+	ProfileId  string
 }
 
 func (h *HandlerSet) RequestReportFile(
@@ -165,8 +166,16 @@ func (h *HandlerSet) RequestReportFile(
 		return echo.NewHTTPError(http.StatusInternalServerError, ErrorRequestDataInvalid)
 	}
 
+	user := ExtractUserContext(ctx)
+
+	req.UserId = user.Id
 	req.Params = b
 	req.SendNotification = true
+	req.NotificationChannelId = user.MerchantId
+
+	if req.NotificationChannelId == "" {
+		req.NotificationChannelId = user.ProfileId
+	}
 
 	if err = h.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, GetValidationError(err))
