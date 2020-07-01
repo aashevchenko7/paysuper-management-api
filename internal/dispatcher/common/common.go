@@ -175,6 +175,7 @@ func (h *HandlerSet) RequestReportFile(
 
 	if req.NotificationChannelId == "" {
 		req.NotificationChannelId = user.ProfileId
+		req.SkipPostProcess = true
 	}
 
 	if err = h.Validate.Struct(req); err != nil {
