@@ -33,6 +33,7 @@ require (
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc
 	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200701105412-7dd151c47a11
 	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200424194932-ce37bf63cef9
+	github.com/paysuper/paysuper-tools v0.0.0-20200615134658-f86985dac3ba // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.5.1

@@ -522,6 +522,8 @@ github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200424194932-ce37bf63cef9 h
 github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200424194932-ce37bf63cef9/go.mod h1:8PLY3qzP8MYdVIV+FrT2K7lvmcRLvNxSkOFSn0kMM7w=
 github.com/paysuper/paysuper-tools v0.0.0-20200117101901-522574ce4d1c h1:Hum6SxOv4GTd5zj45YC7sQzqQy1Nnp5msx/kc9Kk4ks=
 github.com/paysuper/paysuper-tools v0.0.0-20200117101901-522574ce4d1c/go.mod h1:/5apnTovClItkO1uY7kyk1834yp/IXsGk6Syyg9dVMk=
+github.com/paysuper/paysuper-tools v0.0.0-20200615134658-f86985dac3ba h1:FdSgtEVCbR1t5LZNyOxMsqz/k7w5tFRncRWvLn4hQ5k=
+github.com/paysuper/paysuper-tools v0.0.0-20200615134658-f86985dac3ba/go.mod h1:/5apnTovClItkO1uY7kyk1834yp/IXsGk6Syyg9dVMk=
 github.com/pelletier/go-buffruneio v0.2.0/go.mod h1:JkE26KsDizTr40EUHkXVtNPvgGtbSNq5BcowyYOWdKo=
 github.com/pelletier/go-toml v1.2.0/go.mod h1:5z9KED0ma1S8pY6P1sdut58dfprrGBbd/94hg7ilaic=
 github.com/pelletier/go-toml v1.4.0 h1:u3Z1r+oOXJIkxqw34zVhyPgjBsm6X2wn21NWs/HfSeg=
