@@ -57,26 +57,19 @@ func (d *Dispatcher) GetUserDetailsMiddleware(next echo.HandlerFunc) echo.Handle
 			return echo.NewHTTPError(http.StatusUnauthorized, common.ErrorMessageAuthorizedUserNotFound.Message)
 		}
 
+		user := common.ExtractUserContext(ctx)
+		user.Id = u.UserID
+		user.Email = u.Email
+
 		req := &billingpb.GetUserProfileRequest{
 			UserId: u.UserID,
 		}
 		rsp, err := d.appSet.Services.Billing.GetUserProfile(reqCtx, req)
 
-		if err != nil || (rsp != nil && rsp.Status != http.StatusOK) {
-			d.L().Error(billingpb.ErrorGrpcServiceCallFailed,
-				logger.PairArgs(
-					common.ErrorFieldService, billingpb.ServiceName,
-					common.ErrorFieldMethod, "GetUserProfile",
-				),
-				logger.WithPrettyFields(logger.Fields{"err": err, common.ErrorFieldRequest: req}),
-			)
-			return echo.NewHTTPError(http.StatusUnauthorized, common.ErrorMessageAuthorizedUserNotFound.Message)
+		if err == nil && (rsp != nil && rsp.Status == http.StatusOK) {
+			user.ProfileId = rsp.Item.Id
 		}
 
-		user := common.ExtractUserContext(ctx)
-		user.Id = u.UserID
-		user.Email = u.Email
-		user.ProfileId = rsp.Item.Id
 		common.SetUserContext(ctx, user)
 
 		return next(ctx)
