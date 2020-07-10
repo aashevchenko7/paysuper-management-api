@@ -12,6 +12,8 @@ import (
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/reporterpb"
 	"net/http"
+	"reflect"
+	"runtime"
 	"time"
 )
 
@@ -175,17 +177,16 @@ func NewOrderRoute(
 
 func (h *OrderRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(orderPath, h.listOrdersPublic)
-	groups.SystemUser.GET(orderPath, h.listOrdersPublic)
 	groups.AuthUser.GET(orderIdPath, h.getOrderPublic)
-	groups.SystemUser.GET(orderIdPath, h.getOrderPublic)
-	groups.SystemUser.GET(orderGetLogsPath, h.getOrderLogs)
-
 	groups.AuthUser.POST(orderDownloadPath, h.downloadOrdersPublic)
-
 	groups.AuthUser.GET(orderRefundsPath, h.listRefunds)
 	groups.AuthUser.GET(orderRefundsIdsPath, h.getRefund)
-	groups.SystemUser.GET(orderRefundsIdsPath, h.getRefund)
 	groups.AuthUser.POST(orderRefundsPath, h.createRefund)
+
+	groups.SystemUser.GET(orderPath, h.listOrdersPrivate)
+	groups.SystemUser.GET(orderIdPath, h.getOrderPrivate)
+	groups.SystemUser.GET(orderGetLogsPath, h.getOrderLogs)
+	groups.SystemUser.GET(orderRefundsIdsPath, h.getRefund)
 	groups.SystemUser.POST(orderRefundsPath, h.createRefund)
 	groups.SystemUser.PUT(orderReplaceCodePath, h.replaceCode)
 }
@@ -201,10 +202,25 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /admin/api/v1/order/{order_id} [get]
-//
-// @summary Get the full data about the order
-// @desc Get the full data about the order using the order ID
-// @id systemOrderIdPathGetOrderPublic
+func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
+	res, err := h.getOrder(ctx, h.dispatch.Services.Billing.GetOrderPublic)
+
+	if err != nil {
+		return err
+	}
+
+	typed := res.(*billingpb.GetOrderPublicResponse)
+
+	if typed.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(typed.Status), typed.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, typed.Item)
+}
+
+// @summary Get the full private data about the order
+// @desc Get the full private data about the order using the order ID
+// @id systemOrderIdPathGetOrderPrivate
 // @tag Order
 // @accept application/json
 // @produce application/json
@@ -213,14 +229,20 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param order_id path {string} true The unique identifier for the order.
 // @router /system/api/v1/order/{order_id} [get]
-func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
-	order, err := h.getOrder(ctx)
+func (h *OrderRoute) getOrderPrivate(ctx echo.Context) error {
+	res, err := h.getOrder(ctx, h.dispatch.Services.Billing.GetOrderPrivate)
 
 	if err != nil {
 		return err
 	}
 
-	return ctx.JSON(http.StatusOK, order)
+	typed := res.(*billingpb.GetOrderPrivateResponse)
+
+	if typed.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(typed.Status), typed.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, typed.Item)
 }
 
 // @summary Get the orders list
@@ -249,10 +271,26 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 // @param type query {string} false The sales type. Available values: simple, product, key.
 // @param hide_test query {boolean} false Has a true value for getting only production orders.
 // @router /admin/api/v1/order [get]
+func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
+	rsp, err := h.listOrders(ctx, h.dispatch.Services.Billing.FindAllOrdersPublic)
+
+	if err != nil {
+		return err
+	}
+
+	typed := rsp.(*billingpb.ListOrdersPublicResponse)
+
+	if typed.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(typed.Status), typed.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, typed.Item)
+}
+
 //
-// @summary Get the orders list
-// @desc Get the orders list. This list can be filtered by the order's parameters.
-// @id systemOrderPathListOrdersPublic
+// @summary Get the private orders list
+// @desc Get the private orders list. This list can be filtered by the order's parameters.
+// @id systemOrderPathListOrdersPrivate
 // @tag Order
 // @accept application/json
 // @produce application/json
@@ -276,39 +314,20 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 // @param type query {string} false The sales type. Available values: simple, product, key.
 // @param hide_test query {boolean} false Has a true value for getting only production orders.
 // @router /system/api/v1/order [get]
-func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
-	req := &billingpb.ListOrdersRequest{}
-	err := ctx.Bind(req)
+func (h *OrderRoute) listOrdersPrivate(ctx echo.Context) error {
+	rsp, err := h.listOrders(ctx, h.dispatch.Services.Billing.FindAllOrdersPrivate)
 
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		return err
 	}
 
-	if req.Limit <= 0 {
-		req.Limit = int64(h.cfg.LimitDefault)
+	typed := rsp.(*billingpb.ListOrdersPrivateResponse)
+
+	if typed.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(typed.Status), typed.Message)
 	}
 
-	if req.Offset <= 0 {
-		req.Offset = int64(h.cfg.OffsetDefault)
-	}
-
-	err = h.dispatch.Validate.Struct(req)
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
-	}
-
-	res, err := h.dispatch.Services.Billing.FindAllOrdersPublic(ctx.Request().Context(), req)
-
-	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "FindAllOrdersPublic")
-	}
-
-	if res.Status != billingpb.ResponseStatusOk {
-		return echo.NewHTTPError(int(res.Status), res.Message)
-	}
-
-	return ctx.JSON(http.StatusOK, res.Item)
+	return ctx.JSON(http.StatusOK, typed.Item)
 }
 
 // @summary Export the orders list
@@ -527,12 +546,19 @@ func (h *OrderRoute) createRefund(ctx echo.Context) error {
 // @param order_id path {string} true The unique identifier for the order.
 // @router /system/api/v1/order/{order_id}/logs [get]
 func (h *OrderRoute) getOrderLogs(ctx echo.Context) error {
-	order, err := h.getOrder(ctx)
+	res, err := h.getOrder(ctx, h.dispatch.Services.Billing.GetOrderPublic)
 
 	if err != nil {
 		return err
 	}
 
+	typed := res.(*billingpb.GetOrderPublicResponse)
+
+	if typed.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(typed.Status), typed.Message)
+	}
+
+	order := typed.Item
 	createdAt, err := ptypes.Timestamp(order.CreatedAt)
 
 	if err != nil {
@@ -597,22 +623,53 @@ func (h *OrderRoute) getOrderLogs(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, result)
 }
 
-func (h *OrderRoute) getOrder(ctx echo.Context) (*billingpb.OrderViewPublic, error) {
+func (h *OrderRoute) listOrders(ctx echo.Context, fn interface{}) (interface{}, error) {
+	req := &billingpb.ListOrdersRequest{}
+	err := ctx.Bind(req)
+
+	if err != nil {
+		return nil, echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	if req.Limit <= 0 {
+		req.Limit = int64(h.cfg.LimitDefault)
+	}
+
+	if req.Offset <= 0 {
+		req.Offset = int64(h.cfg.OffsetDefault)
+	}
+
+	err = h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return nil, echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	refFn := reflect.ValueOf(fn)
+	fnName := runtime.FuncForPC(refFn.Pointer()).Name()
+	returnValues := refFn.Call([]reflect.Value{reflect.ValueOf(ctx.Request().Context()), reflect.ValueOf(req)})
+
+	if err := returnValues[1].Interface(); err != nil {
+		return nil, h.dispatch.SrvCallHandler(req, err.(error), billingpb.ServiceName, fnName)
+	}
+
+	return returnValues[0].Interface(), nil
+}
+
+func (h *OrderRoute) getOrder(ctx echo.Context, fn interface{}) (interface{}, error) {
 	req := &billingpb.GetOrderRequest{}
 
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
 		return nil, err
 	}
 
-	rsp, err := h.dispatch.Services.Billing.GetOrderPublic(ctx.Request().Context(), req)
+	refFn := reflect.ValueOf(fn)
+	fnName := runtime.FuncForPC(refFn.Pointer()).Name()
+	returnValues := refFn.Call([]reflect.Value{reflect.ValueOf(ctx.Request().Context()), reflect.ValueOf(req)})
 
-	if err != nil {
-		return nil, h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetOrderPublic")
+	if err := returnValues[1].Interface(); err != nil {
+		return nil, h.dispatch.SrvCallHandler(req, err.(error), billingpb.ServiceName, fnName)
 	}
 
-	if rsp.Status != billingpb.ResponseStatusOk {
-		return nil, echo.NewHTTPError(int(rsp.Status), rsp.Message)
-	}
-
-	return rsp.Item, nil
+	return returnValues[0].Interface(), nil
 }

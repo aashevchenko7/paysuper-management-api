@@ -1044,7 +1044,10 @@ func (s *BillingServerOkMock) GetOrderPrivate(
 	in *billingpb.GetOrderRequest,
 	opts ...client.CallOption,
 ) (*billingpb.GetOrderPrivateResponse, error) {
-	return &billingpb.GetOrderPrivateResponse{}, nil
+	return &billingpb.GetOrderPrivateResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item:   &billingpb.OrderViewPrivate{CreatedAt: ptypes.TimestampNow()},
+	}, nil
 }
 
 func (s *BillingServerOkMock) FindAllOrdersPublic(
