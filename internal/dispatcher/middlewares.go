@@ -50,7 +50,8 @@ func (d *Dispatcher) GetUserDetailsMiddleware(next echo.HandlerFunc) echo.Handle
 			return echo.NewHTTPError(http.StatusUnauthorized, common.ErrorMessageAuthorizationTokenNotFound.Message)
 		}
 
-		u, err := d.appSet.JwtVerifier.GetUserInfo(ctx.Request().Context(), match[1])
+		reqCtx := ctx.Request().Context()
+		u, err := d.appSet.JwtVerifier.GetUserInfo(reqCtx, match[1])
 
 		if err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, common.ErrorMessageAuthorizedUserNotFound.Message)
@@ -59,6 +60,16 @@ func (d *Dispatcher) GetUserDetailsMiddleware(next echo.HandlerFunc) echo.Handle
 		user := common.ExtractUserContext(ctx)
 		user.Id = u.UserID
 		user.Email = u.Email
+
+		req := &billingpb.GetUserProfileRequest{
+			UserId: u.UserID,
+		}
+		rsp, err := d.appSet.Services.Billing.GetUserProfile(reqCtx, req)
+
+		if err == nil && (rsp != nil && rsp.Status == http.StatusOK) {
+			user.ProfileId = rsp.Item.Id
+		}
+
 		common.SetUserContext(ctx, user)
 
 		return next(ctx)

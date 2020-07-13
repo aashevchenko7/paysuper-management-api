@@ -46,7 +46,6 @@ const (
 	RequestParameterHasPspSignature          = "has_psp_signature"
 	RequestParameterAgreementSentViaMail     = "agreement_sent_via_mail"
 	RequestParameterMailTrackingLink         = "mail_tracking_link"
-	RequestParameterImage                    = "image"
 	RequestParameterCallbackCurrency         = "callback_currency"
 	RequestParameterCallbackProtocol         = "callback_protocol"
 	RequestParameterCreateOrderAllowedUrls   = "create_order_allowed_urls"

@@ -125,7 +125,6 @@ func (h *VatReportsRoute) downloadVatReportsForCountry(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypeVat
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldCountry: ctx.Param(common.RequestParameterCountry),
@@ -192,7 +191,6 @@ func (h *VatReportsRoute) downloadVatReportTransactions(ctx echo.Context) error 
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	req.UserId = common.ExtractUserContext(ctx).Id
 	req.ReportType = reporterpb.ReportTypeVatTransactions
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldId: ctx.Param(common.RequestParameterId),
