@@ -7,6 +7,7 @@ require (
 	github.com/ProtocolONE/go-micro-plugins/wrapper/select/version v0.0.0-20200213135655-2678e485cc54
 	github.com/alexeyco/simpletable v0.0.0-20190222165044-2eb48bcee7cf
 	github.com/aws/aws-sdk-go v1.30.7
+	github.com/bxcodec/faker v2.0.1+incompatible
 	github.com/fatih/color v1.7.0
 	github.com/forestgiant/sliceutil v0.0.0-20160425183142-94783f95db6c
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
@@ -33,6 +34,7 @@ require (
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc
 	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200701105412-7dd151c47a11
 	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200424194932-ce37bf63cef9
+	github.com/paysuper/paysuper-tools v0.0.0-20200615134658-f86985dac3ba
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.5.1
@@ -41,6 +43,7 @@ require (
 	github.com/ttacon/libphonenumber v1.0.1
 	github.com/wsxiaoys/terminal v0.0.0-20160513160801-0940f3fc43a0 // indirect
 	go.uber.org/automaxprocs v1.2.0
+	go.uber.org/zap v1.13.0
 	gopkg.in/go-playground/validator.v9 v9.30.0
 	gopkg.in/karlseguin/expect.v1 v1.0.1 // indirect
 )
