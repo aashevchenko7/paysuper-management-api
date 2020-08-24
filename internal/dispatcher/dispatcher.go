@@ -70,11 +70,14 @@ func (d *Dispatcher) Dispatch(echoHttp *echo.Echo) error {
 		WebHooks:    echoHttp.Group(common.WebHookGroupPath),
 		Common:      echoHttp.Group(common.NoAuthGroupPath),
 		SystemUser:  echoHttp.Group(common.SystemUserGroupPath),
+		MerchantS2S: echoHttp.Group(common.MerchantS2SGroupPath),
 	}
 	d.authProjectGroup(grp.AuthProject)
 	d.authUserGroup(grp.AuthUser)
 	d.systemUserGroup(grp.SystemUser)
 	d.webHookGroup(grp.WebHooks)
+	d.merchantS2SGroup(grp.MerchantS2S)
+
 	// init routes
 	for _, handler := range d.appSet.Handlers {
 		handler.Route(grp)
@@ -180,6 +183,14 @@ func (d *Dispatcher) systemUserGroup(grp *echo.Group) {
 func (d *Dispatcher) webHookGroup(grp *echo.Group) {
 	// Called after routes
 	grp.Use(d.BodyDumpMiddleware()) // 1
+}
+
+func (d *Dispatcher) merchantS2SGroup(grp *echo.Group) {
+	// Called before routes
+	if !d.globalCfg.DisableAuthMiddleware {
+		grp.Use(d.S2SAuthPreMiddleware()) // 1
+	}
+	grp.Use(d.MerchantBinderPreMiddleware) // 2
 }
 
 // Config

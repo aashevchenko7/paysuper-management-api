@@ -191,6 +191,8 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(orderRefundsIdsPath, h.getRefund)
 	groups.SystemUser.POST(orderRefundsPath, h.createRefund)
 	groups.SystemUser.PUT(orderReplaceCodePath, h.replaceCode)
+
+	groups.MerchantS2S.GET(orderPath, h.listOrdersS2s)
 }
 
 // @summary Get the full data about the order
@@ -317,7 +319,6 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, typed.Item)
 }
 
-//
 // @summary Get the private orders list
 // @desc Get the private orders list. This list can be filtered by the order's parameters.
 // @id systemOrderPathListOrdersPrivate
@@ -369,6 +370,42 @@ func (h *OrderRoute) listOrdersPrivate(ctx echo.Context) error {
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
 		}
+	}
+
+	return ctx.JSON(http.StatusOK, typed.Item)
+}
+
+// @summary Get the orders list
+// @desc Get the orders list. This list can be filtered by the order's parameters.
+// @id merchantS2SOrderPathListOrders
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListOrdersPublicResponseItem Returns the orders list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param id query {string} false The unique identifier for the order in PaySuper's billing system.
+// @param project query {[]string} false The list of projects.
+// @param status query {[]string} false The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
+// @param account query {string} false The payer account (for instance an account in the merchant's project, the account in the payment system, the payer email, etc.)
+// @param project_date_from query {integer} false The end date when the payment was created in the project.
+// @param project_date_to query {integer} false The end date when the payment was closed in the project.
+// @param invoice_id {string} false The unique identifier for the order in merchant's billing system.
+// @param limit query {integer} true The number of orders returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @param sort query {[]string} false The list of the order's fields for sorting.
+// @router /merchant/s2s/api/v1/order [get]
+func (h *OrderRoute) listOrdersS2s(ctx echo.Context) error {
+	rsp, err := h.listOrders(ctx, h.dispatch.Services.Billing.FindAllOrders)
+
+	if err != nil {
+		return err
+	}
+
+	typed := rsp.(*billingpb.ListOrdersResponse)
+
+	if typed.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(typed.Status), typed.Message)
 	}
 
 	return ctx.JSON(http.StatusOK, typed.Item)
