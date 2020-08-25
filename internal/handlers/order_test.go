@@ -992,3 +992,66 @@ func (suite *OrderTestSuite) TestOrder_ListOrdersPrivateRoundError() {
 	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
 	assert.Equal(suite.T(), common.ErrorInternal, httpErr.Message)
 }
+
+func (suite *OrderTestSuite) TestOrder_ListOrdersS2s_Ok() {
+	res, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Path(common.MerchantS2SGroupPath + orderPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+}
+
+func (suite *OrderTestSuite) TestOrder_ListOrdersS2s_ListOrders_Error() {
+	billingMock := &billMock.BillingService{}
+	billingMock.On("FindAllOrders", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(nil, errors.New("TestOrder_ListOrdersS2s_ListOrders_Error"))
+	suite.router.dispatch.Services.Billing = billingMock
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Path(common.MerchantS2SGroupPath + orderPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorInternal, httpErr.Message)
+}
+
+func (suite *OrderTestSuite) TestOrder_ListOrdersS2s_Billing_FindAllOrders_Result_Error() {
+	billingMock := &billMock.BillingService{}
+	billingMock.On("FindAllOrders", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(
+			&billingpb.ListOrdersResponse{
+				Status: billingpb.ResponseStatusBadData,
+				Message: &billingpb.ResponseErrorMessage{
+					Code:    "000",
+					Message: "TestOrder_ListOrdersS2s_Billing_FindAllOrders_Result_Error",
+				},
+			},
+			nil,
+		)
+	suite.router.dispatch.Services.Billing = billingMock
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodGet).
+		Path(common.MerchantS2SGroupPath + orderPath).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
+
+	message, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), "000", message.Code)
+	assert.Equal(suite.T(), "TestOrder_ListOrdersS2s_Billing_FindAllOrders_Result_Error", message.Message)
+}

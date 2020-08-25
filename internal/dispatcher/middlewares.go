@@ -197,3 +197,38 @@ func (d *Dispatcher) AuthOneMerchantPreMiddleware() echo.MiddlewareFunc {
 		return handleFn(c)
 	})
 }
+
+// Middleware to check access for S2S requests from merchant's server
+func (d *Dispatcher) S2SAuthPreMiddleware() echo.MiddlewareFunc {
+	return middleware.BasicAuth(func(projectId, projectSecret string, ctx echo.Context) (bool, error) {
+		req := &billingpb.GetProjectRequest{
+			ProjectId: projectId,
+		}
+		rsp, err := d.appSet.Services.Billing.GetProject(ctx.Request().Context(), req)
+
+		if err != nil || (rsp != nil && rsp.Status != billingpb.ResponseStatusOk) {
+			if err == nil {
+				err = rsp.Message
+			}
+
+			d.L().Error(
+				ctx.Path(),
+				logger.Args(err.Error()),
+				logger.Args("request", common.ExtractRawBodyContext(ctx)),
+				logger.Stack("stacktrace"),
+			)
+			return false, err
+		}
+
+		if rsp.Item.SecretKey != projectSecret {
+			return false, nil
+		}
+
+		user := common.ExtractUserContext(ctx)
+		user.Name = "Merchant User"
+		user.MerchantId = rsp.Item.MerchantId
+		common.SetUserContext(ctx, user)
+
+		return true, nil
+	})
+}
