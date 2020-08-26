@@ -21,6 +21,7 @@ const (
 	AuthProjectGroupPath     = "/auth/api/v1"
 	AuthUserGroupPath        = "/admin/api/v1"
 	SystemUserGroupPath      = "/system/api/v1"
+	MerchantS2SGroupPath     = "/merchant/s2s/api/v1"
 	NoAuthGroupPath          = "/api/v1"
 	WebHookGroupPath         = "/webhook"
 )
@@ -91,6 +92,8 @@ type Groups struct {
 	WebHooks    *echo.Group
 	Common      *echo.Group
 	SystemUser  *echo.Group
+	// Group for process S2S requests from merchant's server to PaySuper's server
+	MerchantS2S *echo.Group
 }
 
 // Handler

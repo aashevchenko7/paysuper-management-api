@@ -2,17 +2,20 @@ package mock
 
 import (
 	"context"
+	"github.com/bxcodec/faker"
 	"github.com/globalsign/mgo/bson"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/micro/go-micro/client"
+	"reflect"
 
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 
 	"net/http"
 )
 
-type BillingServerOkMock struct{}
+type BillingServerOkMock struct {
+}
 
 func (s *BillingServerOkMock) GetVatReportTransactions(ctx context.Context, in *billingpb.VatTransactionsRequest, opts ...client.CallOption) (*billingpb.PrivateTransactionsResponse, error) {
 	return &billingpb.PrivateTransactionsResponse{
@@ -34,6 +37,10 @@ func (s *BillingServerOkMock) OrderReCreateProcess(ctx context.Context, in *bill
 }
 
 func NewBillingServerOkMock() billingpb.BillingService {
+	_ = faker.AddProvider("objectIdString", func(_ reflect.Value) (interface{}, error) {
+		return "ffffffffffffffffffffffff", nil
+	})
+
 	return &BillingServerOkMock{}
 }
 
@@ -1033,9 +1040,12 @@ func (s *BillingServerOkMock) GetOrderPublic(
 	in *billingpb.GetOrderRequest,
 	opts ...client.CallOption,
 ) (*billingpb.GetOrderPublicResponse, error) {
+	item := new(billingpb.OrderViewPublic)
+	_ = faker.FakeData(item)
+
 	return &billingpb.GetOrderPublicResponse{
 		Status: billingpb.ResponseStatusOk,
-		Item:   &billingpb.OrderViewPublic{CreatedAt: ptypes.TimestampNow()},
+		Item:   item,
 	}, nil
 }
 
@@ -1044,9 +1054,12 @@ func (s *BillingServerOkMock) GetOrderPrivate(
 	in *billingpb.GetOrderRequest,
 	opts ...client.CallOption,
 ) (*billingpb.GetOrderPrivateResponse, error) {
+	item := new(billingpb.OrderViewPrivate)
+	_ = faker.FakeData(item)
+
 	return &billingpb.GetOrderPrivateResponse{
 		Status: billingpb.ResponseStatusOk,
-		Item:   &billingpb.OrderViewPrivate{CreatedAt: ptypes.TimestampNow()},
+		Item:   item,
 	}, nil
 }
 
@@ -1055,7 +1068,22 @@ func (s *BillingServerOkMock) FindAllOrdersPublic(
 	in *billingpb.ListOrdersRequest,
 	opts ...client.CallOption,
 ) (*billingpb.ListOrdersPublicResponse, error) {
-	return &billingpb.ListOrdersPublicResponse{}, nil
+	count := 5
+	items := make([]*billingpb.OrderViewPublic, 0, count)
+
+	for i := 0; i < count; i++ {
+		item := new(billingpb.OrderViewPublic)
+		_ = faker.FakeData(item)
+		items = append(items, item)
+	}
+
+	return &billingpb.ListOrdersPublicResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item: &billingpb.ListOrdersPublicResponseItem{
+			Count: int64(count),
+			Items: items,
+		},
+	}, nil
 }
 
 func (s *BillingServerOkMock) FindAllOrdersPrivate(
@@ -1063,7 +1091,22 @@ func (s *BillingServerOkMock) FindAllOrdersPrivate(
 	in *billingpb.ListOrdersRequest,
 	opts ...client.CallOption,
 ) (*billingpb.ListOrdersPrivateResponse, error) {
-	return &billingpb.ListOrdersPrivateResponse{}, nil
+	count := 5
+	items := make([]*billingpb.OrderViewPrivate, 0, count)
+
+	for i := 0; i < count; i++ {
+		item := new(billingpb.OrderViewPrivate)
+		_ = faker.FakeData(item)
+		items = append(items, item)
+	}
+
+	return &billingpb.ListOrdersPrivateResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item: &billingpb.ListOrdersPrivateResponseItem{
+			Count: int64(count),
+			Items: items,
+		},
+	}, nil
 }
 
 func (s *BillingServerOkMock) GetDashboardMainReport(
