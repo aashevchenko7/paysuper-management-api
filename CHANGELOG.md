@@ -1,6 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.4.0] - 2020-08-26
+
+### Added
+- The PaySuper admin user obtains the list and detailed information about payouts. ([16d5e96](https://github.com/paysuper/paysuper-management-api/commit/16d5e969099f60d4c11a497531ebdba91acfe3d9)) ([eea79f9](https://github.com/paysuper/paysuper-management-api/commit/eea79f915ceea1710b8f0240ef1112c95b779c1f))
+- Send notifications to the user's channel when the export has done. ([0e16a6d](https://github.com/paysuper/paysuper-management-api/commit/0e16a6d0dafeda357e94e3502001882e7b25a1a7))
+- Flag to skip the post process. ([c06504d](https://github.com/paysuper/paysuper-management-api/commit/c06504d39c3d0c9bcd96054dfc6c91965c271337))
+- The endpoint to return the order's private data (#244). ([18f7ed3](https://github.com/paysuper/paysuper-management-api/commit/18f7ed3643a44e11fa86c007f1c8fb63c2e1ba0c)) ([2dbab98](https://github.com/paysuper/paysuper-management-api/commit/2dbab98afc9019f269632df4ac6981272aac978c))
+- S2S APIs. ([a73c4d7](https://github.com/paysuper/paysuper-management-api/commit/a73c4d7bf7852e4e58b1897e39928a873a73f145)) ([2daa00f](https://github.com/paysuper/paysuper-management-api/commit/2daa00ff7bb56382e6a179c5ab94660f5fe537d9))
+
+### Changed
+- Update dependencies. ([771c09e](https://github.com/paysuper/paysuper-management-api/commit/771c09edbcd7f804e8b365cd583c59dfddd5c205))
+
+### Fixed
+- GB zip regex. ([085f1ff](https://github.com/paysuper/paysuper-management-api/commit/085f1ff3995f4eefe5627b6795428caf06fde119))
+- Fix a bug for a newly registered user. ([4a798ac](https://github.com/paysuper/paysuper-management-api/commit/4a798acfc06177bc3207487872189be441c153bb))
+- Rounding amounts in the order view. ([2b8cd38](https://github.com/paysuper/paysuper-management-api/commit/2b8cd381f5f7f9ed842cd9137ea66f2834298f8f))
+
+### Removed
+- Remove the unused constant. ([687f88a](https://github.com/paysuper/paysuper-management-api/commit/687f88a23c33f0677fcfc007838552caf8c621f3))
+
+***
+
 ## [2.2.0] - 2020-06-23
 
 ### Added
