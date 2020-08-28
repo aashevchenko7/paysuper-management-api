@@ -1086,3 +1086,7 @@ func (s *BillingServerOkTemporaryMock) RoyaltyReportFinanceDone(ctx context.Cont
 func (s *BillingServerOkTemporaryMock) PayoutFinanceDone(ctx context.Context, in *billingpb.ReportFinanceDoneRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerOkTemporaryMock) GetActOfCompletion(ctx context.Context, in *billingpb.ActOfCompletionRequest, opts ...client.CallOption) (*billingpb.ActOfCompletionResponse, error) {
+	panic("implement me")
+}

@@ -29,10 +29,10 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/paysuper/echo-casbin-middleware v1.0.1-0.20200203133300-6f18edeb3072
 	github.com/paysuper/paysuper-aws-manager v0.0.1
-	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200825075344-1b19f6dd6b65
+	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200828113456-48c00a5a5ea1
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc
-	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200701105412-7dd151c47a11
+	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200824155415-a52edf4ba059
 	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200424194932-ce37bf63cef9
 	github.com/paysuper/paysuper-tools v0.0.0-20200615134658-f86985dac3ba
 	github.com/pkg/errors v0.9.1
@@ -43,7 +43,7 @@ require (
 	github.com/ttacon/libphonenumber v1.0.1
 	github.com/wsxiaoys/terminal v0.0.0-20160513160801-0940f3fc43a0 // indirect
 	go.uber.org/automaxprocs v1.2.0
-	go.uber.org/zap v1.13.0
+	go.uber.org/zap v1.13.0 // indirect
 	gopkg.in/go-playground/validator.v9 v9.30.0
 	gopkg.in/karlseguin/expect.v1 v1.0.1 // indirect
 )
