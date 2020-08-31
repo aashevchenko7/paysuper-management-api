@@ -1010,6 +1010,39 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationEr
 	assert.Regexp(suite.T(), "City", msg.Details)
 }
 
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationOk_CompanyCityWithApostrophe() {
+	company := &billingpb.MerchantCompanyInfo{
+		Name:               mock.OnboardingMerchantMock.Company.Name,
+		AlternativeName:    mock.OnboardingMerchantMock.Company.Name,
+		Website:            "http://localhost",
+		Country:            "CZ",
+		State:              "Prague",
+		Zip:                "12000",
+		City:               "Prague'",
+		Address:            "Prague",
+		RegistrationNumber: "1234567890",
+	}
+	b, err := json.Marshal(company)
+	assert.NoError(suite.T(), err)
+
+	res, err := suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
+		Path(common.AuthUserGroupPath + merchantsCompanyPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+
+	merchant := new(billingpb.Merchant)
+	err = json.Unmarshal(res.Body.Bytes(), merchant)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), merchant.Company, company)
+}
+
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationError_CompanyAddress() {
 	b := `{
         "name": "123",
