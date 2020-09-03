@@ -1153,3 +1153,7 @@ func (s *BillingServerErrorMock) PayoutFinanceDone(ctx context.Context, in *bill
 func (s *BillingServerErrorMock) GetActOfCompletion(ctx context.Context, in *billingpb.ActOfCompletionRequest, opts ...client.CallOption) (*billingpb.ActOfCompletionResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerErrorMock) SetCustomerPaymentActivity(ctx context.Context, in *billingpb.SetCustomerPaymentActivityRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
