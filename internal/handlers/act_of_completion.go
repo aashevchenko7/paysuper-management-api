@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	actOfCompletionDownloadPath         = "/act_of_completion"
-	actOfCompletionDownloadMerchantPath = "/act_of_completion/:merchant_id"
+	actOfCompletionDownloadPath         = "/act_of_completion/download"
+	actOfCompletionDownloadMerchantPath = "/act_of_completion/:merchant_id/download"
 )
 
 type ActOfCompletionApiV1 struct {
@@ -45,8 +45,8 @@ func (h *ActOfCompletionApiV1) Route(groups *common.Groups) {
 // @success 200 {object} reporterpb.CreateFileResponse Returns the document file ID
 // @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
-// @router /admin/api/v1/act_of_completion [post]
-// @router /system/api/v1/act_of_completion/{merchant_id} [post]
+// @router /admin/api/v1/act_of_completion/download [post]
+// @router /system/api/v1/act_of_completion/{merchant_id}/download [post]
 func (h *ActOfCompletionApiV1) download(ctx echo.Context) error {
 	req := &billingpb.ActOfCompletionRequest{}
 	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
