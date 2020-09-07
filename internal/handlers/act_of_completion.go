@@ -56,11 +56,12 @@ func (h *ActOfCompletionApiV1) download(ctx echo.Context) error {
 	file := &reporterpb.ReportFile{
 		MerchantId:       req.MerchantId,
 		ReportType:       reporterpb.ReportTypeActOfCompletion,
+		FileType:         req.FileType,
 		SendNotification: true,
 		SkipPostProcess:  true,
 	}
 
-	if req.Format == "" {
+	if file.FileType == "" {
 		file.FileType = reporterpb.OutputExtensionPdf
 	}
 
