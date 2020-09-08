@@ -425,22 +425,6 @@ func (suite *OrderTestSuite) TestOrder_GetOrders_BillingServer_ResultError() {
 	assert.Equal(suite.T(), "message", msg.Message)
 }
 
-func (suite *OrderTestSuite) TestOrder_ListOrdersPublic_RoundError() {
-	suite.router.moneyPrecision = -1
-
-	_, err := suite.caller.Builder().
-		Method(http.MethodGet).
-		Path(common.AuthUserGroupPath + orderPath).
-		Init(test.ReqInitJSON()).
-		Exec(suite.T())
-
-	assert.Error(suite.T(), err)
-	httpErr, ok := err.(*echo.HTTPError)
-	assert.True(suite.T(), ok)
-	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
-	assert.Equal(suite.T(), common.ErrorInternal, httpErr.Message)
-}
-
 func (suite *OrderTestSuite) TestOrder_GetOrders_BindError_Id() {
 	q := make(url.Values)
 	q.Set(common.RequestParameterId, bson.NewObjectId().Hex())
@@ -975,22 +959,6 @@ func (suite *OrderTestSuite) TestOrder_ListOrdersPrivate_BillingServiceResultErr
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), "000", msg.Code)
 	assert.Equal(suite.T(), "some error", msg.Message)
-}
-
-func (suite *OrderTestSuite) TestOrder_ListOrdersPrivateRoundError() {
-	suite.router.moneyPrecision = -1
-
-	_, err := suite.caller.Builder().
-		Method(http.MethodGet).
-		Path(common.SystemUserGroupPath + orderPath).
-		Init(test.ReqInitJSON()).
-		Exec(suite.T())
-
-	assert.Error(suite.T(), err)
-	httpErr, ok := err.(*echo.HTTPError)
-	assert.True(suite.T(), ok)
-	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
-	assert.Equal(suite.T(), common.ErrorInternal, httpErr.Message)
 }
 
 func (suite *OrderTestSuite) TestOrder_ListOrdersS2s_Ok() {
