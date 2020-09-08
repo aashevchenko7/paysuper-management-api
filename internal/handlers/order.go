@@ -55,9 +55,9 @@ type ListOrdersRequest struct {
 	// The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
 	Status []string `json:"status," validate:"omitempty,dive,alpha,oneof=created processed canceled rejected refunded chargeback pending"`
 	// The start date when the payment was created.
-	PmDateFrom int64 `json:"pm_date_from" validate:"omitempty,numeric,gt=0"`
+	PmDateFrom string `json:"pm_date_from" validate:"omitempty,datetime"`
 	// The end date when the payment was closed.
-	PmDateTo int64 `json:"pm_date_to" validate:"omitempty,numeric,gt=0"`
+	PmDateTo string `json:"pm_date_to" validate:"omitempty,datetime"`
 }
 
 type cloudWatchLogSettings struct {
@@ -430,6 +430,29 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	var (
+		pmDateFrom = int64(0)
+		pmDateTo   = int64(0)
+	)
+
+	if req.PmDateFrom != "" {
+		dateFrom, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateFrom)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		}
+
+		pmDateFrom = dateFrom.Unix()
+	}
+
+	if req.PmDateTo != "" {
+		dateTo, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateTo)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		}
+
+		pmDateTo = dateTo.Unix()
+	}
+
 	file := &reporterpb.ReportFile{
 		ReportType: reporterpb.ReportTypeTransactions,
 		FileType:   req.FileType,
@@ -438,8 +461,8 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldStatus:        req.Status,
 		reporterpb.ParamsFieldPaymentMethod: req.PaymentMethod,
-		reporterpb.ParamsFieldDateFrom:      req.PmDateFrom,
-		reporterpb.ParamsFieldDateTo:        req.PmDateTo,
+		reporterpb.ParamsFieldDateFrom:      pmDateFrom,
+		reporterpb.ParamsFieldDateTo:        pmDateTo,
 	}
 
 	return h.dispatch.RequestReportFile(ctx, file, params)
