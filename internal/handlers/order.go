@@ -55,9 +55,9 @@ type ListOrdersRequest struct {
 	// The list of orders' statuses. Available values: created, processed, canceled, rejected, refunded, chargeback, pending.
 	Status []string `json:"status," validate:"omitempty,dive,alpha,oneof=created processed canceled rejected refunded chargeback pending"`
 	// The start date when the payment was created.
-	PmDateFrom int64 `json:"pm_date_from" validate:"omitempty,numeric,gt=0"`
+	PmDateFrom string `json:"pm_date_from" validate:"omitempty,datetime"`
 	// The end date when the payment was closed.
-	PmDateTo int64 `json:"pm_date_to" validate:"omitempty,numeric,gt=0"`
+	PmDateTo string `json:"pm_date_to" validate:"omitempty,datetime"`
 }
 
 type cloudWatchLogSettings struct {
@@ -122,9 +122,8 @@ func (b *OrderListRefundsBinder) Bind(i interface{}, ctx echo.Context) error {
 }
 
 type OrderRoute struct {
-	dispatch       common.HandlerSet
-	cfg            common.Config
-	moneyPrecision int64
+	dispatch common.HandlerSet
+	cfg      common.Config
 	provider.LMT
 	*cloudWatch
 }
@@ -169,11 +168,10 @@ func NewOrderRoute(
 	}
 
 	return &OrderRoute{
-		dispatch:       set,
-		LMT:            &set.AwareSet,
-		cloudWatch:     cloudWatch,
-		cfg:            *cfg,
-		moneyPrecision: common.MoneyDefaultPrecision,
+		dispatch:   set,
+		LMT:        &set.AwareSet,
+		cloudWatch: cloudWatch,
+		cfg:        *cfg,
 	}
 }
 
@@ -219,13 +217,6 @@ func (h *OrderRoute) getOrderPublic(ctx echo.Context) error {
 		return echo.NewHTTPError(int(typed.Status), typed.Message)
 	}
 
-	opts := []common.MoneyOption{
-		common.MoneyLogger(h.L()),
-		common.MoneyPrecision(h.moneyPrecision),
-	}
-	money := common.NewMoney(opts...)
-	typed.Item, err = h.formatOrderPublic(money, typed.Item)
-
 	return ctx.JSON(http.StatusOK, typed.Item)
 }
 
@@ -252,13 +243,6 @@ func (h *OrderRoute) getOrderPrivate(ctx echo.Context) error {
 	if typed.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(typed.Status), typed.Message)
 	}
-
-	opts := []common.MoneyOption{
-		common.MoneyLogger(h.L()),
-		common.MoneyPrecision(h.moneyPrecision),
-	}
-	money := common.NewMoney(opts...)
-	typed.Item, err = h.formatOrderPrivate(money, typed.Item)
 
 	return ctx.JSON(http.StatusOK, typed.Item)
 }
@@ -302,20 +286,6 @@ func (h *OrderRoute) listOrdersPublic(ctx echo.Context) error {
 		return echo.NewHTTPError(int(typed.Status), typed.Message)
 	}
 
-	opts := []common.MoneyOption{
-		common.MoneyLogger(h.L()),
-		common.MoneyPrecision(h.moneyPrecision),
-	}
-	money := common.NewMoney(opts...)
-
-	for key, val := range typed.Item.Items {
-		typed.Item.Items[key], err = h.formatOrderPublic(money, val)
-
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
-		}
-	}
-
 	return ctx.JSON(http.StatusOK, typed.Item)
 }
 
@@ -356,20 +326,6 @@ func (h *OrderRoute) listOrdersPrivate(ctx echo.Context) error {
 
 	if typed.Status != billingpb.ResponseStatusOk {
 		return echo.NewHTTPError(int(typed.Status), typed.Message)
-	}
-
-	opts := []common.MoneyOption{
-		common.MoneyLogger(h.L()),
-		common.MoneyPrecision(h.moneyPrecision),
-	}
-	money := common.NewMoney(opts...)
-
-	for key, val := range typed.Item.Items {
-		typed.Item.Items[key], err = h.formatOrderPrivate(money, val)
-
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
-		}
 	}
 
 	return ctx.JSON(http.StatusOK, typed.Item)
@@ -430,6 +386,29 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	var (
+		pmDateFrom = int64(0)
+		pmDateTo   = int64(0)
+	)
+
+	if req.PmDateFrom != "" {
+		dateFrom, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateFrom)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		}
+
+		pmDateFrom = dateFrom.Unix()
+	}
+
+	if req.PmDateTo != "" {
+		dateTo, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateTo)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		}
+
+		pmDateTo = dateTo.Unix()
+	}
+
 	file := &reporterpb.ReportFile{
 		ReportType: reporterpb.ReportTypeTransactions,
 		FileType:   req.FileType,
@@ -438,8 +417,8 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldStatus:        req.Status,
 		reporterpb.ParamsFieldPaymentMethod: req.PaymentMethod,
-		reporterpb.ParamsFieldDateFrom:      req.PmDateFrom,
-		reporterpb.ParamsFieldDateTo:        req.PmDateTo,
+		reporterpb.ParamsFieldDateFrom:      pmDateFrom,
+		reporterpb.ParamsFieldDateTo:        pmDateTo,
 	}
 
 	return h.dispatch.RequestReportFile(ctx, file, params)
@@ -753,642 +732,4 @@ func (h *OrderRoute) getOrder(ctx echo.Context, fn interface{}) (interface{}, er
 	}
 
 	return returnValues[0].Interface(), nil
-}
-
-func (h *OrderRoute) formatOrderPublic(
-	money *common.Money,
-	in *billingpb.OrderViewPublic,
-) (*billingpb.OrderViewPublic, error) {
-	var err error
-	in.TotalPaymentAmount, err = money.Round("total_payment_amount", in.TotalPaymentAmount)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if in.GrossRevenue != nil {
-		in.GrossRevenue.Amount, err = money.Round("gross_revenue", in.GrossRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.TaxFee != nil {
-		in.TaxFee.Amount, err = money.Round("tax_fee", in.TaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.TaxFeeCurrencyExchangeFee != nil {
-		in.TaxFeeCurrencyExchangeFee.Amount, err = money.Round("tax_fee_currency_exchange_fee", in.TaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.TaxFeeTotal != nil {
-		in.TaxFeeTotal.Amount, err = money.Round("tax_fee_total", in.TaxFeeTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodFeeTotal != nil {
-		in.MethodFeeTotal.Amount, err = money.Round("method_fee_total", in.MethodFeeTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodFeeTariff != nil {
-		in.MethodFeeTariff.Amount, err = money.Round("method_fee_tariff", in.MethodFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodFixedFeeTariff != nil {
-		in.MethodFixedFeeTariff.Amount, err = money.Round("method_fixed_fee_tariff", in.MethodFixedFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperFixedFee != nil {
-		in.PaysuperFixedFee.Amount, err = money.Round("paysuper_fixed_fee", in.PaysuperFixedFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotal != nil {
-		in.FeesTotal.Amount, err = money.Round("fees_total", in.FeesTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.FeesTotalLocal.Amount, err = money.Round("fees_total_local", in.FeesTotalLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.NetRevenue != nil {
-		in.NetRevenue.Amount, err = money.Round("net_revenue", in.NetRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.RefundGrossRevenue != nil {
-		in.RefundGrossRevenue.Amount, err = money.Round("refund_gross_revenue", in.RefundGrossRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodRefundFeeTariff != nil {
-		in.MethodRefundFeeTariff.Amount, err = money.Round("method_refund_fee_tariff", in.MethodRefundFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MerchantRefundFixedFeeTariff != nil {
-		in.MerchantRefundFixedFeeTariff.Amount, err = money.Round("method_refund_fee_tariff", in.MerchantRefundFixedFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.RefundTaxFee != nil {
-		in.RefundTaxFee.Amount, err = money.Round("refund_tax_fee", in.RefundTaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.RefundTaxFeeCurrencyExchangeFee != nil {
-		in.RefundTaxFeeCurrencyExchangeFee.Amount, err = money.Round("refund_tax_fee_currency_exchange_fee", in.RefundTaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperRefundTaxFeeCurrencyExchangeFee != nil {
-		in.PaysuperRefundTaxFeeCurrencyExchangeFee.Amount, err = money.Round("paysuper_refund_tax_fee_currency_exchange_fee", in.PaysuperRefundTaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.RefundReverseRevenue != nil {
-		in.RefundReverseRevenue.Amount, err = money.Round("refund_reverse_revenue", in.RefundReverseRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.RefundFeesTotal != nil {
-		in.RefundFeesTotal.Amount, err = money.Round("refund_fees_total", in.RefundFeesTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.RefundFeesTotalLocal != nil {
-		in.RefundFeesTotalLocal.Amount, err = money.Round("refund_fees_total_local", in.RefundFeesTotalLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.OrderCharge != nil {
-		in.OrderCharge.Amount, err = money.Round("order_charge", in.OrderCharge.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return in, nil
-}
-
-func (h *OrderRoute) formatOrderPrivate(
-	money *common.Money,
-	in *billingpb.OrderViewPrivate,
-) (*billingpb.OrderViewPrivate, error) {
-	var err error
-	in.TotalPaymentAmount, err = money.Round("total_payment_amount", in.TotalPaymentAmount)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if in.PaymentGrossRevenueLocal != nil {
-		in.PaymentGrossRevenueLocal.Amount, err = money.Round("payment_gross_revenue_local", in.PaymentGrossRevenueLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentGrossRevenueOrigin != nil {
-		in.PaymentGrossRevenueOrigin.Amount, err = money.Round("payment_gross_revenue_origin", in.PaymentGrossRevenueOrigin.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentGrossRevenue != nil {
-		in.PaymentGrossRevenue.Amount, err = money.Round("payment_gross_revenue", in.PaymentGrossRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentTaxFee != nil {
-		in.PaymentTaxFee.Amount, err = money.Round("payment_tax_fee", in.PaymentTaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentTaxFeeLocal != nil {
-		in.PaymentTaxFeeLocal.Amount, err = money.Round("payment_tax_fee_local", in.PaymentTaxFeeLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentTaxFeeOrigin != nil {
-		in.PaymentTaxFeeOrigin.Amount, err = money.Round("payment_tax_fee_origin", in.PaymentTaxFeeOrigin.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentTaxFeeCurrencyExchangeFee != nil {
-		in.PaymentTaxFeeCurrencyExchangeFee.Amount, err = money.Round("payment_tax_fee_currency_exchange_fee", in.PaymentTaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentTaxFeeTotal != nil {
-		in.PaymentTaxFeeTotal.Amount, err = money.Round("payment_tax_fee_total", in.PaymentTaxFeeTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentGrossRevenueFx != nil {
-		in.PaymentGrossRevenueFx.Amount, err = money.Round("payment_gross_revenue_fx", in.PaymentGrossRevenueFx.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentGrossRevenueFxTaxFee != nil {
-		in.PaymentGrossRevenueFxTaxFee.Amount, err = money.Round("payment_gross_revenue_fx_tax_fee", in.PaymentGrossRevenueFxTaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaymentGrossRevenueFxProfit != nil {
-		in.PaymentGrossRevenueFxProfit.Amount, err = money.Round("payment_gross_revenue_fx_profit", in.PaymentGrossRevenueFxProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.GrossRevenue != nil {
-		in.GrossRevenue.Amount, err = money.Round("gross_revenue", in.GrossRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.TaxFee != nil {
-		in.TaxFee.Amount, err = money.Round("tax_fee", in.TaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.TaxFeeCurrencyExchangeFee != nil {
-		in.TaxFeeCurrencyExchangeFee.Amount, err = money.Round("tax_fee_currency_exchange_fee", in.TaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.TaxFeeTotal != nil {
-		in.TaxFeeTotal.Amount, err = money.Round("tax_fee_total", in.TaxFeeTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodFeeTotal != nil {
-		in.MethodFeeTotal.Amount, err = money.Round("method_fee_total", in.MethodFeeTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodFeeTariff != nil {
-		in.MethodFeeTariff.Amount, err = money.Round("method_fee_tariff", in.MethodFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperMethodFeeTariffSelfCost != nil {
-		in.PaysuperMethodFeeTariffSelfCost.Amount, err = money.Round("paysuper_method_fee_tariff_self_cost", in.PaysuperMethodFeeTariffSelfCost.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperMethodFeeProfit != nil {
-		in.PaysuperMethodFeeProfit.Amount, err = money.Round("paysuper_method_fee_profit", in.PaysuperMethodFeeProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.MethodFixedFeeTariff != nil {
-		in.MethodFixedFeeTariff.Amount, err = money.Round("method_fixed_fee_tariff", in.MethodFixedFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperMethodFixedFeeTariffFxProfit != nil {
-		in.PaysuperMethodFixedFeeTariffFxProfit.Amount, err = money.Round("paysuper_method_fixed_fee_tariff_fx_profit", in.PaysuperMethodFixedFeeTariffFxProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperMethodFixedFeeTariffSelfCost != nil {
-		in.PaysuperMethodFixedFeeTariffSelfCost.Amount, err = money.Round("paysuper_method_fixed_fee_tariff_self_cost", in.PaysuperMethodFixedFeeTariffSelfCost.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperMethodFixedFeeTariffTotalProfit != nil {
-		in.PaysuperMethodFixedFeeTariffTotalProfit.Amount, err = money.Round("paysuper_method_fixed_fee_tariff_total_profit", in.PaysuperMethodFixedFeeTariffTotalProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperFixedFee != nil {
-		in.PaysuperFixedFee.Amount, err = money.Round("paysuper_fixed_fee", in.PaysuperFixedFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.PaysuperFixedFeeFxProfit != nil {
-		in.PaysuperFixedFeeFxProfit.Amount, err = money.Round("paysuper_fixed_fee_fx_profit", in.PaysuperFixedFeeFxProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotal != nil {
-		in.FeesTotal.Amount, err = money.Round("fees_total", in.FeesTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.FeesTotalLocal.Amount, err = money.Round("fees_total_local", in.FeesTotalLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.NetRevenue.Amount, err = money.Round("net_revenue", in.NetRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperMethodTotalProfit.Amount, err = money.Round("paysuper_method_total_profit", in.PaysuperMethodTotalProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperTotalProfit.Amount, err = money.Round("paysuper_total_profit", in.PaysuperTotalProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundGrossRevenueLocal.Amount, err = money.Round("payment_refund_gross_revenue_local", in.PaymentRefundGrossRevenueLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundGrossRevenueOrigin.Amount, err = money.Round("payment_refund_gross_revenue_origin", in.PaymentRefundGrossRevenueOrigin.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundGrossRevenue.Amount, err = money.Round("payment_refund_gross_revenue", in.PaymentRefundGrossRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundTaxFee.Amount, err = money.Round("payment_refund_tax_fee", in.PaymentRefundTaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundTaxFeeLocal.Amount, err = money.Round("payment_refund_tax_fee_local", in.PaymentRefundTaxFeeLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundTaxFeeOrigin.Amount, err = money.Round("payment_refund_tax_fee_origin", in.PaymentRefundTaxFeeOrigin.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaymentRefundFeeTariff.Amount, err = money.Round("payment_refund_fee_tariff", in.PaymentRefundFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.MethodRefundFixedFeeTariff.Amount, err = money.Round("method_refund_fixed_fee_tariff", in.MethodRefundFixedFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundGrossRevenue.Amount, err = money.Round("refund_gross_revenue", in.RefundGrossRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundGrossRevenueFx.Amount, err = money.Round("refund_gross_revenue_fx", in.RefundGrossRevenueFx.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.MethodRefundFeeTariff.Amount, err = money.Round("method_refund_fee_tariff", in.MethodRefundFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperMethodRefundFeeTariffProfit.Amount, err = money.Round("paysuper_method_refund_fee_tariff_profit", in.PaysuperMethodRefundFeeTariffProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperMethodRefundFixedFeeTariffSelfCost.Amount, err = money.Round("paysuper_method_refund_fixed_fee_tariff_self_cost", in.PaysuperMethodRefundFixedFeeTariffSelfCost.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.MerchantRefundFixedFeeTariff.Amount, err = money.Round("merchant_refund_fixed_fee_tariff", in.MerchantRefundFixedFeeTariff.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperMethodRefundFixedFeeTariffProfit.Amount, err = money.Round("paysuper_method_refund_fixed_fee_tariff_profit", in.PaysuperMethodRefundFixedFeeTariffProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundTaxFee.Amount, err = money.Round("refund_tax_fee", in.RefundTaxFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundTaxFeeCurrencyExchangeFee.Amount, err = money.Round("refund_tax_fee_currency_exchange_fee", in.RefundTaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperRefundTaxFeeCurrencyExchangeFee.Amount, err = money.Round("paysuper_refund_tax_fee_currency_exchange_fee", in.PaysuperRefundTaxFeeCurrencyExchangeFee.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundTaxFeeTotal.Amount, err = money.Round("refund_tax_fee_total", in.RefundTaxFeeTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundReverseRevenue.Amount, err = money.Round("refund_reverse_revenue", in.RefundReverseRevenue.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundFeesTotal.Amount, err = money.Round("refund_fees_total", in.RefundFeesTotal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.RefundFeesTotalLocal.Amount, err = money.Round("refund_fees_total_local", in.RefundFeesTotalLocal.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.PaysuperRefundTotalProfit.Amount, err = money.Round("paysuper_refund_total_profit", in.PaysuperRefundTotalProfit.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.OrderCharge.Amount, err = money.Round("order_charge", in.OrderCharge.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	if in.FeesTotalLocal != nil {
-		in.OrderChargeBeforeVat.Amount, err = money.Round("order_charge_before_vat", in.OrderChargeBeforeVat.Amount)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	in.TaxRate, err = money.Round("tax_rate", in.TaxRate)
-
-	return in, nil
 }

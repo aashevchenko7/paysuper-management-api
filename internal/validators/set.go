@@ -52,7 +52,7 @@ var (
 	companyNameRegexp = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\.0-9\"]+$")
 	zipGeneralRegexp  = regexp.MustCompile("^\\d{0,30}$")
 	swiftRegexp       = regexp.MustCompile("^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$")
-	cityRegexp        = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\.]+$")
+	cityRegexp        = regexp.MustCompile("^[\\p{L}\\p{M} \\-\\.\\']+$")
 	localeRegexp      = regexp.MustCompile("^[a-z]{2}-[A-Z]{2,10}$")
 )
 
