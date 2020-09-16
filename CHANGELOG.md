@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Add an endpoint for the act of completion report (#247). ([68b7e60](https://github.com/paysuper/paysuper-management-api/commit/68b7e60e588139666ad0f0cd71879534c879749d))
 
 ### Changed
-- The URL path of a request to download an act of completion document (#251). ([1a50fca](https://github.com/paysuper/paysuper-management-api/commit/1a50fca9eb217bbc4b49fe006cd33219776185eb))
+- The URL path of a request to download an act of completion report (#251). ([1a50fca](https://github.com/paysuper/paysuper-management-api/commit/1a50fca9eb217bbc4b49fe006cd33219776185eb))
 - Update dependencies. ([cfcfaab](https://github.com/paysuper/paysuper-management-api/commit/cfcfaab592493c944a279d20d85fcbfbe25e002d)) ([10c3955](https://github.com/paysuper/paysuper-management-api/commit/10c3955f65c356e707a7e194a240c94b60ed47a3)) ([2cf0942]()https://github.com/paysuper/paysuper-management-api/commit/2cf0942605da605bd73b1e835925ad184664953c)
 
 ### Fixed
