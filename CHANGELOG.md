@@ -1,6 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.5.0] - 2020-09-10
+
+### Added
+- Remove the order's amount rounding. ([e4d6a95])(https://github.com/paysuper/paysuper-management-api/commit/e4d6a95804a20ce7e1bf423dc0971708591326a7)
+- Add an endpoint for the act of completion report (#247). ([68b7e60](https://github.com/paysuper/paysuper-management-api/commit/68b7e60e588139666ad0f0cd71879534c879749d))
+
+### Changed
+- The URL path of a request to download an act of completion report (#251). ([1a50fca](https://github.com/paysuper/paysuper-management-api/commit/1a50fca9eb217bbc4b49fe006cd33219776185eb))
+- Update dependencies. ([cfcfaab](https://github.com/paysuper/paysuper-management-api/commit/cfcfaab592493c944a279d20d85fcbfbe25e002d)) ([10c3955](https://github.com/paysuper/paysuper-management-api/commit/10c3955f65c356e707a7e194a240c94b60ed47a3)) ([2cf0942]()https://github.com/paysuper/paysuper-management-api/commit/2cf0942605da605bd73b1e835925ad184664953c)
+
+### Fixed
+- Use a string type value for dates in the ListOrdersRequest (#253). ([22d94f9](https://github.com/paysuper/paysuper-management-api/commit/22d94f93bef1dc7010f975e3746713bb93ba2531))
+- If a company city contains an apostrophe then don't return an error (#249). ([9eca626](https://github.com/paysuper/paysuper-management-api/commit/9eca6265ccaff8b2a7f91215adc0299180364464))
+
+### Removed
+
+***
+
 ## [2.4.0] - 2020-08-26
 
 ### Added
