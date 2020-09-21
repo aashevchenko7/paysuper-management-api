@@ -35,6 +35,8 @@ func (suite *DashboardTestSuite) SetupTest() {
 	bs := &billingMocks.BillingService{}
 	bs.On("GetDashboardMainReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(&billingpb.GetDashboardMainResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.DashboardMainReport{}}, nil)
+	bs.On("GetDashboardCustomersReport", mock.Anything, mock.Anything).
+		Return(&billingpb.GetDashboardCustomerReportResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.DashboardCustomerReport{}}, nil)
 	bs.On("GetDashboardRevenueDynamicsReport", mock.Anything, mock.Anything, mock.Anything).
 		Return(
 			&billingpb.GetDashboardRevenueDynamicsReportResponse{
@@ -311,6 +313,91 @@ func (suite *DashboardTestSuite) TestDashboard_GetBaseReports_BillingServerRetur
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath + dashboardBasePath).
+		SetQueryParams(q).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
+
+	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), "some error", msg.Message)
+}
+
+func (suite *DashboardTestSuite) TestDashboard_GetCustomersReports_Ok() {
+	q := make(url.Values)
+	q.Set("period", "current_month")
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+dashboardCustomersPath).
+		SetQueryParams(q).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *DashboardTestSuite) TestDashboard_GetCustomersReports_ValidationError() {
+	q := make(url.Values)
+	q.Set("period", "123")
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+dashboardCustomersPath).
+		SetQueryParams(q).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusBadRequest, httpErr.Code)
+	assert.NotEmpty(suite.T(), httpErr.Message)
+}
+
+func (suite *DashboardTestSuite) TestDashboard_GetCustomersReports_BillingServerSystemError() {
+	q := make(url.Values)
+	q.Set("period", "current_month")
+
+	bs := &billingMocks.BillingService{}
+	bs.On("GetDashboardCustomersReport", mock.Anything, mock.Anything).
+		Return(nil, errors.New("some error"))
+	suite.router.dispatch.Services.Billing = bs
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+dashboardCustomersPath).
+		SetQueryParams(q).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorUnknown, httpErr.Message)
+}
+
+func (suite *DashboardTestSuite) TestDashboard_GetCustomersReports_BillingServerReturnError() {
+	q := make(url.Values)
+	q.Set("period", "current_month")
+
+	bs := &billingMocks.BillingService{}
+	bs.On("GetDashboardCustomersReport", mock.Anything, mock.Anything).
+		Return(
+			&billingpb.GetDashboardCustomerReportResponse{
+				Status:  billingpb.ResponseStatusBadData,
+				Message: &billingpb.ResponseErrorMessage{Message: "some error"},
+			},
+			nil,
+		)
+	suite.router.dispatch.Services.Billing = bs
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath + dashboardCustomersPath).
 		SetQueryParams(q).
 		Exec(suite.T())
 

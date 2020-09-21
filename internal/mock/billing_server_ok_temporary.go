@@ -10,6 +10,22 @@ import (
 
 type BillingServerOkTemporaryMock struct{}
 
+func (s *BillingServerOkTemporaryMock) GetDashboardCustomersReport(ctx context.Context, in *billingpb.DashboardCustomerReportRequest, opts ...client.CallOption) (*billingpb.GetDashboardCustomerReportResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) GetDashboardCustomerArpu(ctx context.Context, in *billingpb.DashboardCustomerReportArpuRequest, opts ...client.CallOption) (*billingpb.DashboardCustomerReportArpuResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) GetCustomerList(ctx context.Context, in *billingpb.ListCustomersRequest, opts ...client.CallOption) (*billingpb.ListCustomersResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) GetCustomerInfo(ctx context.Context, in *billingpb.GetCustomerInfoRequest, opts ...client.CallOption) (*billingpb.GetCustomerInfoResponse, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerOkTemporaryMock) GetVatReportTransactions(ctx context.Context, in *billingpb.VatTransactionsRequest, opts ...client.CallOption) (*billingpb.PrivateTransactionsResponse, error) {
 	panic("implement me")
 }

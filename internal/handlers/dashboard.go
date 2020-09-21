@@ -14,6 +14,7 @@ const (
 	dashboardMainPath            = "/merchants/dashboard/main"
 	dashboardRevenueDynamicsPath = "/merchants/dashboard/revenue_dynamics"
 	dashboardBasePath            = "/merchants/dashboard/base"
+	dashboardCustomersPath       = "/merchants/dashboard/customers"
 )
 
 type DashboardRoute struct {
@@ -35,6 +36,36 @@ func (h *DashboardRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(dashboardMainPath, h.getMainReports)
 	groups.AuthUser.GET(dashboardRevenueDynamicsPath, h.getRevenueDynamicsReport)
 	groups.AuthUser.GET(dashboardBasePath, h.getBaseReports)
+
+	groups.AuthUser.GET(dashboardCustomersPath, h.getCustomers)
+}
+
+func (h *DashboardRoute) getCustomers(ctx echo.Context) error {
+	req := &billingpb.DashboardCustomerReportRequest{}
+	err := ctx.Bind(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	err = h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.GetDashboardCustomersReport(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetDashboardCustomersReport", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Item)
 }
 
 // @summary Get the main reports for the Dashboard
