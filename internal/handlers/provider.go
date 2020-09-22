@@ -77,5 +77,6 @@ func ProviderHandlers(initial config.Initial, srv common.Services, validator *va
 		NewUserRoute(hSet, &copyCfg),
 		NewWebHookRoute(hSet, &copyCfg),
 		NewActOfCompletionApiV1(hSet, &copyCfg),
+		NewCustomerRoute(hSet, &copyCfg),
 	}, func() {}, nil
 }
