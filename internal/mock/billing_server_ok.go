@@ -1464,10 +1464,6 @@ func (s *BillingServerOkMock) SetCustomerPaymentActivity(ctx context.Context, in
 	panic("implement me")
 }
 
-func (s *BillingServerOkMock) GetDashboardCustomersReport(ctx context.Context, in *billingpb.DashboardCustomerReportRequest, opts ...client.CallOption) (*billingpb.GetDashboardCustomerReportResponse, error) {
-	panic("implement me")
-}
-
-func (s *BillingServerOkMock) GetDashboardCustomerArpu(ctx context.Context, in *billingpb.DashboardCustomerReportArpuRequest, opts ...client.CallOption) (*billingpb.DashboardCustomerReportArpuResponse, error) {
+func (s *BillingServerOkMock) DeserializeCookie(ctx context.Context, in *billingpb.DeserializeCookieRequest, opts ...client.CallOption) (*billingpb.DeserializeCookieResponse, error) {
 	panic("implement me")
 }
