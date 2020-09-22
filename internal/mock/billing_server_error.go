@@ -1173,3 +1173,11 @@ func (s *BillingServerErrorMock) GetActOfCompletion(ctx context.Context, in *bil
 func (s *BillingServerErrorMock) SetCustomerPaymentActivity(ctx context.Context, in *billingpb.SetCustomerPaymentActivityRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerErrorMock) GetDashboardCustomersReport(ctx context.Context, in *billingpb.DashboardCustomerReportRequest, opts ...client.CallOption) (*billingpb.GetDashboardCustomerReportResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetDashboardCustomerArpu(ctx context.Context, in *billingpb.DashboardCustomerReportArpuRequest, opts ...client.CallOption) (*billingpb.DashboardCustomerReportArpuResponse, error) {
+	panic("implement me")
+}
