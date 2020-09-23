@@ -31,7 +31,7 @@ require (
 	github.com/paysuper/paysuper-aws-manager v0.0.1
 	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200922163534-14a4a669f527
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7
-	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc
+	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200922163534-14a4a669f527
 	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200824155415-a52edf4ba059
 	github.com/paysuper/paysuper-proto/go/taxpb v0.0.0-20200424194932-ce37bf63cef9
 	github.com/paysuper/paysuper-tools v0.0.0-20200615134658-f86985dac3ba // indirect

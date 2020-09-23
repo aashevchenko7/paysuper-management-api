@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"errors"
 	"github.com/globalsign/mgo/bson"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/test"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
+	"github.com/paysuper/paysuper-proto/go/recurringpb"
+	recurringMocks "github.com/paysuper/paysuper-proto/go/recurringpb/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -145,5 +148,119 @@ func (suite *CustomerTestSuite) TestCustomer_GetListing_Error() {
 	e, ok := err.(*echo.HTTPError)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), 400, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Ok() {
+	service := &recurringMocks.RepositoryService{}
+	service.On("FindSubscriptions", mock.Anything, mock.Anything, mock.Anything).
+		Return(&recurringpb.FindSubscriptionsResponse{List: []*recurringpb.Subscription{
+			{
+				Id: "123",
+			},
+	}}, nil)
+	suite.router.dispatch.Services.Repository = service
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+customerSubscriptions).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Error() {
+	service := &recurringMocks.RepositoryService{}
+	service.On("FindSubscriptions", mock.Anything, mock.Anything, mock.Anything).
+		Return(&recurringpb.FindSubscriptionsResponse{List: nil}, errors.New("some error"))
+	suite.router.dispatch.Services.Repository = service
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+customerSubscriptions).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 500, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+
+func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Ok() {
+	id := bson.NewObjectId().Hex()
+
+	service := &recurringMocks.RepositoryService{}
+	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&recurringpb.GetSubscriptionResponse{Status: 200, Subscription: &recurringpb.Subscription{
+		Id:  id, CustomerUuid: id,
+	}}, nil)
+	suite.router.dispatch.Services.Repository = service
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, id).
+		Params(":subscription_id", id).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+}
+
+
+func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ServiceError() {
+	service := &recurringMocks.RepositoryService{}
+	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&recurringpb.GetSubscriptionResponse{Status: 400, Message: "some message"}, nil)
+	suite.router.dispatch.Services.Repository = service
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Params(":subscription_id", bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 400, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Error() {
+	service := &recurringMocks.RepositoryService{}
+	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&recurringpb.GetSubscriptionResponse{}, errors.New("some error"))
+	suite.router.dispatch.Services.Repository = service
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Params(":subscription_id", bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 500, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ForbiddenError() {
+	service := &recurringMocks.RepositoryService{}
+	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&recurringpb.GetSubscriptionResponse{Subscription: &recurringpb.Subscription{CustomerUuid: "123"}, Status: 200}, nil)
+	suite.router.dispatch.Services.Repository = service
+
+	_, err := suite.caller.Builder().
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Params(":subscription_id", bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 403, e.Code)
 	assert.NotEmpty(suite.T(), e.Message)
 }
