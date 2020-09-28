@@ -10,6 +10,18 @@ import (
 
 type BillingServerOkTemporaryMock struct{}
 
+func (s *BillingServerOkTemporaryMock) GetCustomerSubscription(ctx context.Context, in *billingpb.GetSubscriptionRequest, opts ...client.CallOption) (*billingpb.GetSubscriptionResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) FindSubscriptions(ctx context.Context, in *billingpb.FindSubscriptionsRequest, opts ...client.CallOption) (*billingpb.FindSubscriptionsResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkTemporaryMock) DeleteCustomerCard(ctx context.Context, in *billingpb.DeleteCustomerCardRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerOkTemporaryMock) GetDashboardCustomersReport(ctx context.Context, in *billingpb.DashboardCustomerReportRequest, opts ...client.CallOption) (*billingpb.GetDashboardCustomerReportResponse, error) {
 	panic("implement me")
 }

@@ -5,7 +5,6 @@ import (
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
-	"github.com/paysuper/paysuper-management-api/internal/helpers"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"github.com/paysuper/paysuper-proto/go/recurringpb"
 	"net/http"
@@ -41,11 +40,11 @@ func (h *CustomerRoute) Route(groups *common.Groups) {
 
 	groups.AuthUser.GET(customerSubscriptions, h.getCustomerSubscriptions)
 	groups.SystemUser.GET(customerSubscriptions, h.getCustomerSubscriptions)
-	groups.Common.GET(customerSubscriptions, h.getCustomerSubscriptions)
 
 	groups.AuthUser.GET(customerSubscription, h.getCustomerSubscription)
 	groups.SystemUser.GET(customerSubscription, h.getCustomerSubscription)
-	groups.Common.GET(customerSubscription, h.getCustomerSubscription)
+
+	groups.SystemUser.DELETE(customerSubscription, h.deleteCustomerSubscriptionAdmin)
 }
 
 func (h *CustomerRoute) getCustomerDetails(ctx echo.Context) error {
@@ -111,24 +110,6 @@ func (h *CustomerRoute) getCustomerSubscriptions(ctx echo.Context) error {
 
 	customerId := ctx.Param(common.RequestParameterId)
 	req.CustomerUuid = customerId
-	user := common.ExtractUserContext(ctx)
-
-	if user == nil {
-		cookies := helpers.GetRequestCookie(ctx, common.CustomerTokenCookiesName)
-		rsp, err := h.dispatch.Services.Billing.DeserializeCookie(ctx.Request().Context(), &billingpb.DeserializeCookieRequest{Cookie: cookies})
-		if err != nil {
-			common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeserializeCookie", req)
-			return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-		}
-
-		if rsp.Status != billingpb.ResponseStatusOk {
-			return echo.NewHTTPError(int(rsp.Status), rsp.Message)
-		}
-
-		if rsp.Item.CustomerId != customerId {
-			return echo.NewHTTPError(http.StatusForbidden, common.ErrorUnknown)
-		}
-	}
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -157,24 +138,6 @@ func (h *CustomerRoute) getCustomerSubscription(ctx echo.Context) error {
 	err := h.dispatch.Validate.Struct(req)
 	customerId := ctx.Param(common.RequestParameterId)
 
-	user := common.ExtractUserContext(ctx)
-	if user == nil {
-		cookies := helpers.GetRequestCookie(ctx, common.CustomerTokenCookiesName)
-		rsp, err := h.dispatch.Services.Billing.DeserializeCookie(ctx.Request().Context(), &billingpb.DeserializeCookieRequest{Cookie: cookies})
-		if err != nil {
-			common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeserializeCookie", req)
-			return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-		}
-
-		if rsp.Status != billingpb.ResponseStatusOk {
-			return echo.NewHTTPError(int(rsp.Status), rsp.Message)
-		}
-
-		if rsp.Item.CustomerId != customerId {
-			return echo.NewHTTPError(http.StatusForbidden, common.ErrorUnknown)
-		}
-	}
-
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
@@ -195,4 +158,30 @@ func (h *CustomerRoute) getCustomerSubscription(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, res.Subscription)
+}
+
+func (h *CustomerRoute) deleteCustomerSubscriptionAdmin(ctx echo.Context) error {
+	req := &billingpb.DeleteCustomerCardRequest{}
+
+	req.CustomerId = ctx.Param(common.RequestParameterId)
+	req.Id = ctx.Param("subscription_id")
+
+	err := h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.DeleteCustomerCard(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeleteCustomerCard", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.NoContent(http.StatusOK)
 }

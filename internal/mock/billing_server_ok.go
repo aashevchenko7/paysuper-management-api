@@ -17,6 +17,18 @@ import (
 type BillingServerOkMock struct {
 }
 
+func (s *BillingServerOkMock) GetCustomerSubscription(ctx context.Context, in *billingpb.GetSubscriptionRequest, opts ...client.CallOption) (*billingpb.GetSubscriptionResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkMock) FindSubscriptions(ctx context.Context, in *billingpb.FindSubscriptionsRequest, opts ...client.CallOption) (*billingpb.FindSubscriptionsResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerOkMock) DeleteCustomerCard(ctx context.Context, in *billingpb.DeleteCustomerCardRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerOkMock) GetDashboardCustomersReport(ctx context.Context, in *billingpb.DashboardCustomerReportRequest, opts ...client.CallOption) (*billingpb.GetDashboardCustomerReportResponse, error) {
 	panic("implement me")
 }
