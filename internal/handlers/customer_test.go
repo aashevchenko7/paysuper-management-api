@@ -8,8 +8,6 @@ import (
 	"github.com/paysuper/paysuper-management-api/internal/test"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
-	"github.com/paysuper/paysuper-proto/go/recurringpb"
-	recurringMocks "github.com/paysuper/paysuper-proto/go/recurringpb/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -152,14 +150,10 @@ func (suite *CustomerTestSuite) TestCustomer_GetListing_Error() {
 }
 
 func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Ok() {
-	service := &recurringMocks.RepositoryService{}
+	service := &billingMocks.BillingService{}
 	service.On("FindSubscriptions", mock.Anything, mock.Anything, mock.Anything).
-		Return(&recurringpb.FindSubscriptionsResponse{List: []*recurringpb.Subscription{
-			{
-				Id: "123",
-			},
-	}}, nil)
-	suite.router.dispatch.Services.Repository = service
+		Return(&billingpb.FindSubscriptionsResponse{List: []*billingpb.Subscription{{Id: "123", CustomerUuid: "123"}}, Status: 200}, nil)
+	suite.router.dispatch.Services.Billing = service
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath+customerSubscriptions).
@@ -170,10 +164,10 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Ok() {
 }
 
 func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Error() {
-	service := &recurringMocks.RepositoryService{}
+	service := &billingMocks.BillingService{}
 	service.On("FindSubscriptions", mock.Anything, mock.Anything, mock.Anything).
-		Return(&recurringpb.FindSubscriptionsResponse{List: nil}, errors.New("some error"))
-	suite.router.dispatch.Services.Repository = service
+		Return(&billingpb.FindSubscriptionsResponse{}, errors.New("some error"))
+	suite.router.dispatch.Services.Billing = service
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath+customerSubscriptions).
@@ -191,12 +185,10 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Error() {
 func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Ok() {
 	id := bson.NewObjectId().Hex()
 
-	service := &recurringMocks.RepositoryService{}
-	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
-		Return(&recurringpb.GetSubscriptionResponse{Status: 200, Subscription: &recurringpb.Subscription{
-		Id:  id, CustomerUuid: id,
-	}}, nil)
-	suite.router.dispatch.Services.Repository = service
+	service := &billingMocks.BillingService{}
+	service.On("GetCustomerSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.GetSubscriptionResponse{Subscription: &billingpb.Subscription{CustomerUuid: id, Id: id, CustomerId: id}, Status: 200}, nil)
+	suite.router.dispatch.Services.Billing = service
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath+customerSubscription).
@@ -209,10 +201,10 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Ok() {
 
 
 func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ServiceError() {
-	service := &recurringMocks.RepositoryService{}
-	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
-		Return(&recurringpb.GetSubscriptionResponse{Status: 400, Message: "some message"}, nil)
-	suite.router.dispatch.Services.Repository = service
+	service := &billingMocks.BillingService{}
+	service.On("GetCustomerSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.GetSubscriptionResponse{Message: &billingpb.ResponseErrorMessage{Message: "some message"}, Status: 400}, nil)
+	suite.router.dispatch.Services.Billing = service
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath+customerSubscription).
@@ -228,10 +220,10 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ServiceError() {
 }
 
 func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Error() {
-	service := &recurringMocks.RepositoryService{}
-	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
-		Return(&recurringpb.GetSubscriptionResponse{}, errors.New("some error"))
-	suite.router.dispatch.Services.Repository = service
+	service := &billingMocks.BillingService{}
+	service.On("GetCustomerSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.GetSubscriptionResponse{}, errors.New("some error"))
+	suite.router.dispatch.Services.Billing = service
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath+customerSubscription).
@@ -247,10 +239,10 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Error() {
 }
 
 func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ForbiddenError() {
-	service := &recurringMocks.RepositoryService{}
-	service.On("GetSubscription", mock.Anything, mock.Anything, mock.Anything).
-		Return(&recurringpb.GetSubscriptionResponse{Subscription: &recurringpb.Subscription{CustomerUuid: "123"}, Status: 200}, nil)
-	suite.router.dispatch.Services.Repository = service
+	service := &billingMocks.BillingService{}
+	service.On("GetCustomerSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.GetSubscriptionResponse{Subscription: &billingpb.Subscription{CustomerUuid: "123"}, Status: 200}, nil)
+	suite.router.dispatch.Services.Billing = service
 
 	_, err := suite.caller.Builder().
 		Path(common.AuthUserGroupPath+customerSubscription).
