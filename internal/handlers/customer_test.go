@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"net/http"
 	"testing"
 )
 
@@ -123,23 +124,58 @@ func (suite *CustomerTestSuite) TestCustomer_GetDetails_Error() {
 }
 
 func (suite *CustomerTestSuite) TestCustomer_GetListing_Ok() {
+	data := `{"merchant_id": "123", "external_id": "123"}`
+
 	_, err := suite.caller.Builder().
+		Method(http.MethodPost).
+		Init(test.ReqInitJSON()).
 		Path(common.AuthUserGroupPath+customerListing).
 		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		BodyString(data).
 		Exec(suite.T())
 
 	assert.NoError(suite.T(), err)
 }
 
-func (suite *CustomerTestSuite) TestCustomer_GetListing_Error() {
+
+func (suite *CustomerTestSuite) TestCustomer_GetListing_ValidationError() {
+	data := `{"limit": -1}`
+
 	billingService := &billingMocks.BillingService{}
 	billingService.On("GetCustomerList", mock.Anything, mock.Anything, mock.Anything).
 		Return(&billingpb.ListCustomersResponse{Status: billingpb.ResponseStatusBadData, Items: nil, Message: &billingpb.ResponseErrorMessage{Message: "asd", Code: "123"}}, nil)
 	suite.router.dispatch.Services.Billing = billingService
 
 	_, err := suite.caller.Builder().
+		Method(http.MethodPost).
 		Path(common.AuthUserGroupPath+customerListing).
 		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Init(test.ReqInitJSON()).
+		BodyString(data).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 400, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+
+func (suite *CustomerTestSuite) TestCustomer_GetListing_Error() {
+	data := `{"merchant_id": "123", "external_id": "123"}`
+
+	billingService := &billingMocks.BillingService{}
+	billingService.On("GetCustomerList", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.ListCustomersResponse{Status: billingpb.ResponseStatusBadData, Items: nil, Message: &billingpb.ResponseErrorMessage{Message: "asd", Code: "123"}}, nil)
+	suite.router.dispatch.Services.Billing = billingService
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodPost).
+		Path(common.AuthUserGroupPath+customerListing).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Init(test.ReqInitJSON()).
+		BodyString(data).
 		Exec(suite.T())
 
 	assert.Error(suite.T(), err)
