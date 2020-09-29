@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	"github.com/paysuper/paysuper-proto/go/recurringpb"
+	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -105,11 +105,11 @@ func (h *CustomerRoute) getCustomers(ctx echo.Context) error {
 }
 
 func (h *CustomerRoute) getCustomerSubscriptions(ctx echo.Context) error {
-	req := &recurringpb.FindSubscriptionsRequest{}
+	req := &billingpb.FindSubscriptionsRequest{}
 	err := ctx.Bind(req)
 
 	customerId := ctx.Param(common.RequestParameterId)
-	req.CustomerUuid = customerId
+	req.CustomerId = customerId
 
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -121,7 +121,7 @@ func (h *CustomerRoute) getCustomerSubscriptions(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
-	res, err := h.dispatch.Services.Repository.FindSubscriptions(ctx.Request().Context(), req)
+	res, err := h.dispatch.Services.Billing.FindSubscriptions(ctx.Request().Context(), req)
 
 	if err != nil {
 		common.LogSrvCallFailedGRPC(h.L(), err, "recurringpb", "FindSubscriptions", req)
@@ -132,9 +132,10 @@ func (h *CustomerRoute) getCustomerSubscriptions(ctx echo.Context) error {
 }
 
 func (h *CustomerRoute) getCustomerSubscription(ctx echo.Context) error {
-	req := &recurringpb.GetSubscriptionRequest{}
+	req := &billingpb.GetSubscriptionRequest{}
 
 	req.Id = ctx.Param("subscription_id")
+	req.CustomerId = ctx.Param(common.RequestParameterId)
 	err := h.dispatch.Validate.Struct(req)
 	customerId := ctx.Param(common.RequestParameterId)
 
@@ -142,7 +143,7 @@ func (h *CustomerRoute) getCustomerSubscription(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
-	res, err := h.dispatch.Services.Repository.GetSubscription(ctx.Request().Context(), req)
+	res, err := h.dispatch.Services.Billing.GetCustomerSubscription(ctx.Request().Context(), req)
 
 	if err != nil {
 		common.LogSrvCallFailedGRPC(h.L(), err, "recurringpb", "GetSubscription", req)
@@ -154,6 +155,7 @@ func (h *CustomerRoute) getCustomerSubscription(ctx echo.Context) error {
 	}
 
 	if res.Subscription.CustomerUuid != customerId {
+		zap.L().Error("trying to get wrong subscription", zap.String("request_customer_id", customerId), zap.String("subscription_customer_id", res.Subscription.CustomerId))
 		return echo.NewHTTPError(http.StatusForbidden, common.ErrorUnknown)
 	}
 
