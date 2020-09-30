@@ -470,14 +470,6 @@ github.com/paysuper/echo-casbin-middleware v1.0.1-0.20200203133300-6f18edeb3072 
 github.com/paysuper/echo-casbin-middleware v1.0.1-0.20200203133300-6f18edeb3072/go.mod h1:8qcpkOGOZ4rRHsEGdrjlfmJS07gfwQ7+xvvZkNXY5Rw=
 github.com/paysuper/paysuper-aws-manager v0.0.1 h1:792ZR+2Pva93ziJbV8zTxjod9gbx4jBlZ1ZUZpN/8Ts=
 github.com/paysuper/paysuper-aws-manager v0.0.1/go.mod h1:TjXLdcbFp4VeSvZK3+sKv61uRS1tH0mtrEEqziaJ/+E=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200924072214-e535669bf4c2 h1:fKo5NxtuaXdMCk82r5RMtgJrtPG/LJqbWDEKncjFfnE=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200924072214-e535669bf4c2/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200924091851-fd05fc765f9f h1:Dvnsa87rDK2BUvCjm1qriSzw5+4WJE5badlYhQSUmD4=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200924091851-fd05fc765f9f/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200925160831-9e7948ee12e7 h1:GPag3Nfbf8BFtsMgFp7PtgLjzBsSkGEEgktSZauT7oo=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200925160831-9e7948ee12e7/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200929083649-f874b25d82c4 h1:ekLnz9ew7sjo5zoFfhDJm1Zzhac1rMQMBlgEGSpfv6E=
-github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200929083649-f874b25d82c4/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200929151029-4ea96d388ed4 h1:V2r9gy1XYclYGifdcG5IVh0NGMdVsvzIm8e9YDBi2hE=
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200929151029-4ea96d388ed4/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
 github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7 h1:q8mNBBuf3lHX/YCHC6B7cpspJRqoVshtRAQpywBUY0s=
