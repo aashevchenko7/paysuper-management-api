@@ -33,9 +33,9 @@ func NewCustomerRoute(set common.HandlerSet, cfg *common.Config) *CustomerRoute 
 }
 
 func (h *CustomerRoute) Route(groups *common.Groups) {
-	groups.AuthUser.GET(customerListing, h.getCustomers)
+	groups.AuthUser.POST(customerListing, h.getCustomers)
 	groups.AuthUser.GET(customerDetailed, h.getCustomerDetails)
-	groups.SystemUser.GET(customerListing, h.getCustomers)
+	groups.SystemUser.POST(customerListing, h.getCustomers)
 	groups.SystemUser.GET(customerDetailed, h.getCustomerDetails)
 
 	groups.AuthUser.GET(customerSubscriptions, h.getCustomerSubscriptions)
