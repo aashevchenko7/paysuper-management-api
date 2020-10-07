@@ -11,11 +11,13 @@ import (
 )
 
 const (
-	merchantListRoles    = "/merchants/roles"
-	merchantUsers        = "/merchants/users"
-	merchantInvite       = "/merchants/invite"
-	merchantInviteResend = "/merchants/users/resend"
-	merchantUsersRole    = "/merchants/users/roles/:role_id"
+	merchantListRoles           = "/merchants/roles"
+	merchantUsers               = "/merchants/users"
+	merchantInvite              = "/merchants/invite"
+	merchantInviteResend        = "/merchants/users/resend"
+	merchantUsersRole           = "/merchants/users/roles/:role_id"
+	merchantSubscriptions       = "/merchants/subscriptions"
+	merchantSubscriptionDetails = "/merchants/subscriptions/:subscription_id"
 )
 
 type MerchantUsersRoute struct {
@@ -41,6 +43,11 @@ func (h *MerchantUsersRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(merchantListRoles, h.listRoles)
 	groups.AuthUser.DELETE(merchantUsersRole, h.deleteUser)
 	groups.AuthUser.GET(merchantUsersRole, h.getUser)
+	groups.AuthUser.GET(merchantSubscriptions, h.getMerchantSubscriptions)
+	groups.AuthUser.GET(merchantSubscriptionDetails, h.getMerchantSubscriptionDetails)
+
+	groups.SystemUser.GET(merchantSubscriptions, h.getMerchantSubscriptions)
+	groups.SystemUser.GET(merchantSubscriptionDetails, h.getMerchantSubscriptionDetails)
 }
 
 // @summary Update the merchant user role
@@ -240,6 +247,63 @@ func (h *MerchantUsersRoute) getUser(ctx echo.Context) error {
 
 	if err != nil {
 		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantUserRole")
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res)
+}
+
+// @summary Get subscriptions for merchant
+// @desc Get subscriptions for merchant
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.GetMerchantSubscriptionsResponse Returns the merchant subscriptions
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/merchants/subscriptions [get]
+func (h *MerchantUsersRoute) getMerchantSubscriptions(ctx echo.Context) error {
+	req := &billingpb.GetMerchantSubscriptionsRequest{}
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
+	}
+
+	res, err := h.dispatch.Services.Billing.GetMerchantSubscriptions(ctx.Request().Context(), req)
+
+	if err != nil {
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantSubscriptions")
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res)
+}
+
+// @summary Get orders for subscriptions
+// @desc Get orders for subscriptions
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.GetSubscriptionOrdersResponse Returns list of orders for subscriptions
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /admin/api/v1/merchants/subscriptions/:id [get]
+func (h *MerchantUsersRoute) getMerchantSubscriptionDetails(ctx echo.Context) error {
+	req := &billingpb.GetSubscriptionOrdersRequest{}
+	req.SubscriptionId = ctx.Param(common.RequestParameterSubscriptionId)
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
+	}
+
+	res, err := h.dispatch.Services.Billing.GetSubscriptionOrders(ctx.Request().Context(), req)
+
+	if err != nil {
+		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetSubscriptionOrders")
 	}
 
 	if res.Status != billingpb.ResponseStatusOk {

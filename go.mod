@@ -29,7 +29,7 @@ require (
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/paysuper/echo-casbin-middleware v1.0.1-0.20200203133300-6f18edeb3072
 	github.com/paysuper/paysuper-aws-manager v0.0.1
-	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20200929151029-4ea96d388ed4
+	github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201007104854-ecba64b225fb
 	github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7
 	github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200922163534-14a4a669f527
 	github.com/paysuper/paysuper-proto/go/reporterpb v0.0.0-20200824155415-a52edf4ba059
