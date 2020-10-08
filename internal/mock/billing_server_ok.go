@@ -17,6 +17,10 @@ import (
 type BillingServerOkMock struct {
 }
 
+func (s *BillingServerOkMock) DeleteRecurringSubscription(ctx context.Context, in *billingpb.DeleteRecurringSubscriptionRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerOkMock) FindPublicSubscriptions(ctx context.Context, in *billingpb.FindPublicSubscriptionsRequest, opts ...client.CallOption) (*billingpb.FindPublicSubscriptionsResponse, error) {
 	panic("implement me")
 }
