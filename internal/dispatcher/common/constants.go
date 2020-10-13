@@ -18,6 +18,7 @@ const (
 	// OffsetDefault = 0
 
 	RequestParameterId                       = "id"
+	RequestParameterSubscriptionId           = "subscription_id"
 	RequestParameterName                     = "name"
 	RequestParameterVatPayer                 = "vat_payer"
 	RequestParameterSku                      = "sku"

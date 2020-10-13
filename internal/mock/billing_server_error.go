@@ -11,6 +11,26 @@ import (
 
 type BillingServerErrorMock struct{}
 
+func (s *BillingServerErrorMock) DeleteRecurringSubscription(ctx context.Context, in *billingpb.DeleteRecurringSubscriptionRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) FindPublicSubscriptions(ctx context.Context, in *billingpb.FindPublicSubscriptionsRequest, opts ...client.CallOption) (*billingpb.FindPublicSubscriptionsResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetCustomerShortInfo(ctx context.Context, in *billingpb.GetCustomerShortInfoRequest, opts ...client.CallOption) (*billingpb.GetCustomerShortInfoResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetSubscriptionOrders(ctx context.Context, in *billingpb.GetSubscriptionOrdersRequest, opts ...client.CallOption) (*billingpb.GetSubscriptionOrdersResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetMerchantSubscriptions(ctx context.Context, in *billingpb.GetMerchantSubscriptionsRequest, opts ...client.CallOption) (*billingpb.GetMerchantSubscriptionsResponse, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerErrorMock) GetCustomerSubscription(ctx context.Context, in *billingpb.GetSubscriptionRequest, opts ...client.CallOption) (*billingpb.GetSubscriptionResponse, error) {
 	panic("implement me")
 }
