@@ -45,39 +45,39 @@ func (suite *CustomerTestSuite) SetupTest() {
 				Orders:     0,
 				Revenue:    0,
 			},
-	}}, nil)
+		}}, nil)
 
 	bs.On("GetCustomerInfo", mock.Anything, mock.Anything).
 		Return(&billingpb.GetCustomerInfoResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.Customer{
-		Id:                    "",
-		TechEmail:             "",
-		ExternalId:            "",
-		Email:                 "",
-		EmailVerified:         false,
-		Phone:                 "",
-		PhoneVerified:         false,
-		Name:                  "",
-		Ip:                    nil,
-		Locale:                "",
-		AcceptLanguage:        "",
-		UserAgent:             "",
-		Address:               nil,
-		Identity:              nil,
-		IpHistory:             nil,
-		AddressHistory:        nil,
-		LocaleHistory:         nil,
-		AcceptLanguageHistory: nil,
-		Metadata:              nil,
-		CreatedAt:             nil,
-		UpdatedAt:             nil,
-		NotifySale:            false,
-		NotifySaleEmail:       "",
-		NotifyNewRegion:       false,
-		NotifyNewRegionEmail:  "",
-		IpString:              "",
-		PaymentActivity:       nil,
-		Uuid:                  "",
-	}}, nil)
+			Id:                    "",
+			TechEmail:             "",
+			ExternalId:            "",
+			Email:                 "",
+			EmailVerified:         false,
+			Phone:                 "",
+			PhoneVerified:         false,
+			Name:                  "",
+			Ip:                    nil,
+			Locale:                "",
+			AcceptLanguage:        "",
+			UserAgent:             "",
+			Address:               nil,
+			Identity:              nil,
+			IpHistory:             nil,
+			AddressHistory:        nil,
+			LocaleHistory:         nil,
+			AcceptLanguageHistory: nil,
+			Metadata:              nil,
+			CreatedAt:             nil,
+			UpdatedAt:             nil,
+			NotifySale:            false,
+			NotifySaleEmail:       "",
+			NotifyNewRegion:       false,
+			NotifyNewRegionEmail:  "",
+			IpString:              "",
+			PaymentActivity:       nil,
+			Uuid:                  "",
+		}}, nil)
 
 	var e error
 	settings := test.DefaultSettings()
@@ -137,7 +137,6 @@ func (suite *CustomerTestSuite) TestCustomer_GetListing_Ok() {
 	assert.NoError(suite.T(), err)
 }
 
-
 func (suite *CustomerTestSuite) TestCustomer_GetListing_ValidationError() {
 	data := `{"limit": -1}`
 
@@ -160,7 +159,6 @@ func (suite *CustomerTestSuite) TestCustomer_GetListing_ValidationError() {
 	assert.Equal(suite.T(), 400, e.Code)
 	assert.NotEmpty(suite.T(), e.Message)
 }
-
 
 func (suite *CustomerTestSuite) TestCustomer_GetListing_Error() {
 	data := `{"merchant_id": "123", "external_id": "123"}`
@@ -217,7 +215,6 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscriptions_Error() {
 	assert.NotEmpty(suite.T(), e.Message)
 }
 
-
 func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Ok() {
 	id := bson.NewObjectId().Hex()
 
@@ -234,7 +231,6 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscription_Ok() {
 
 	assert.NoError(suite.T(), err)
 }
-
 
 func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ServiceError() {
 	service := &billingMocks.BillingService{}
@@ -290,5 +286,63 @@ func (suite *CustomerTestSuite) TestCustomer_GetSubscription_ForbiddenError() {
 	e, ok := err.(*echo.HTTPError)
 	assert.True(suite.T(), ok)
 	assert.Equal(suite.T(), 403, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_DeleteSubscription_Ok() {
+	id := bson.NewObjectId().Hex()
+
+	service := &billingMocks.BillingService{}
+	service.On("DeleteRecurringSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.EmptyResponseWithStatus{Status: 200}, nil)
+	suite.router.dispatch.Services.Billing = service
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodDelete).
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, id).
+		Params(":subscription_id", id).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_DeleteSubscription_ServiceError() {
+	service := &billingMocks.BillingService{}
+	service.On("DeleteRecurringSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.EmptyResponseWithStatus{Message: &billingpb.ResponseErrorMessage{Message: "some message"}, Status: 400}, nil)
+	suite.router.dispatch.Services.Billing = service
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodDelete).
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Params(":subscription_id", bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 400, e.Code)
+	assert.NotEmpty(suite.T(), e.Message)
+}
+
+func (suite *CustomerTestSuite) TestCustomer_DeleteSubscription_Error() {
+	service := &billingMocks.BillingService{}
+	service.On("DeleteRecurringSubscription", mock.Anything, mock.Anything, mock.Anything).
+		Return(&billingpb.EmptyResponseWithStatus{}, errors.New("some error"))
+	suite.router.dispatch.Services.Billing = service
+
+	_, err := suite.caller.Builder().
+		Method(http.MethodDelete).
+		Path(common.AuthUserGroupPath+customerSubscription).
+		Params(":"+common.RequestParameterId, bson.NewObjectId().Hex()).
+		Params(":subscription_id", bson.NewObjectId().Hex()).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+	e, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), 500, e.Code)
 	assert.NotEmpty(suite.T(), e.Message)
 }
