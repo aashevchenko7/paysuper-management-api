@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	customerListing  = "/customers"
-	customerDetailed = "/customers/:id"
+	customerListing       = "/customers"
+	customerDetailed      = "/customers/:id"
 	customerSubscriptions = "/customers/:id/subscriptions"
-	customerSubscription = "/customers/:id/subscription/:subscription_id"
+	customerSubscription  = "/customers/:id/subscription/:subscription_id"
+	customerCard          = "/customers/:id/card/:card_id"
 )
 
 type CustomerRoute struct {
@@ -44,7 +45,10 @@ func (h *CustomerRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(customerSubscription, h.getCustomerSubscription)
 	groups.SystemUser.GET(customerSubscription, h.getCustomerSubscription)
 
-	groups.SystemUser.DELETE(customerSubscription, h.deleteCustomerSubscriptionAdmin)
+	groups.AuthUser.DELETE(customerSubscription, h.deleteCustomerSubscription)
+	groups.SystemUser.DELETE(customerSubscription, h.deleteCustomerSubscription)
+
+	groups.SystemUser.DELETE(customerCard, h.deleteCustomerCardAdmin)
 }
 
 func (h *CustomerRoute) getCustomerDetails(ctx echo.Context) error {
@@ -162,11 +166,11 @@ func (h *CustomerRoute) getCustomerSubscription(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res.Subscription)
 }
 
-func (h *CustomerRoute) deleteCustomerSubscriptionAdmin(ctx echo.Context) error {
+func (h *CustomerRoute) deleteCustomerCardAdmin(ctx echo.Context) error {
 	req := &billingpb.DeleteCustomerCardRequest{}
 
 	req.CustomerId = ctx.Param(common.RequestParameterId)
-	req.Id = ctx.Param("subscription_id")
+	req.Id = ctx.Param("card_id")
 
 	err := h.dispatch.Validate.Struct(req)
 
@@ -178,6 +182,32 @@ func (h *CustomerRoute) deleteCustomerSubscriptionAdmin(ctx echo.Context) error 
 
 	if err != nil {
 		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeleteCustomerCard", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.NoContent(http.StatusOK)
+}
+
+func (h *CustomerRoute) deleteCustomerSubscription(ctx echo.Context) error {
+	req := &billingpb.DeleteRecurringSubscriptionRequest{}
+
+	req.CustomerId = ctx.Param(common.RequestParameterId)
+	req.SubscriptionId = ctx.Param("subscription_id")
+
+	err := h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.DeleteRecurringSubscription(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "DeleteRecurringSubscription", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
