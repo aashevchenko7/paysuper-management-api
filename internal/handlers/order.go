@@ -58,6 +58,8 @@ type ListOrdersRequest struct {
 	PmDateFrom string `json:"pm_date_from" validate:"omitempty,datetime"`
 	// The end date when the payment was closed.
 	PmDateTo string `json:"pm_date_to" validate:"omitempty,datetime"`
+	// Hide test transactions.
+	HideTest bool `json:"hide_test"`
 }
 
 type cloudWatchLogSettings struct {
@@ -410,9 +412,10 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	}
 
 	file := &reporterpb.ReportFile{
-		ReportType: reporterpb.ReportTypeTransactions,
-		FileType:   req.FileType,
-		MerchantId: req.MerchantId,
+		ReportType:           reporterpb.ReportTypeTransactions,
+		FileType:             req.FileType,
+		MerchantId:           req.MerchantId,
+		HideTestTransactions: req.HideTest,
 	}
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldStatus:        req.Status,

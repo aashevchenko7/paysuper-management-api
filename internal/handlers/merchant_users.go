@@ -3,7 +3,9 @@ package handlers
 import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
+	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
@@ -310,5 +312,60 @@ func (h *MerchantUsersRoute) getMerchantSubscriptionDetails(ctx echo.Context) er
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	return ctx.JSON(http.StatusOK, res)
+	req1 := &billingpb.GetSubscriptionRequest{
+		Id:         req.SubscriptionId,
+		Cookie:     req.Cookie,
+	}
+
+	res1, err := h.dispatch.Services.Billing.GetCustomerSubscription(ctx.Request().Context(), req1)
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetCustomerSubscription", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res1.Status != billingpb.ResponseStatusOk {
+		zap.L().Error("response code is not OK", zap.Int32("status", res1.Status), zap.String("method", "GetCustomerSubscription"))
+		return echo.NewHTTPError(int(res1.Status), res1)
+	}
+
+	projRes, err := h.dispatch.Services.Billing.GetProject(ctx.Request().Context(), &billingpb.GetProjectRequest{
+		MerchantId: res1.Subscription.MerchantId,
+		ProjectId:  res1.Subscription.ProjectId,
+	})
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetProject", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if projRes.Status != billingpb.ResponseStatusOk {
+		zap.L().Error("response code is not OK", zap.Int32("status", projRes.Status), zap.String("method", "GetProject"))
+		return echo.NewHTTPError(int(projRes.Status), projRes)
+	}
+
+	type subscriptionDetails struct {
+		Amount       float32                 `json:"amount"`
+		Currency     string                  `json:"currency"`
+		Id           string                  `json:"id"`
+		IsActive     bool                    `json:"is_active"`
+		MaskedPan    string                  `json:"masked_pan"`
+		ProjectName  string                  `json:"project_name"`
+		StartDate    *timestamp.Timestamp    `json:"start_date"`
+		Transactions []*billingpb.ShortOrder `json:"transactions"`
+		Count        int32                   `json:"count"`
+	}
+
+	subscription := res1.Subscription
+	result := subscriptionDetails{
+		Amount:       float32(subscription.Amount),
+		Currency:     subscription.Currency,
+		Id:           subscription.Id,
+		IsActive:     subscription.IsActive,
+		MaskedPan:    subscription.MaskedPan,
+		ProjectName:  projRes.Item.Name["en"],
+		StartDate:    subscription.CreatedAt,
+		Transactions: res.List,
+		Count:        res.Count,
+	}
+
+	return ctx.JSON(http.StatusOK, result)
 }
