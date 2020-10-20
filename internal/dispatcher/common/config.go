@@ -33,7 +33,8 @@ type Config struct {
 	LimitDefault          int32 `default:"100"`
 	OffsetDefault         int32 `default:"0"`
 	LimitMax              int32 `default:"1000"`
-	DisableAuthMiddleware bool
+	DisableAuthMiddleware bool  `envconfig:"DISABLE_AUTH_MIDDLEWARE"`
+	DisableCasbinPolicy   bool  `envconfig:"DISABLE_CASBIN_POLICY"`
 
 	OrderInlineFormUrlMask string `envconfig:"ORDER_INLINE_FORM_URL_MASK" required:"true"`
 

@@ -31,6 +31,7 @@ import (
 type OnboardingTestSuite struct {
 	suite.Suite
 	router  *OnboardingRoute
+	user    *common.AuthUser
 	caller  *test.EchoReqResCaller
 	somePDF []byte
 }
@@ -40,7 +41,7 @@ func Test_Onboarding(t *testing.T) {
 }
 
 func (suite *OnboardingTestSuite) SetupTest() {
-	user := &common.AuthUser{
+	suite.user = &common.AuthUser{
 		Id:         "ffffffffffffffffffffffff",
 		Email:      "test@unit.test",
 		MerchantId: "ffffffffffffffffffffffff",
@@ -53,7 +54,7 @@ func (suite *OnboardingTestSuite) SetupTest() {
 	}
 	suite.caller, e = test.SetUp(settings, srv, func(set *test.TestSet, mw test.Middleware) common.Handlers {
 
-		mw.Pre(test.PreAuthUserMiddleware(user))
+		mw.Pre(test.PreAuthUserMiddleware(suite.user))
 
 		suite.somePDF, e = ioutil.ReadFile(set.Initial.WorkDir + "/test/test_pdf.pdf")
 		if e != nil {
@@ -780,39 +781,6 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithoutMerch
 	assert.Equal(suite.T(), merchant.Company, company)
 }
 
-func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithMerchantId_Ok() {
-	company := &billingpb.MerchantCompanyInfo{
-		Name:               mock.OnboardingMerchantMock.Company.Name,
-		AlternativeName:    mock.OnboardingMerchantMock.Company.Name,
-		Website:            "http://localhost",
-		Country:            "RU",
-		State:              "St.Petersburg",
-		Zip:                "190000",
-		City:               "St.Petersburg",
-		Address:            "Nevskiy st. 1",
-		RegistrationNumber: "1234567890",
-	}
-	b, err := json.Marshal(company)
-	assert.NoError(suite.T(), err)
-
-	res, err := suite.caller.Builder().
-		Method(http.MethodPut).
-		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
-		Path(common.SystemUserGroupPath + merchantsIdCompanyPath).
-		Init(test.ReqInitJSON()).
-		BodyBytes(b).
-		Exec(suite.T())
-
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), http.StatusOK, res.Code)
-	assert.NotEmpty(suite.T(), res.Body.String())
-
-	merchant := new(billingpb.Merchant)
-	err = json.Unmarshal(res.Body.Bytes(), merchant)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), merchant.Company, company)
-}
-
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_BindError() {
 	b := `{"name": 123}`
 
@@ -1173,41 +1141,6 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithoutMerc
 	assert.Equal(suite.T(), merchant.Contacts, contacts)
 }
 
-func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithMerchantId_Ok() {
-	contacts := &billingpb.MerchantContact{
-		Authorized: &billingpb.MerchantContactAuthorized{
-			Name:     "Unit Test",
-			Email:    "test@unit.test",
-			Phone:    "1234567890",
-			Position: "CEO",
-		},
-		Technical: &billingpb.MerchantContactTechnical{
-			Name:  "Unit Test",
-			Email: "test@unit.test",
-			Phone: "1234567890",
-		},
-	}
-	b, err := json.Marshal(contacts)
-	assert.NoError(suite.T(), err)
-
-	res, err := suite.caller.Builder().
-		Method(http.MethodPut).
-		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
-		Path(common.SystemUserGroupPath + merchantsIdContactsPath).
-		Init(test.ReqInitJSON()).
-		BodyBytes(b).
-		Exec(suite.T())
-
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), http.StatusOK, res.Code)
-	assert.NotEmpty(suite.T(), res.Body.String())
-
-	merchant := new(billingpb.Merchant)
-	err = json.Unmarshal(res.Body.Bytes(), merchant)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), merchant.Contacts, contacts)
-}
-
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_BindError() {
 	b := `{"authorized": {"name": "Unit Test", "Email": "test@unit.test", "Phone": "1234567890"}, "technical": 1234}`
 
@@ -1520,36 +1453,6 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithoutMerch
 	res, err := suite.caller.Builder().
 		Method(http.MethodPut).
 		Path(common.AuthUserGroupPath + merchantsBankingPath).
-		Init(test.ReqInitJSON()).
-		BodyBytes(b).
-		Exec(suite.T())
-
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), http.StatusOK, res.Code)
-	assert.NotEmpty(suite.T(), res.Body.String())
-
-	merchant := new(billingpb.Merchant)
-	err = json.Unmarshal(res.Body.Bytes(), merchant)
-	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), merchant.Banking, banking)
-}
-
-func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithMerchantId_Ok() {
-	banking := &billingpb.MerchantBanking{
-		Currency:             "RUB",
-		Name:                 "Bank Name-Spb.",
-		Address:              "St.Petersburg, Nevskiy st. 1",
-		AccountNumber:        "SE1412345678901234567890",
-		Swift:                "ALFARUMM",
-		CorrespondentAccount: "408000000001",
-	}
-	b, err := json.Marshal(banking)
-	assert.NoError(suite.T(), err)
-
-	res, err := suite.caller.Builder().
-		Method(http.MethodPut).
-		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
-		Path(common.SystemUserGroupPath + merchantsIdBankingPath).
 		Init(test.ReqInitJSON()).
 		BodyBytes(b).
 		Exec(suite.T())
@@ -2240,4 +2143,343 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_CzechRepubli
 	msg, ok := httpErr.Message.(*billingpb.ResponseErrorMessage)
 	assert.True(suite.T(), ok)
 	assert.Regexp(suite.T(), "Zip", msg.Details)
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContactsForAdmin_Ok() {
+	var (
+		oldContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test",
+				Email:    "test@unit.test",
+				Phone:    "1234567890",
+				Position: "CEO",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test",
+				Email: "test@unit.test",
+				Phone: "1234567890",
+			},
+		}
+		newContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test2",
+				Email:    "test2@unit.test",
+				Phone:    "0987654321",
+				Position: "ADMIN",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test3",
+				Email: "test3@unit.test",
+				Phone: "1212121212",
+			},
+		}
+		expectedContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     newContacts.Authorized.Name,
+				Email:    newContacts.Authorized.Email,
+				Phone:    newContacts.Authorized.Phone,
+				Position: oldContacts.Authorized.Position,
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  oldContacts.Technical.Name,
+				Email: oldContacts.Technical.Email,
+				Phone: oldContacts.Technical.Phone,
+			},
+		}
+		merchant = &billingpb.Merchant{
+			Id:       "ffffffffffffffffffffffff",
+			Contacts: expectedContacts,
+		}
+	)
+
+	billingService := &billMock.BillingService{}
+	billingService.On("GetMerchantBy", mock2.Anything, &billingpb.GetMerchantByRequest{MerchantId: merchant.Id}).
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.Merchant{
+			Id:       merchant.Id,
+			Contacts: oldContacts,
+		}}, nil)
+	billingService.On("ChangeMerchant", mock2.Anything, &billingpb.OnboardingRequest{
+		Contacts: expectedContacts,
+		Id:       merchant.Id,
+		User: &billingpb.MerchantUser{
+			Id:    suite.user.Id,
+			Email: suite.user.Email,
+		},
+	}).
+		Return(&billingpb.ChangeMerchantResponse{Status: billingpb.ResponseStatusOk}, nil)
+	suite.router.dispatch.Services.Billing = billingService
+
+	b, err := json.Marshal(newContacts)
+	assert.NoError(suite.T(), err)
+
+	res, err := suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, merchant.Id).
+		Path(common.SystemUserGroupPath + merchantsIdContactsPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+
+	merchantResponse := new(billingpb.Merchant)
+	err = json.Unmarshal(res.Body.Bytes(), merchantResponse)
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), merchant.Contacts, expectedContacts)
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContactsForAdmin_GetMerchantBy_BillingError() {
+	var (
+		newContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test2",
+				Email:    "test2@unit.test",
+				Phone:    "0987654321",
+				Position: "ADMIN",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test3",
+				Email: "test3@unit.test",
+				Phone: "1212121212",
+			},
+		}
+		merchant = &billingpb.Merchant{
+			Id: "ffffffffffffffffffffffff",
+		}
+	)
+
+	billingService := &billMock.BillingService{}
+	billingService.On("GetMerchantBy", mock2.Anything, &billingpb.GetMerchantByRequest{MerchantId: merchant.Id}).
+		Return(nil, errors.New("error"))
+	suite.router.dispatch.Services.Billing = billingService
+
+	b, err := json.Marshal(newContacts)
+	assert.NoError(suite.T(), err)
+
+	_, err = suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, merchant.Id).
+		Path(common.SystemUserGroupPath + merchantsIdContactsPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorUnknown, httpErr.Message)
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContactsForAdmin_GetMerchantBy_Error() {
+	var (
+		newContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test2",
+				Email:    "test2@unit.test",
+				Phone:    "0987654321",
+				Position: "ADMIN",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test3",
+				Email: "test3@unit.test",
+				Phone: "1212121212",
+			},
+		}
+		merchant = &billingpb.Merchant{
+			Id: "ffffffffffffffffffffffff",
+		}
+	)
+
+	billingService := &billMock.BillingService{}
+	billingService.On("GetMerchantBy", mock2.Anything, &billingpb.GetMerchantByRequest{MerchantId: merchant.Id}).
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusNotFound, Message: common.ErrorUnknown}, nil)
+	suite.router.dispatch.Services.Billing = billingService
+
+	b, err := json.Marshal(newContacts)
+	assert.NoError(suite.T(), err)
+
+	_, err = suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, merchant.Id).
+		Path(common.SystemUserGroupPath + merchantsIdContactsPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), int(billingpb.ResponseStatusNotFound), httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorUnknown, httpErr.Message)
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContactsForAdmin_ChangeMerchant_BillingError() {
+	var (
+		oldContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test",
+				Email:    "test@unit.test",
+				Phone:    "1234567890",
+				Position: "CEO",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test",
+				Email: "test@unit.test",
+				Phone: "1234567890",
+			},
+		}
+		newContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test2",
+				Email:    "test2@unit.test",
+				Phone:    "0987654321",
+				Position: "ADMIN",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test3",
+				Email: "test3@unit.test",
+				Phone: "1212121212",
+			},
+		}
+		expectedContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     newContacts.Authorized.Name,
+				Email:    newContacts.Authorized.Email,
+				Phone:    newContacts.Authorized.Phone,
+				Position: oldContacts.Authorized.Position,
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  oldContacts.Technical.Name,
+				Email: oldContacts.Technical.Email,
+				Phone: oldContacts.Technical.Phone,
+			},
+		}
+		merchant = &billingpb.Merchant{
+			Id:       "ffffffffffffffffffffffff",
+			Contacts: expectedContacts,
+		}
+	)
+
+	billingService := &billMock.BillingService{}
+	billingService.On("GetMerchantBy", mock2.Anything, &billingpb.GetMerchantByRequest{MerchantId: merchant.Id}).
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.Merchant{
+			Id:       merchant.Id,
+			Contacts: oldContacts,
+		}}, nil)
+	billingService.On("ChangeMerchant", mock2.Anything, &billingpb.OnboardingRequest{
+		Contacts: expectedContacts,
+		Id:       merchant.Id,
+		User: &billingpb.MerchantUser{
+			Id:    suite.user.Id,
+			Email: suite.user.Email,
+		},
+	}).
+		Return(nil, errors.New("error"))
+	suite.router.dispatch.Services.Billing = billingService
+
+	b, err := json.Marshal(newContacts)
+	assert.NoError(suite.T(), err)
+
+	_, err = suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, merchant.Id).
+		Path(common.SystemUserGroupPath + merchantsIdContactsPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), http.StatusInternalServerError, httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorUnknown, httpErr.Message)
+}
+
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContactsForAdmin_ChangeMerchant_Error() {
+	var (
+		oldContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test",
+				Email:    "test@unit.test",
+				Phone:    "1234567890",
+				Position: "CEO",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test",
+				Email: "test@unit.test",
+				Phone: "1234567890",
+			},
+		}
+		newContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     "Unit Test2",
+				Email:    "test2@unit.test",
+				Phone:    "0987654321",
+				Position: "ADMIN",
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  "Unit Test3",
+				Email: "test3@unit.test",
+				Phone: "1212121212",
+			},
+		}
+		expectedContacts = &billingpb.MerchantContact{
+			Authorized: &billingpb.MerchantContactAuthorized{
+				Name:     newContacts.Authorized.Name,
+				Email:    newContacts.Authorized.Email,
+				Phone:    newContacts.Authorized.Phone,
+				Position: oldContacts.Authorized.Position,
+			},
+			Technical: &billingpb.MerchantContactTechnical{
+				Name:  oldContacts.Technical.Name,
+				Email: oldContacts.Technical.Email,
+				Phone: oldContacts.Technical.Phone,
+			},
+		}
+		merchant = &billingpb.Merchant{
+			Id:       "ffffffffffffffffffffffff",
+			Contacts: expectedContacts,
+		}
+	)
+
+	billingService := &billMock.BillingService{}
+	billingService.On("GetMerchantBy", mock2.Anything, &billingpb.GetMerchantByRequest{MerchantId: merchant.Id}).
+		Return(&billingpb.GetMerchantResponse{Status: billingpb.ResponseStatusOk, Item: &billingpb.Merchant{
+			Id:       merchant.Id,
+			Contacts: oldContacts,
+		}}, nil)
+	billingService.On("ChangeMerchant", mock2.Anything, &billingpb.OnboardingRequest{
+		Contacts: expectedContacts,
+		Id:       merchant.Id,
+		User: &billingpb.MerchantUser{
+			Id:    suite.user.Id,
+			Email: suite.user.Email,
+		},
+	}).
+		Return(&billingpb.ChangeMerchantResponse{Status: billingpb.ResponseStatusBadData, Message: common.ErrorUnknown}, nil)
+	suite.router.dispatch.Services.Billing = billingService
+
+	b, err := json.Marshal(newContacts)
+	assert.NoError(suite.T(), err)
+
+	_, err = suite.caller.Builder().
+		Method(http.MethodPut).
+		Params(":"+common.RequestParameterMerchantId, merchant.Id).
+		Path(common.SystemUserGroupPath + merchantsIdContactsPath).
+		Init(test.ReqInitJSON()).
+		BodyBytes(b).
+		Exec(suite.T())
+
+	assert.Error(suite.T(), err)
+
+	httpErr, ok := err.(*echo.HTTPError)
+	assert.True(suite.T(), ok)
+	assert.Equal(suite.T(), int(billingpb.ResponseStatusBadData), httpErr.Code)
+	assert.Equal(suite.T(), common.ErrorUnknown, httpErr.Message)
 }
