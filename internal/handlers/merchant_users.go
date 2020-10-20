@@ -313,8 +313,8 @@ func (h *MerchantUsersRoute) getMerchantSubscriptionDetails(ctx echo.Context) er
 	}
 
 	req1 := &billingpb.GetSubscriptionRequest{
-		Id:         req.SubscriptionId,
-		Cookie:     req.Cookie,
+		Id:     req.SubscriptionId,
+		Cookie: req.Cookie,
 	}
 
 	res1, err := h.dispatch.Services.Billing.GetCustomerSubscription(ctx.Request().Context(), req1)
@@ -352,6 +352,7 @@ func (h *MerchantUsersRoute) getMerchantSubscriptionDetails(ctx echo.Context) er
 		StartDate    *timestamp.Timestamp    `json:"start_date"`
 		Transactions []*billingpb.ShortOrder `json:"transactions"`
 		Count        int32                   `json:"count"`
+		CustomerId   string                  `json:"customer_id"`
 	}
 
 	subscription := res1.Subscription
@@ -365,6 +366,7 @@ func (h *MerchantUsersRoute) getMerchantSubscriptionDetails(ctx echo.Context) er
 		StartDate:    subscription.CreatedAt,
 		Transactions: res.List,
 		Count:        res.Count,
+		CustomerId:   subscription.CustomerUuid,
 	}
 
 	return ctx.JSON(http.StatusOK, result)
