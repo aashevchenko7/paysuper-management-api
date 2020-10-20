@@ -23,9 +23,7 @@ const (
 	merchantsCompanyPath               = "/merchants/company"
 	merchantsContactsPath              = "/merchants/contacts"
 	merchantsBankingPath               = "/merchants/banking"
-	merchantsIdCompanyPath             = "/merchants/:merchant_id/company"
 	merchantsIdContactsPath            = "/merchants/:merchant_id/contacts"
-	merchantsIdBankingPath             = "/merchants/:merchant_id/banking"
 	merchantsStatusCompanyPath         = "/merchants/status"
 	merchantsIdChangeStatusCompanyPath = "/merchants/:merchant_id/change-status"
 	merchantsNotificationsPath         = "/merchants/notifications"
@@ -93,9 +91,7 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 	groups.AuthUser.PUT(merchantsCompanyPath, h.setMerchantCompany)
 	groups.AuthUser.PUT(merchantsContactsPath, h.setMerchantContacts)
 	groups.AuthUser.PUT(merchantsBankingPath, h.setMerchantBanking)
-	groups.SystemUser.PUT(merchantsIdCompanyPath, h.setMerchantCompany)
-	groups.SystemUser.PUT(merchantsIdContactsPath, h.setMerchantContacts)
-	groups.SystemUser.PUT(merchantsIdBankingPath, h.setMerchantBanking)
+	groups.SystemUser.PUT(merchantsIdContactsPath, h.setMerchantContactsForAdmin)
 	groups.AuthUser.GET(merchantsStatusCompanyPath, h.getMerchantStatus)
 
 	groups.SystemUser.PUT(merchantsIdChangeStatusCompanyPath, h.changeMerchantStatus)
@@ -662,6 +658,42 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 // @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/merchants/contacts [put]
+func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
+	authUser := common.ExtractUserContext(ctx)
+	in := &billingpb.MerchantContact{}
+	err := ctx.Bind(in)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	req := &billingpb.OnboardingRequest{
+		Contacts: in,
+		Id:       ctx.Param(common.RequestParameterMerchantId),
+		User: &billingpb.MerchantUser{
+			Id:    authUser.Id,
+			Email: authUser.Email,
+		},
+	}
+	err = h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.ChangeMerchant(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchant", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Item)
+}
 
 // @summary Update the merchant's contacts
 // @desc Update the merchant's contacts for the authorized merchant
@@ -676,7 +708,7 @@ func (h *OnboardingRoute) setMerchantCompany(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param merchant_id path {string} true The unique identifier for the merchant.
 // @router /system/api/v1/merchants/{merchant_id}/contacts [put]
-func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
+func (h *OnboardingRoute) setMerchantContactsForAdmin(ctx echo.Context) error {
 	authUser := common.ExtractUserContext(ctx)
 	in := &billingpb.MerchantContact{}
 	err := ctx.Bind(in)
@@ -685,9 +717,31 @@ func (h *OnboardingRoute) setMerchantContacts(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
+	reqGetMerchant := &billingpb.GetMerchantByRequest{
+		MerchantId: ctx.Param(common.RequestParameterMerchantId),
+	}
+	resMerchant, err := h.dispatch.Services.Billing.GetMerchantBy(ctx.Request().Context(), reqGetMerchant)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetMerchantBy", reqGetMerchant)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if resMerchant.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(resMerchant.Status), resMerchant.Message)
+	}
+
+	if resMerchant.Item.Contacts.Authorized == nil {
+		resMerchant.Item.Contacts.Authorized = &billingpb.MerchantContactAuthorized{}
+	}
+
+	resMerchant.Item.Contacts.Authorized.Name = in.Authorized.Name
+	resMerchant.Item.Contacts.Authorized.Email = in.Authorized.Email
+	resMerchant.Item.Contacts.Authorized.Phone = in.Authorized.Phone
+
 	req := &billingpb.OnboardingRequest{
-		Contacts: in,
-		Id:       ctx.Param(common.RequestParameterMerchantId),
+		Contacts: resMerchant.Item.Contacts,
+		Id:       resMerchant.Item.Id,
 		User: &billingpb.MerchantUser{
 			Id:    authUser.Id,
 			Email: authUser.Email,

@@ -253,6 +253,7 @@ func DefaultSettings() map[string]interface{} {
 			"global": map[string]interface{}{
 				"returnPaymentForm":            true,
 				"disableAuthMiddleware":        true,
+				"disableCasbinPolicy":          true,
 				"paymentFormJsLibraryUrl":      "unknown",
 				"awsAccessKeyIdAgreement":      "unknown",
 				"awsSecretAccessKeyAgreement":  "unknown",

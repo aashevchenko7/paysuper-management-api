@@ -158,26 +158,34 @@ func (d *Dispatcher) accessGroup(grp *echo.Group) {
 func (d *Dispatcher) authUserGroup(grp *echo.Group) {
 	// Called before routes
 	if !d.globalCfg.DisableAuthMiddleware {
-		grp.Use(d.GetUserDetailsMiddleware)       // 1
-		grp.Use(d.AuthOneMerchantPreMiddleware()) // 2
+		grp.Use(d.GetUserDetailsMiddleware)
+		grp.Use(d.AuthOneMerchantPreMiddleware())
+	}
+
+	if !d.globalCfg.DisableCasbinPolicy {
 		grp.Use(d.CasbinMiddleware(func(c echo.Context) string {
 			user := common.ExtractUserContext(c)
 			return fmt.Sprintf(billingpb.CasbinMerchantUserMask, user.MerchantId, user.Id)
-		})) // 3
+		}))
 	}
-	grp.Use(d.MerchantBinderPreMiddleware) // 3
+
+	grp.Use(d.MerchantBinderPreMiddleware)
 }
 
 func (d *Dispatcher) systemUserGroup(grp *echo.Group) {
 	// Called before routes
 	if !d.globalCfg.DisableAuthMiddleware {
-		grp.Use(d.GetUserDetailsMiddleware) // 1
+		grp.Use(d.GetUserDetailsMiddleware)
+	}
+
+	if !d.globalCfg.DisableCasbinPolicy {
 		grp.Use(d.CasbinMiddleware(func(c echo.Context) string {
 			user := common.ExtractUserContext(c)
 			return user.Id
-		})) // 2
+		}))
 	}
-	grp.Use(d.SystemBinderPreMiddleware) // 3
+
+	grp.Use(d.SystemBinderPreMiddleware)
 }
 
 func (d *Dispatcher) webHookGroup(grp *echo.Group) {
