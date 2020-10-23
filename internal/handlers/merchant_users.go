@@ -3,23 +3,18 @@ package handlers
 import (
 	"github.com/ProtocolONE/go-core/v2/pkg/logger"
 	"github.com/ProtocolONE/go-core/v2/pkg/provider"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
-
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
 	"net/http"
 )
 
 const (
-	merchantListRoles           = "/merchants/roles"
-	merchantUsers               = "/merchants/users"
-	merchantInvite              = "/merchants/invite"
-	merchantInviteResend        = "/merchants/users/resend"
-	merchantUsersRole           = "/merchants/users/roles/:role_id"
-	merchantSubscriptions       = "/merchants/subscriptions"
-	merchantSubscriptionDetails = "/merchants/subscriptions/:subscription_id"
+	merchantListRoles    = "/merchants/roles"
+	merchantUsers        = "/merchants/users"
+	merchantInvite       = "/merchants/invite"
+	merchantInviteResend = "/merchants/users/resend"
+	merchantUsersRole    = "/merchants/users/roles/:role_id"
 )
 
 type MerchantUsersRoute struct {
@@ -45,11 +40,6 @@ func (h *MerchantUsersRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(merchantListRoles, h.listRoles)
 	groups.AuthUser.DELETE(merchantUsersRole, h.deleteUser)
 	groups.AuthUser.GET(merchantUsersRole, h.getUser)
-	groups.AuthUser.GET(merchantSubscriptions, h.getMerchantSubscriptions)
-	groups.AuthUser.GET(merchantSubscriptionDetails, h.getMerchantSubscriptionDetails)
-
-	groups.SystemUser.GET(merchantSubscriptions, h.getMerchantSubscriptions)
-	groups.SystemUser.GET(merchantSubscriptionDetails, h.getMerchantSubscriptionDetails)
 }
 
 // @summary Update the merchant user role
@@ -256,118 +246,4 @@ func (h *MerchantUsersRoute) getUser(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, res)
-}
-
-// @summary Get subscriptions for merchant
-// @desc Get subscriptions for merchant
-// @accept application/json
-// @produce application/json
-// @success 200 {object} billingpb.GetMerchantSubscriptionsResponse Returns the merchant subscriptions
-// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
-// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
-// @router /admin/api/v1/merchants/subscriptions [get]
-func (h *MerchantUsersRoute) getMerchantSubscriptions(ctx echo.Context) error {
-	req := &billingpb.GetMerchantSubscriptionsRequest{}
-
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
-	}
-
-	res, err := h.dispatch.Services.Billing.GetMerchantSubscriptions(ctx.Request().Context(), req)
-
-	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetMerchantSubscriptions")
-	}
-
-	if res.Status != billingpb.ResponseStatusOk {
-		return echo.NewHTTPError(int(res.Status), res.Message)
-	}
-
-	return ctx.JSON(http.StatusOK, res)
-}
-
-// @summary Get orders for subscriptions
-// @desc Get orders for subscriptions
-// @accept application/json
-// @produce application/json
-// @success 200 {object} billingpb.GetSubscriptionOrdersResponse Returns list of orders for subscriptions
-// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
-// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
-// @router /admin/api/v1/merchants/subscriptions/:id [get]
-func (h *MerchantUsersRoute) getMerchantSubscriptionDetails(ctx echo.Context) error {
-	req := &billingpb.GetSubscriptionOrdersRequest{}
-	req.SubscriptionId = ctx.Param(common.RequestParameterSubscriptionId)
-
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
-	}
-
-	res, err := h.dispatch.Services.Billing.GetSubscriptionOrders(ctx.Request().Context(), req)
-
-	if err != nil {
-		return h.dispatch.SrvCallHandler(req, err, billingpb.ServiceName, "GetSubscriptionOrders")
-	}
-
-	if res.Status != billingpb.ResponseStatusOk {
-		return echo.NewHTTPError(int(res.Status), res.Message)
-	}
-
-	req1 := &billingpb.GetSubscriptionRequest{
-		Id:     req.SubscriptionId,
-		Cookie: req.Cookie,
-	}
-
-	res1, err := h.dispatch.Services.Billing.GetCustomerSubscription(ctx.Request().Context(), req1)
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetCustomerSubscription", req)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-
-	if res1.Status != billingpb.ResponseStatusOk {
-		zap.L().Error("response code is not OK", zap.Int32("status", res1.Status), zap.String("method", "GetCustomerSubscription"))
-		return echo.NewHTTPError(int(res1.Status), res1)
-	}
-
-	projRes, err := h.dispatch.Services.Billing.GetProject(ctx.Request().Context(), &billingpb.GetProjectRequest{
-		MerchantId: res1.Subscription.MerchantId,
-		ProjectId:  res1.Subscription.ProjectId,
-	})
-	if err != nil {
-		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "GetProject", req)
-		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
-	}
-
-	if projRes.Status != billingpb.ResponseStatusOk {
-		zap.L().Error("response code is not OK", zap.Int32("status", projRes.Status), zap.String("method", "GetProject"))
-		return echo.NewHTTPError(int(projRes.Status), projRes)
-	}
-
-	type subscriptionDetails struct {
-		Amount       float32                 `json:"amount"`
-		Currency     string                  `json:"currency"`
-		Id           string                  `json:"id"`
-		IsActive     bool                    `json:"is_active"`
-		MaskedPan    string                  `json:"masked_pan"`
-		ProjectName  string                  `json:"project_name"`
-		StartDate    *timestamp.Timestamp    `json:"start_date"`
-		Transactions []*billingpb.ShortOrder `json:"transactions"`
-		Count        int32                   `json:"count"`
-		CustomerId   string                  `json:"customer_id"`
-	}
-
-	subscription := res1.Subscription
-	result := subscriptionDetails{
-		Amount:       float32(subscription.Amount),
-		Currency:     subscription.Currency,
-		Id:           subscription.Id,
-		IsActive:     subscription.IsActive,
-		MaskedPan:    subscription.MaskedPan,
-		ProjectName:  projRes.Item.Name["en"],
-		StartDate:    subscription.CreatedAt,
-		Transactions: res.List,
-		Count:        res.Count,
-		CustomerId:   subscription.CustomerUuid,
-	}
-
-	return ctx.JSON(http.StatusOK, result)
 }
