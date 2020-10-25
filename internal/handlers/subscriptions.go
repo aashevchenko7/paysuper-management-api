@@ -105,10 +105,8 @@ func (h *SubscriptionsRoute) getSubscription(ctx echo.Context) error {
 		Id: ctx.Param(common.RequestParameterId),
 	}
 
-	err := h.dispatch.Validate.Struct(req)
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
 	}
 
 	res, err := h.dispatch.Services.Billing.GetSubscription(ctx.Request().Context(), req)
@@ -186,10 +184,8 @@ func (h *SubscriptionsRoute) deleteSubscription(ctx echo.Context) error {
 		Id: ctx.Param(common.RequestParameterId),
 	}
 
-	err := h.dispatch.Validate.Struct(req)
-
-	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
 	}
 
 	res, err := h.dispatch.Services.Billing.DeleteRecurringSubscription(ctx.Request().Context(), req)
