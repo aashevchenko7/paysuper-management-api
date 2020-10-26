@@ -39,6 +39,7 @@ const (
 	merchantsIdManualPayoutEnablePath  = "/merchants/manual_payout/enable"
 	merchantsIdManualPayoutDisablePath = "/merchants/manual_payout/disable"
 	merchantsIdSetOperatingCompanyPath = "/merchants/:merchant_id/set_operating_company"
+	merchantsIdAcceptPath              = "/merchants/:merchant_id/accept"
 )
 
 const (
@@ -116,6 +117,7 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 	groups.AuthUser.PUT(merchantsIdManualPayoutDisablePath, h.disableMerchantManualPayout)
 
 	groups.SystemUser.POST(merchantsIdSetOperatingCompanyPath, h.setOperatingCompany)
+	groups.SystemUser.POST(merchantsIdAcceptPath, h.acceptMerchant)
 }
 
 // @summary Get the merchant user
@@ -1117,6 +1119,48 @@ func (h *OnboardingRoute) setOperatingCompany(ctx echo.Context) error {
 
 	if err != nil {
 		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetMerchantOperatingCompany", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+// @summary Accept merchant and set status for signing agreement
+// @desc Accept merchant and set status for signing agreement
+// @id merchantsIdAccept
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body billingpb.SetMerchantAcceptedStatusRequest
+// @success 200 {object} billingpb.Merchant Returns the merchant user
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id}/accept [post]
+func (h *OnboardingRoute) acceptMerchant(ctx echo.Context) error {
+	req := &billingpb.SetMerchantAcceptedStatusRequest{}
+	err := ctx.Bind(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	req.MerchantId = ctx.Param(common.RequestParameterMerchantId)
+	err = h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.SetMerchantAcceptedStatus(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetMerchantAcceptedStatus", req)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 

@@ -2078,6 +2078,33 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetOperatingCompany_Ok() {
 	assert.NotEmpty(suite.T(), res.Body.String())
 }
 
+func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantAcceptedStatus_Ok() {
+	billingService := &billMock.BillingService{}
+	billingService.On("SetMerchantAcceptedStatus", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(&billingpb.SetMerchantAcceptedStatusResponse{Status: billingpb.ResponseStatusOk}, nil)
+	suite.router.dispatch.Services.Billing = billingService
+
+	userOK := &common.AuthUser{
+		MerchantId: mock.SomeMerchantId1,
+	}
+
+	customInit := func(request *http.Request, middleware test.Middleware) {
+		middleware.Pre(test.PreAuthUserMiddleware(userOK))
+	}
+
+	res, err := suite.caller.Builder().
+		Method(http.MethodPost).
+		Params(":"+common.RequestParameterMerchantId, mock.SomeMerchantId1).
+		Path(common.SystemUserGroupPath + merchantsIdAcceptPath).
+		Init(customInit).
+		Init(test.ReqInitJSON()).
+		Exec(suite.T())
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), http.StatusOK, res.Code)
+	assert.NotEmpty(suite.T(), res.Body.String())
+}
+
 func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_CzechRepublicZip_Ok() {
 	company := &billingpb.MerchantCompanyInfo{
 		Name:               mock.OnboardingMerchantMock.Company.Name,
