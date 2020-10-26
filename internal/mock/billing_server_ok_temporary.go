@@ -1080,6 +1080,10 @@ func (s *BillingServerOkTemporaryMock) SetMerchantOperatingCompany(ctx context.C
 	panic("implement me")
 }
 
+func (s *BillingServerOkTemporaryMock) SetMerchantAcceptedStatus(ctx context.Context, in *billingpb.SetMerchantAcceptedStatusRequest, opts ...client.CallOption) (*billingpb.SetMerchantAcceptedStatusResponse, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerOkTemporaryMock) GetOperatingCompaniesList(ctx context.Context, in *billingpb.EmptyRequest, opts ...client.CallOption) (*billingpb.GetOperatingCompaniesListResponse, error) {
 	panic("implement me")
 }
