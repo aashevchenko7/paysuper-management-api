@@ -402,29 +402,6 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
 
-	var (
-		pmDateFrom = int64(0)
-		pmDateTo   = int64(0)
-	)
-
-	if req.PmDateFrom != "" {
-		dateFrom, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateFrom)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
-		}
-
-		pmDateFrom = dateFrom.Unix()
-	}
-
-	if req.PmDateTo != "" {
-		dateTo, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateTo)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
-		}
-
-		pmDateTo = dateTo.Unix()
-	}
-
 	file := &reporterpb.ReportFile{
 		ReportType:           reporterpb.ReportTypeTransactions,
 		FileType:             req.FileType,
@@ -434,8 +411,24 @@ func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	params := map[string]interface{}{
 		reporterpb.ParamsFieldStatus:        req.Status,
 		reporterpb.ParamsFieldPaymentMethod: req.PaymentMethod,
-		reporterpb.ParamsFieldDateFrom:      pmDateFrom,
-		reporterpb.ParamsFieldDateTo:        pmDateTo,
+	}
+
+	if req.PmDateFrom != "" {
+		dateFrom, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateFrom)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		}
+
+		params[reporterpb.ParamsFieldDateFrom] = dateFrom.Unix()
+	}
+
+	if req.PmDateTo != "" {
+		dateTo, err := time.Parse(billingpb.FilterDatetimeFormat, req.PmDateTo)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+		}
+
+		params[reporterpb.ParamsFieldDateTo] = dateTo.Unix()
 	}
 
 	return h.dispatch.RequestReportFile(ctx, file, params)
