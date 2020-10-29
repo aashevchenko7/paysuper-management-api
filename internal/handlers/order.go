@@ -18,13 +18,14 @@ import (
 )
 
 const (
-	orderIdPath          = "/order/:order_id"
-	orderPath            = "/order"
-	orderDownloadPath    = "/order/download"
-	orderRefundsPath     = "/order/:order_id/refunds"
-	orderRefundsIdsPath  = "/order/:order_id/refunds/:refund_id"
-	orderReplaceCodePath = "/order/:order_id/replace_code"
-	orderGetLogsPath     = "/order/:order_id/logs"
+	orderIdPath                        = "/order/:order_id"
+	orderPath                          = "/order"
+	orderDownloadPath                  = "/order/download"
+	orderRefundsPath                   = "/order/:order_id/refunds"
+	orderRefundsIdsPath                = "/order/:order_id/refunds/:refund_id"
+	orderReplaceCodePath               = "/order/:order_id/replace_code"
+	orderGetLogsPath                   = "/order/:order_id/logs"
+	merchantIdTransactionsDownloadPath = "/merchants/:merchant_id/transactions/download"
 )
 
 const (
@@ -187,6 +188,7 @@ func (h *OrderRoute) Route(groups *common.Groups) {
 
 	groups.SystemUser.GET(orderPath, h.listOrdersPrivate)
 	groups.SystemUser.GET(orderIdPath, h.getOrderPrivate)
+	groups.SystemUser.POST(merchantIdTransactionsDownloadPath, h.downloadOrdersPublic)
 	groups.SystemUser.GET(orderGetLogsPath, h.getOrderLogs)
 	groups.SystemUser.GET(orderRefundsIdsPath, h.getRefund)
 	groups.SystemUser.POST(orderRefundsPath, h.createRefund)
@@ -380,6 +382,18 @@ func (h *OrderRoute) listOrdersS2s(ctx echo.Context) error {
 // @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @router /admin/api/v1/order/download [post]
+
+// @summary Export the orders list of merchant
+// @desc Export the orders list of merchant
+// @id merchantOrderDownloadPathDownloadOrdersPublic
+// @tag Order
+// @accept application/json
+// @produce application/json
+// @body ListOrdersRequest
+// @success 200 {object} reporterpb.CreateFileResponse Returns the file ID
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @router /system/api/v1/merchants/:merchant_id/transactions/download [post]
 func (h *OrderRoute) downloadOrdersPublic(ctx echo.Context) error {
 	req := &ListOrdersRequest{}
 	err := ctx.Bind(req)
