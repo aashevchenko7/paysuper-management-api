@@ -19,6 +19,7 @@ import (
 
 const (
 	merchantsPath                      = "/merchants"
+	merchantsAgreementRequestPath      = "/merchants/agreement_request"
 	merchantsIdPath                    = "/merchants/:merchant_id"
 	merchantsCompanyPath               = "/merchants/company"
 	merchantsContactsPath              = "/merchants/contacts"
@@ -87,6 +88,7 @@ func NewOnboardingRoute(set common.HandlerSet, _ config.Initial, awsManager awsW
 
 func (h *OnboardingRoute) Route(groups *common.Groups) {
 	groups.SystemUser.GET(merchantsPath, h.listMerchants)
+	groups.SystemUser.GET(merchantsAgreementRequestPath, h.listMerchantsForAgreement)
 	groups.SystemUser.GET(merchantsIdPath, h.getMerchant)
 
 	groups.AuthUser.PUT(merchantsCompanyPath, h.setMerchantCompany)
@@ -169,6 +171,56 @@ func (h *OnboardingRoute) getMerchantByUser(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+// @summary Get the merchants list
+// @desc Get the merchants list. This list can be filtered.
+// @id merchantsPathListMerchants
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListMerchantsForAgreementResponse Returns the merchants list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param name query {string} false The merchant's name.
+// @param last_payout_date_from query {integer} false The start date of the payout to the merchant.
+// @param last_payout_date_to query {integer} false The end date of the payout to the merchant.
+// @param last_payout_amount query {integer} false The last payout amount.
+// @param sort query {[]string} false The list of the merchant's fields for sorting.
+// @param quick_search query {string} false The quick search by the merchant's name or the user owner email.
+// @param status query {[]string} false The merchant's statuses list.
+// @param registration_date_from query {integer} false The start date of the owner was registered.
+// @param registration_date_to query {integer} false The end date of the owner was registered.
+// @param received_date_from query {integer} false The start date when the license agreement was signed by the merchant owner.
+// @param received_date_to query {integer} false The end date when the license agreement was signed by the merchant owner.
+// @param limit query {integer} true The number of merchants returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /system/api/v1/merchants/agreement_request [get]
+func (h *OnboardingRoute) listMerchantsForAgreement(ctx echo.Context) error {
+	req := &billingpb.MerchantListingRequest{}
+	err := (&common.OnboardingMerchantListingBinder{
+		LimitDefault:  int64(h.cfg.LimitDefault),
+		OffsetDefault: int64(h.cfg.OffsetDefault),
+	}).Bind(req, ctx)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	err = h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.ListMerchantsForAgreement(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ListMerchantsForAgreement", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	return ctx.JSON(http.StatusOK, res)
 }
 
 // @summary Get the merchants list
