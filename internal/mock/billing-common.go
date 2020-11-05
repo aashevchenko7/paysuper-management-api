@@ -73,6 +73,14 @@ var (
 		},
 	}
 
+	OnboardingMerchantShortInfoMock = &billingpb.MerchantShortInfo{
+		Id:       OnboardingMerchantMock.Id,
+		Company:  OnboardingMerchantMock.Company,
+		Contacts: OnboardingMerchantMock.Contacts,
+		Banking:  OnboardingMerchantMock.Banking,
+		Status:   OnboardingMerchantMock.Status,
+	}
+
 	ProductPrice = &billingpb.ProductPrice{
 		Currency: "USD",
 		Amount:   1010.23,

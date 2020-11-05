@@ -151,6 +151,14 @@ func (s *BillingServerSystemErrorMock) ListMerchants(
 	return nil, SomeError
 }
 
+func (s *BillingServerSystemErrorMock) ListMerchantsForAgreement(
+	ctx context.Context,
+	in *billingpb.MerchantListingRequest,
+	opts ...client.CallOption,
+) (*billingpb.ListMerchantsForAgreementResponse, error) {
+	return nil, SomeError
+}
+
 func (s *BillingServerSystemErrorMock) ChangeMerchant(
 	ctx context.Context,
 	in *billingpb.OnboardingRequest,

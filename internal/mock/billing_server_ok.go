@@ -204,6 +204,17 @@ func (s *BillingServerOkMock) ListMerchants(
 ) (*billingpb.MerchantListingResponse, error) {
 	return &billingpb.MerchantListingResponse{
 		Count: 3,
+		Items: []*billingpb.MerchantShortInfo{OnboardingMerchantShortInfoMock, OnboardingMerchantShortInfoMock, OnboardingMerchantShortInfoMock},
+	}, nil
+}
+
+func (s *BillingServerOkMock) ListMerchantsForAgreement(
+	ctx context.Context,
+	in *billingpb.MerchantListingRequest,
+	opts ...client.CallOption,
+) (*billingpb.ListMerchantsForAgreementResponse, error) {
+	return &billingpb.ListMerchantsForAgreementResponse{
+		Count: 3,
 		Items: []*billingpb.Merchant{OnboardingMerchantMock, OnboardingMerchantMock, OnboardingMerchantMock},
 	}, nil
 }
