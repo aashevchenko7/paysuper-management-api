@@ -93,7 +93,7 @@ func (h *CustomerRoute) getCustomers(ctx echo.Context) error {
 		return echo.NewHTTPError(int(res.Status), res.Message)
 	}
 
-	return ctx.JSON(http.StatusOK, res.Items)
+	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *CustomerRoute) deleteCustomerCardAdmin(ctx echo.Context) error {
