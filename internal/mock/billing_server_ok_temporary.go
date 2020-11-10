@@ -10,6 +10,10 @@ import (
 
 type BillingServerOkTemporaryMock struct{}
 
+func (s *BillingServerOkTemporaryMock) GetActsOfCompletionList(ctx context.Context, in *billingpb.ActsOfCompletionListRequest, opts ...client.CallOption) (*billingpb.ActsOfCompletionListResponse, error) {
+	panic("implement me")
+}
+
 func (s *BillingServerOkTemporaryMock) DeleteRecurringSubscription(ctx context.Context, in *billingpb.DeleteRecurringSubscriptionRequest, opts ...client.CallOption) (*billingpb.EmptyResponseWithStatus, error) {
 	panic("implement me")
 }
