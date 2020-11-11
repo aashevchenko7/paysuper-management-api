@@ -253,6 +253,8 @@ func (h *OnboardingRoute) listMerchants(ctx echo.Context) error {
 		OffsetDefault: int64(h.cfg.OffsetDefault),
 	}).Bind(req, ctx)
 
+	req.Statuses = []int32{billingpb.MerchantStatusAgreementSigned}
+
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
 	}
