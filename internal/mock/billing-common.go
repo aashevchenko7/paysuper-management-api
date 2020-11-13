@@ -9,7 +9,6 @@ import (
 const (
 	SomeAgreementName  = "some_name.pdf"
 	SomeAgreementName1 = "some_name1.pdf"
-	SomeAgreementName2 = "some_name2.pdf"
 )
 
 var (
@@ -17,8 +16,6 @@ var (
 
 	SomeMerchantId  = bson.NewObjectId().Hex()
 	SomeMerchantId1 = bson.NewObjectId().Hex()
-	SomeMerchantId2 = bson.NewObjectId().Hex()
-	SomeMerchantId3 = bson.NewObjectId().Hex()
 
 	OnboardingMerchantMock = &billingpb.Merchant{
 		Id: bson.NewObjectId().Hex(),
