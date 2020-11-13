@@ -7,7 +7,9 @@ import (
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 	"github.com/stretchr/testify/assert"
+	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/url"
@@ -44,6 +46,21 @@ func (suite *ZipCodeTestSuite) SetupTest() {
 func (suite *ZipCodeTestSuite) TearDownTest() {}
 
 func (suite *ZipCodeTestSuite) TestCheckZip_Ok() {
+	bs := &billMock.BillingService{}
+	bs.On("FindByZipCode", mock2.Anything, mock2.Anything, mock2.Anything).
+		Return(
+			&billingpb.FindByZipCodeResponse{
+				Count: 1,
+				Items: []*billingpb.ZipCode{
+					{
+						Zip:     "98",
+						Country: "US",
+					},
+				},
+			},
+			nil)
+	suite.router.dispatch.Services.Billing = bs
+
 	q := make(url.Values)
 	q.Set("country", "US")
 	q.Set("zip", "98")

@@ -11,7 +11,6 @@ import (
 	awsWrapperMocks "github.com/paysuper/paysuper-aws-manager/pkg/mocks"
 
 	billMock "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
-	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-management-api/internal/mock"
@@ -763,6 +762,22 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_WithoutMerch
 	b, err := json.Marshal(company)
 	assert.NoError(suite.T(), err)
 
+	bill := &billMock.BillingService{}
+	bill.On("ChangeMerchant", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeMerchantResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.Merchant{
+				Id: bson.NewObjectId().Hex(),
+				User: &billingpb.MerchantUser{
+					Id:    bson.NewObjectId().Hex(),
+					Email: "test@unit.test",
+				},
+				Company: company,
+				Status:  billingpb.MerchantStatusDraft,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodPut).
 		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
@@ -993,6 +1008,22 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_ValidationOk
 	b, err := json.Marshal(company)
 	assert.NoError(suite.T(), err)
 
+	bill := &billMock.BillingService{}
+	bill.On("ChangeMerchant", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeMerchantResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.Merchant{
+				Id: "ffffffffffffffffffffffff",
+				User: &billingpb.MerchantUser{
+					Id:    bson.NewObjectId().Hex(),
+					Email: "test@unit.test",
+				},
+				Company: company,
+				Status:  billingpb.MerchantStatusDraft,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodPut).
 		Params(":"+common.RequestParameterMerchantId, "ffffffffffffffffffffffff").
@@ -1123,6 +1154,21 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantContacts_WithoutMerc
 	}
 	b, err := json.Marshal(contacts)
 	assert.NoError(suite.T(), err)
+
+	bill := &billMock.BillingService{}
+	bill.On("ChangeMerchant", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeMerchantResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.Merchant{
+				User: &billingpb.MerchantUser{
+					Id:    bson.NewObjectId().Hex(),
+					Email: "test@unit.test",
+				},
+				Contacts: contacts,
+				Status:   billingpb.MerchantStatusDraft,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodPut).
@@ -1449,6 +1495,22 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantBanking_WithoutMerch
 	}
 	b, err := json.Marshal(banking)
 	assert.NoError(suite.T(), err)
+
+	bill := &billMock.BillingService{}
+	bill.On("ChangeMerchant", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeMerchantResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.Merchant{
+				Id: bson.NewObjectId().Hex(),
+				User: &billingpb.MerchantUser{
+					Id:    bson.NewObjectId().Hex(),
+					Email: "test@unit.test",
+				},
+				Banking: banking,
+				Status:  billingpb.MerchantStatusDraft,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodPut).
@@ -2005,7 +2067,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_GetAgreementData_Ok() {
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_enableMerchantManualPayout_Ok() {
-	billingService := &billingMocks.BillingService{}
+	billingService := &billMock.BillingService{}
 	billingService.
 		On("ChangeMerchantManualPayouts", mock2.Anything, mock2.Anything).
 		Return(&billingpb.ChangeMerchantManualPayoutsResponse{Status: http.StatusOK}, nil)
@@ -2027,7 +2089,7 @@ func (suite *OnboardingTestSuite) TestOnboarding_enableMerchantManualPayout_Ok()
 }
 
 func (suite *OnboardingTestSuite) TestOnboarding_disableMerchantManualPayout_Ok() {
-	billingService := &billingMocks.BillingService{}
+	billingService := &billMock.BillingService{}
 	billingService.
 		On("ChangeMerchantManualPayouts", mock2.Anything, mock2.Anything).
 		Return(&billingpb.ChangeMerchantManualPayoutsResponse{Status: http.StatusOK}, nil)
@@ -2119,6 +2181,22 @@ func (suite *OnboardingTestSuite) TestOnboarding_SetMerchantCompany_CzechRepubli
 	}
 	b, err := json.Marshal(company)
 	assert.NoError(suite.T(), err)
+
+	bill := &billMock.BillingService{}
+	bill.On("ChangeMerchant", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeMerchantResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.Merchant{
+				Id: "ffffffffffffffffffffffff",
+				User: &billingpb.MerchantUser{
+					Id:    bson.NewObjectId().Hex(),
+					Email: "test@unit.test",
+				},
+				Company: company,
+				Status:  billingpb.MerchantStatusDraft,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
 
 	res, err := suite.caller.Builder().
 		Method(http.MethodPut).

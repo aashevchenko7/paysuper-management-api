@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"github.com/bxcodec/faker"
 	"github.com/globalsign/mgo/bson"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
@@ -316,6 +317,26 @@ func (suite *OrderTestSuite) TestOrder_CreateRefund_BillingServer_CreateError() 
 }
 
 func (suite *OrderTestSuite) TestOrder_GetOrders_Ok() {
+	count := 5
+	items := make([]*billingpb.OrderViewPublic, 0, count)
+
+	for i := 0; i < count; i++ {
+		item := new(billingpb.OrderViewPublic)
+		_ = faker.FakeData(item)
+		items = append(items, item)
+	}
+
+	bill := &billMock.BillingService{}
+	bill.On("FindAllOrdersPublic", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ListOrdersPublicResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.ListOrdersPublicResponseItem{
+				Count: int64(count),
+				Items: items,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Path(common.AuthUserGroupPath + orderPath).
@@ -584,6 +605,17 @@ func (suite *OrderTestSuite) TestOrder_ChangeOrderCode_ValidationError() {
 }
 
 func (suite *OrderTestSuite) TestOrder_GetOrderPublic_Ok() {
+	item := new(billingpb.OrderViewPublic)
+	_ = faker.FakeData(item)
+
+	bill := &billMock.BillingService{}
+	bill.On("GetOrderPublic", mock2.Anything, mock2.Anything).
+		Return(&billingpb.GetOrderPublicResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item:   item,
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
@@ -664,6 +696,17 @@ func (suite *OrderTestSuite) TestOrder_GetOrderPublic_GetOrderPublic_Error() {
 }
 
 func (suite *OrderTestSuite) TestOrder_GetOrderLogs_Ok() {
+	item := new(billingpb.OrderViewPublic)
+	_ = faker.FakeData(item)
+
+	bill := &billMock.BillingService{}
+	bill.On("GetOrderPublic", mock2.Anything, mock2.Anything).
+		Return(&billingpb.GetOrderPublicResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item:   item,
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
@@ -767,6 +810,17 @@ func (suite *OrderTestSuite) TestOrder_GetOrderLogs_CloudWatchLog_Error() {
 		Return(nil, errors.New("some error"))
 	suite.router.cloudWatch.instance = cloudwatchMock
 
+	item := new(billingpb.OrderViewPublic)
+	_ = faker.FakeData(item)
+
+	bill := &billMock.BillingService{}
+	bill.On("GetOrderPublic", mock2.Anything, mock2.Anything).
+		Return(&billingpb.GetOrderPublicResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item:   item,
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
@@ -787,6 +841,17 @@ func (suite *OrderTestSuite) TestOrder_GetOrderLogs_CloudWatchLog_Error() {
 }
 
 func (suite *OrderTestSuite) TestOrder_GetOrderPrivate_Ok() {
+	item := new(billingpb.OrderViewPrivate)
+	_ = faker.FakeData(item)
+
+	bill := &billMock.BillingService{}
+	bill.On("GetOrderPrivate", mock2.Anything, mock2.Anything).
+		Return(&billingpb.GetOrderPrivateResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item:   item,
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Params(":order_id", "ace2fc5c-b8c2-4424-96e8-5b631a73b88a").
@@ -867,6 +932,26 @@ func (suite *OrderTestSuite) TestOrder_GetOrderPublic_GetOrderPrivate_Error() {
 }
 
 func (suite *OrderTestSuite) TestOrder_ListOrdersPrivate_Ok() {
+	count := 5
+	items := make([]*billingpb.OrderViewPrivate, 0, count)
+
+	for i := 0; i < count; i++ {
+		item := new(billingpb.OrderViewPrivate)
+		_ = faker.FakeData(item)
+		items = append(items, item)
+	}
+
+	bill := &billMock.BillingService{}
+	bill.On("FindAllOrdersPrivate", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ListOrdersPrivateResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.ListOrdersPrivateResponseItem{
+				Count: int64(count),
+				Items: items,
+			},
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
+
 	res, err := suite.caller.Builder().
 		Method(http.MethodGet).
 		Path(common.SystemUserGroupPath + orderPath).

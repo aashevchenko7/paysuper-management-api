@@ -12,6 +12,7 @@ import (
 	"github.com/paysuper/paysuper-management-api/internal/mock"
 	"github.com/paysuper/paysuper-management-api/internal/test"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
+	billingMocks "github.com/paysuper/paysuper-proto/go/billingpb/mocks"
 	"github.com/stretchr/testify/assert"
 	mock2 "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -302,9 +303,26 @@ func (suite *ProjectTestSuite) TestProject_UpdateProject_ValidationError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_UpdateProject_BillingServerError() {
-	body := `{"min_payment_amount": 10}`
+	billingService := &billMock.BillingService{}
+	billingService.On("GetProject", mock2.Anything, mock2.Anything).Return(&billingpb.ChangeProjectResponse{
+		Status: billingpb.ResponseStatusOk,
+		Item: &billingpb.Project{
+			MerchantId:         "ffffffffffffffffffffffff",
+			Name:               map[string]string{"en": "A", "ru": "А"},
+			CallbackCurrency:   "RUB",
+			CallbackProtocol:   billingpb.ProjectCallbackProtocolEmpty,
+			LimitsCurrency:     "RUB",
+			MinPaymentAmount:   0,
+			MaxPaymentAmount:   15000,
+			IsProductsCheckout: false,
+			VatPayer:           billingpb.VatPayerBuyer,
+		},
+	}, nil)
+	billingService.On("ChangeProject", mock2.Anything, mock2.Anything).
+		Return(nil, mock.SomeError)
+	suite.router.dispatch.Services.Billing = billingService
 
-	suite.router.dispatch.Services.Billing = mock.NewBillingServerSystemErrorMock()
+	body := `{"min_payment_amount": 10}`
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodPatch).
@@ -323,9 +341,30 @@ func (suite *ProjectTestSuite) TestProject_UpdateProject_BillingServerError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_UpdateProject_BillingServerResultError() {
-	body := `{"min_payment_amount": 10}`
+	bill := &billingMocks.BillingService{}
+	bill.On("GetProject", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeProjectResponse{
+			Status: billingpb.ResponseStatusOk,
+			Item: &billingpb.Project{
+				MerchantId:         "ffffffffffffffffffffffff",
+				Name:               map[string]string{"en": "A", "ru": "А"},
+				CallbackCurrency:   "RUB",
+				CallbackProtocol:   billingpb.ProjectCallbackProtocolEmpty,
+				LimitsCurrency:     "RUB",
+				MinPaymentAmount:   0,
+				MaxPaymentAmount:   15000,
+				IsProductsCheckout: false,
+				VatPayer:           billingpb.VatPayerBuyer,
+			},
+		}, nil)
+	bill.On("ChangeProject", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeProjectResponse{
+			Status:  billingpb.ResponseStatusBadData,
+			Message: mock.SomeError,
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
 
-	suite.router.dispatch.Services.Billing = mock.NewBillingServerErrorMock()
+	body := `{"min_payment_amount": 10}`
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodPatch).
@@ -390,7 +429,13 @@ func (suite *ProjectTestSuite) TestProject_GetProject_BillingServerError() {
 }
 
 func (suite *ProjectTestSuite) TestProject_GetProject_BillingServerResultError() {
-	suite.router.dispatch.Services.Billing = mock.NewBillingServerErrorMock()
+	bill := &billingMocks.BillingService{}
+	bill.On("GetProject", mock2.Anything, mock2.Anything).
+		Return(&billingpb.ChangeProjectResponse{
+			Status:  billingpb.ResponseStatusBadData,
+			Message: mock.SomeError,
+		}, nil)
+	suite.router.dispatch.Services.Billing = bill
 
 	_, err := suite.caller.Builder().
 		Method(http.MethodGet).
