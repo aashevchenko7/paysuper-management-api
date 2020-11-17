@@ -87,3 +87,15 @@ func NewBillingServerErrorMock() billingpb.BillingService {
 
 	return bill
 }
+
+func (s *BillingServerErrorMock) AddMerchantDocument(ctx context.Context, in *billingpb.MerchantDocument, opts ...client.CallOption) (*billingpb.AddMerchantDocumentResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetMerchantDocument(ctx context.Context, in *billingpb.GetMerchantDocumentRequest, opts ...client.CallOption) (*billingpb.GetMerchantDocumentResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerErrorMock) GetMerchantDocuments(ctx context.Context, in *billingpb.GetMerchantDocumentsRequest, opts ...client.CallOption) (*billingpb.GetMerchantDocumentsResponse, error) {
+	panic("implement me")
+}

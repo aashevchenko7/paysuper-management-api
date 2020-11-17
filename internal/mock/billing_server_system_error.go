@@ -1146,3 +1146,15 @@ func (s *BillingServerSystemErrorMock) SetCustomerPaymentActivity(ctx context.Co
 func (s *BillingServerSystemErrorMock) DeserializeCookie(ctx context.Context, in *billingpb.DeserializeCookieRequest, opts ...client.CallOption) (*billingpb.DeserializeCookieResponse, error) {
 	panic("implement me")
 }
+
+func (s *BillingServerSystemErrorMock) AddMerchantDocument(ctx context.Context, in *billingpb.MerchantDocument, opts ...client.CallOption) (*billingpb.AddMerchantDocumentResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetMerchantDocument(ctx context.Context, in *billingpb.GetMerchantDocumentRequest, opts ...client.CallOption) (*billingpb.GetMerchantDocumentResponse, error) {
+	panic("implement me")
+}
+
+func (s *BillingServerSystemErrorMock) GetMerchantDocuments(ctx context.Context, in *billingpb.GetMerchantDocumentsRequest, opts ...client.CallOption) (*billingpb.GetMerchantDocumentsResponse, error) {
+	panic("implement me")
+}

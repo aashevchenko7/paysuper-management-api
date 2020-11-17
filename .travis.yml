@@ -32,6 +32,10 @@ env:
   - AWS_CLOUDWATCH_LOG_GROUP_BILLING_SERVER=aws_cloudwatch_log_group_billing_server
   - AWS_CLOUDWATCH_LOG_GROUP_MANAGEMENT_API=aws_cloudwatch_log_group_management_api
   - AWS_CLOUDWATCH_LOG_GROUP_WEBHOOK_NOTIFIER=aws_cloudwatch_log_group_webhook_notifier
+  - AWS_ACCESS_KEY_ID_MERCHANTDOCS=key_id
+  - AWS_SECRET_ACCESS_KEY_MERCHANTDOCS=secret_key
+  - AWS_REGION_MERCHANTDOCS=eu-west-1
+  - AWS_BUCKET_MERCHANTDOCS=bucket
 jobs:
   include:
   - stage: test

@@ -173,6 +173,12 @@ var (
 	ErrorMessageListOrdersRequestProjectDateFrom             = NewManagementApiResponseError("ma000111", "date filter is incorrect")
 	ErrorMessageListOrdersRequestProjectDateTo               = NewManagementApiResponseError("ma000111", "date filter is incorrect")
 
+	ErrorMessageMerchantDocumentNotFoundInRequest = NewManagementApiResponseError("ma000112", "unable to find file in merchant document upload request")
+	ErrorMessageMerchantDocumentInvalidSize       = NewManagementApiResponseError("ma000113", "uploaded file must be less then 30MB")
+	ErrorMessageMerchantDocumentInvalidType       = NewManagementApiResponseError("ma000114", "unsupported file type")
+	ErrorMessageMerchantDocumentUploadFailed      = NewManagementApiResponseError("ma000115", "unable to upload file")
+	ErrorMessageMerchantDocumentDownloadFailed    = NewManagementApiResponseError("ma000116", "unable to download document file")
+
 	ValidationErrors = map[string]*billingpb.ResponseErrorMessage{
 		UserProfileFieldNumberOfEmployees: ErrorMessageIncorrectNumberOfEmployees,
 		UserProfileFieldAnnualIncome:      ErrorMessageIncorrectAnnualIncome,

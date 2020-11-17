@@ -522,6 +522,12 @@ github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201113074511-1816d0aa62
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201113074511-1816d0aa62b8/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201113144455-14652c2d3a56 h1:FCRmbL9RsLoFFfu3AkpB9A+JgPQIXoZAzebVMwTGNoU=
 github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201113144455-14652c2d3a56/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201117090058-10f56caa17f6 h1:1+cpW+sZrdC80BgObspwiGAqGoVND/UXr1yEVLD9hKE=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201117090058-10f56caa17f6/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201117093154-803c5501ad18 h1:KIZ0mfpgO6P7GuG8WLLeFiCR/NwdZINs2fV/CRLy6TE=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201117093154-803c5501ad18/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201117095738-ce9c0292dcb9 h1:GsCEX1MeuDq3aGngChHqJ/Hc6Fn3G6kCAvg8oCa4kM8=
+github.com/paysuper/paysuper-proto/go/billingpb v0.0.0-20201117095738-ce9c0292dcb9/go.mod h1:nzAuryXupP6jYt4glcwc+kquCT2QjwGd+JeW/DdANC4=
 github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7 h1:q8mNBBuf3lHX/YCHC6B7cpspJRqoVshtRAQpywBUY0s=
 github.com/paysuper/paysuper-proto/go/casbinpb v0.0.0-20200203130641-45056764a1d7/go.mod h1:U81Y1A3gMvE6Fl4LJEJC/yKwMJCqljkwH3e+3qI8LsA=
 github.com/paysuper/paysuper-proto/go/recurringpb v0.0.0-20200302121221-60194355f1cc h1:Dh6/7CS/y2rgGjFUrAF147M+J+C1Hae5YAbTYnVO5kM=

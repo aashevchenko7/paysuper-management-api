@@ -11,7 +11,6 @@ import (
 
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	"github.com/paysuper/paysuper-proto/go/billingpb"
-	"mime/multipart"
 	"net/http"
 	"os"
 	"time"
@@ -48,7 +47,6 @@ const (
 	agreementExtension       = "pdf"
 	merchantAgreementUrlMask = "%s://%s/admin/api/v1/merchants/agreement/document"
 	systemAgreementUrlMask   = "%s://%s/system/api/v1/merchants/%s/agreement/document"
-	agreementUploadMaxSize   = 3145728
 )
 
 type OnboardingFileMetadata struct {
@@ -602,42 +600,6 @@ func (h *OnboardingRoute) getAgreementStructure(
 	}
 
 	return data, nil
-}
-
-func (h *OnboardingRoute) validateUpload(file *multipart.FileHeader) (multipart.File, error) {
-	if file.Size > agreementUploadMaxSize {
-		return nil, common.ErrorMessageAgreementUploadMaxSize
-	}
-
-	src, err := file.Open()
-
-	if err != nil {
-		h.L().Error("validate upload error", logger.PairArgs("err", err.Error()))
-		return nil, common.ErrorUnknown
-	}
-
-	buffer := make([]byte, 512)
-	_, err = src.Read(buffer)
-
-	if err != nil {
-		h.L().Error("validate upload error", logger.PairArgs("err", err.Error()))
-		return nil, common.ErrorUnknown
-	}
-
-	_, err = src.Seek(0, 0)
-
-	if err != nil {
-		h.L().Error("validate upload error", logger.PairArgs("err", err.Error()))
-		return nil, common.ErrorUnknown
-	}
-
-	ct := http.DetectContentType(buffer)
-
-	if ct != agreementContentType {
-		return nil, common.ErrorMessageAgreementContentType
-	}
-
-	return src, nil
 }
 
 // @summary Update the merchant's company information
