@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/paysuper/paysuper-management-api/internal/dispatcher/common"
 	httpEcho "github.com/paysuper/paysuper-management-api/pkg/http"
@@ -11,9 +12,9 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -151,13 +152,23 @@ func (s *QueryBuilder) ExecFileUpload(t *testing.T, params map[string]string, pa
 		}
 	}()
 
+	contentType, err := s.GetFileContentType(file)
+	if err != nil {
+		return nil, err
+	}
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(paramName, filepath.Base(path))
+
+	h := make(textproto.MIMEHeader)
+	h.Set(echo.HeaderContentType, contentType)
+	h.Set(echo.HeaderContentDisposition, fmt.Sprintf(`form-data; name="%s"; filename="%s"`, paramName, paramName))
+	part, err := writer.CreatePart(h)
 
 	if err != nil {
 		return nil, err
 	}
+
 	_, err = io.Copy(part, file)
 
 	for key, val := range params {
@@ -178,6 +189,22 @@ func (s *QueryBuilder) ExecFileUpload(t *testing.T, params map[string]string, pa
 	s.Body(body)
 
 	return s.Exec(t)
+}
+
+func (s *QueryBuilder) GetFileContentType(out *os.File) (string, error) {
+	// Only the first 512 bytes are used to sniff the content type.
+	buffer := make([]byte, 512)
+
+	_, err := out.Read(buffer)
+	if err != nil {
+		return "", err
+	}
+
+	// Use the net/http package's handy DectectContentType function. Always returns a valid
+	// content-type by returning "application/octet-stream" if no others seemed to match.
+	contentType := http.DetectContentType(buffer)
+
+	return contentType, nil
 }
 
 // NewQueryBuilder

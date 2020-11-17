@@ -40,6 +40,18 @@ func ProviderHandlers(initial config.Initial, srv common.Services, validator *va
 		return nil, func() {}, err
 	}
 
+	// Merchant Docs S3 AWS Client
+	awsOptions = []awsWrapper.Option{
+		awsWrapper.AccessKeyId(cfg.AwsAccessKeyIdMerchantDocs),
+		awsWrapper.SecretAccessKey(cfg.AwsSecretAccessKeyMerchantDocs),
+		awsWrapper.Region(cfg.AwsRegionMerchantDocs),
+		awsWrapper.Bucket(cfg.AwsBucketMerchantDocs),
+	}
+	awsManagerMerchantDocs, err := awsWrapper.New(awsOptions...)
+	if err != nil {
+		return nil, func() {}, err
+	}
+
 	awsCloudWatchLogs, err := common.NewCloudWatch(cfg.LogsSettings)
 
 	if err != nil {
@@ -79,5 +91,6 @@ func ProviderHandlers(initial config.Initial, srv common.Services, validator *va
 		NewActOfCompletionApiV1(hSet, &copyCfg),
 		NewCustomerRoute(hSet, &copyCfg),
 		NewSubscriptionsRoute(hSet, &copyCfg),
+		NewMerchantDocumentRoute(hSet, awsManagerMerchantDocs, &copyCfg),
 	}, func() {}, nil
 }

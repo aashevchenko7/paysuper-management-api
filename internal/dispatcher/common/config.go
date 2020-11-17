@@ -30,6 +30,11 @@ type Config struct {
 	AwsRegionReporter          string `envconfig:"AWS_REGION_REPORTER" default:"eu-west-1"`
 	AwsBucketReporter          string `envconfig:"AWS_BUCKET_REPORTER" required:"true"`
 
+	AwsAccessKeyIdMerchantDocs     string `envconfig:"AWS_ACCESS_KEY_ID_MERCHANTDOCS" required:"true"`
+	AwsSecretAccessKeyMerchantDocs string `envconfig:"AWS_SECRET_ACCESS_KEY_MERCHANTDOCS" required:"true"`
+	AwsRegionMerchantDocs          string `envconfig:"AWS_REGION_MERCHANTDOCS" default:"eu-west-1"`
+	AwsBucketMerchantDocs          string `envconfig:"AWS_BUCKET_MERCHANTDOCS" required:"true"`
+
 	LimitDefault          int32 `default:"100"`
 	OffsetDefault         int32 `default:"0"`
 	LimitMax              int32 `default:"1000"`
