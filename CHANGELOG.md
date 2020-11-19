@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.6.0] - 2020-11-18
+
+### Added
+- Routes for subscriptions functionality
+- Routes for List of acts of completion
+
+### Changed
+- Update dependencies.
+
+*** 
+
 ## [2.5.0] - 2020-09-10
 
 ### Added
