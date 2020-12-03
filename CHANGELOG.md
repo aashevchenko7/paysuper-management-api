@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+
+## [2.7.0] - 2020-12-03
+
+### Added
+- KYC procedure for merchant onboarding
+
+### Fixed
+- Some minor fixes added 
+    
+***
+
+
 ## [2.6.0] - 2020-11-18
 
 ### Added
