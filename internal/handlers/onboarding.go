@@ -97,6 +97,7 @@ func (h *OnboardingRoute) Route(groups *common.Groups) {
 	groups.SystemUser.PUT(merchantsIdContactsPath, h.setMerchantContacts)
 	groups.SystemUser.PUT(merchantsIdCompanyPath, h.setMerchantCompany)
 	groups.SystemUser.PUT(merchantsIdBankingPath, h.setMerchantBanking)
+	groups.SystemUser.PUT(merchantsIdPath, h.setMerchantOnboardingData)
 	groups.AuthUser.GET(merchantsStatusCompanyPath, h.getMerchantStatus)
 
 	groups.SystemUser.PUT(merchantsIdChangeStatusCompanyPath, h.changeMerchantStatus)
@@ -784,6 +785,53 @@ func (h *OnboardingRoute) setMerchantBanking(ctx echo.Context) error {
 
 	if err != nil {
 		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchant", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
+	}
+
+	if res.Status != billingpb.ResponseStatusOk {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+// @summary Update the merchant's onboarding data
+// @desc Update the merchant's onboarding data for the system admin
+// @id setAdminMerchantOnboardingData
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body billingpb.OnboardingRequest
+// @success 200 {object} billingpb.Merchant Returns the merchant data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 401 {object} billingpb.ResponseErrorMessage Unauthorized request
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/merchants/{merchant_id} [put]
+func (h *OnboardingRoute) setMerchantOnboardingData(ctx echo.Context) error {
+	authUser := common.ExtractUserContext(ctx)
+	in := &billingpb.OnboardingRequest{}
+	err := ctx.Bind(in)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
+	}
+
+	in.Id = ctx.Param(common.RequestParameterMerchantId)
+	in.User = &billingpb.MerchantUser{
+		Id:    authUser.Id,
+		Email: authUser.Email,
+	}
+	err = h.dispatch.Validate.Struct(in)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
+	}
+
+	res, err := h.dispatch.Services.Billing.ChangeMerchant(ctx.Request().Context(), in)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "ChangeMerchant", in)
 		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorUnknown)
 	}
 
