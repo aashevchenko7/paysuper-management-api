@@ -50,6 +50,7 @@ func (h *RoyaltyReportsRoute) Route(groups *common.Groups) {
 	groups.AuthUser.POST(royaltyReportsTransactionsDownloadPath, h.downloadRoyaltyReportOrders)
 	groups.AuthUser.POST(royaltyReportsAcceptPath, h.merchantReviewRoyaltyReport)
 	groups.AuthUser.POST(royaltyReportsDeclinePath, h.merchantDeclineRoyaltyReport)
+	groups.SystemUser.GET(royaltyReportsPath, h.getRoyaltyReportsList)
 	groups.SystemUser.POST(royaltyReportsChangePath, h.changeRoyaltyReport)
 	groups.SystemUser.GET(royaltyReportsIdPath, h.getRoyaltyReport)
 	groups.SystemUser.GET(royaltyReportsTransactionsPath, h.listRoyaltyReportOrders)
