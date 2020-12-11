@@ -15,6 +15,9 @@ const (
 	dashboardRevenueDynamicsPath = "/merchants/dashboard/revenue_dynamics"
 	dashboardBasePath            = "/merchants/dashboard/base"
 	dashboardCustomersPath       = "/merchants/dashboard/customers"
+
+	dashboardMerchantIdMainPath            = "/merchants/:merchant_id/dashboard/main"
+	dashboardMerchantIdRevenueDynamicsPath = "/merchants/:merchant_id/dashboard/revenue_dynamics"
 )
 
 type DashboardRoute struct {
@@ -36,8 +39,10 @@ func (h *DashboardRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(dashboardMainPath, h.getMainReports)
 	groups.AuthUser.GET(dashboardRevenueDynamicsPath, h.getRevenueDynamicsReport)
 	groups.AuthUser.GET(dashboardBasePath, h.getBaseReports)
-
 	groups.AuthUser.GET(dashboardCustomersPath, h.getCustomers)
+
+	groups.SystemUser.POST(dashboardMerchantIdMainPath, h.getMainReports)
+	groups.SystemUser.POST(dashboardMerchantIdRevenueDynamicsPath, h.getRevenueDynamicsReport)
 }
 
 func (h *DashboardRoute) getCustomers(ctx echo.Context) error {
