@@ -37,6 +37,9 @@ func (h *ProjectRoute) Route(groups *common.Groups) {
 	groups.AuthUser.PATCH(projectsIdPath, h.updateProject)
 	groups.AuthUser.DELETE(projectsIdPath, h.deleteProject)
 	groups.AuthUser.POST(projectsSkuPath, h.checkSku)
+
+	groups.SystemUser.GET(projectsPath, h.listProjects)
+	groups.SystemUser.GET(projectsIdPath, h.getProject)
 }
 
 // @summary Create a new project

@@ -52,8 +52,9 @@ func (h *KeyProductRoute) Route(groups *common.Groups) {
 
 	groups.AuthUser.POST(keyProductsPlatformsFilePath, h.uploadKeys)
 	groups.AuthUser.GET(keyProductsPlatformsCountPath, h.getCountOfKeys)
-
 	groups.AuthProject.GET(keyProductsIdPath, h.getKeyProduct)
+
+	groups.SystemUser.GET(keyProductsPath, h.getKeyProductList)
 }
 
 // @summary Make the key-activated product inactive
@@ -340,7 +341,6 @@ func (h *KeyProductRoute) createKeyProduct(ctx echo.Context) error {
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/key-products [get]
 func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
-	authUser := common.ExtractUserContext(ctx)
 	req := &billingpb.ListKeyProductsRequest{}
 	if err := ctx.Bind(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestParamsIncorrect)
@@ -353,8 +353,6 @@ func (h *KeyProductRoute) getKeyProductList(ctx echo.Context) error {
 	if req.Limit <= 0 {
 		req.Limit = int64(h.cfg.LimitDefault)
 	}
-
-	req.MerchantId = authUser.MerchantId
 
 	if err := h.dispatch.Validate.Struct(req); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
