@@ -34,13 +34,14 @@ func NewProductRoute(set common.HandlerSet, cfg *common.Config) *ProductRoute {
 
 func (h *ProductRoute) Route(groups *common.Groups) {
 	groups.AuthUser.GET(productsPath, h.getProductsList)
-	groups.SystemUser.GET(productsMerchantPath, h.getProductsList)
 	groups.AuthUser.POST(productsPath, h.createProduct)
 	groups.AuthUser.GET(productsIdPath, h.getProduct)
 	groups.AuthUser.PUT(productsIdPath, h.updateProduct)
 	groups.AuthUser.DELETE(productsIdPath, h.deleteProduct)
 	groups.AuthUser.GET(productsPricesPath, h.getProductPrices)    // TODO: Need test
 	groups.AuthUser.PUT(productsPricesPath, h.updateProductPrices) // TODO: Need test
+
+	groups.SystemUser.GET(productsMerchantPath, h.getProductsList)
 }
 
 // @summary Get the list of products
