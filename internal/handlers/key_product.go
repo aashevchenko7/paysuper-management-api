@@ -55,6 +55,9 @@ func (h *KeyProductRoute) Route(groups *common.Groups) {
 	groups.AuthProject.GET(keyProductsIdPath, h.getKeyProduct)
 
 	groups.SystemUser.GET(keyProductsPath, h.getKeyProductList)
+	groups.SystemUser.GET(keyProductsIdPath, h.getKeyProductById)
+	groups.SystemUser.GET(platformsPath, h.getPlatformsList)
+	groups.SystemUser.GET(keyProductsPlatformsCountPath, h.getCountOfKeys)
 }
 
 // @summary Make the key-activated product inactive
@@ -144,6 +147,19 @@ func (h *KeyProductRoute) publishKeyProduct(ctx echo.Context) error {
 // @param limit query {integer} true The number of platforms returned in one page. Default value is 100.
 // @param offset query {integer} false The ranking number of the first item on the page.
 // @router /admin/api/v1/platforms [get]
+
+// @summary Get available platforms list
+// @desc Get available platforms list
+// @id systemPlatformsPathGetPlatformsList
+// @tag Product
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.ListPlatformsResponse Returns the available platforms list
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param limit query {integer} true The number of platforms returned in one page. Default value is 100.
+// @param offset query {integer} false The ranking number of the first item on the page.
+// @router /system/api/v1/platforms [get]
 func (h *KeyProductRoute) getPlatformsList(ctx echo.Context) error {
 	req := &billingpb.ListPlatformsRequest{}
 
@@ -263,6 +279,19 @@ func (h *KeyProductRoute) changeKeyProduct(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param key_product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/key-products/{key_product_id} [get]
+
+// @summary Get the key-activated product using the product ID
+// @desc Get the key-activated product using the product ID
+// @id systemKeyProductsIdPathGetKeyProductById
+// @tag Product
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.KeyProduct Returns the key-activated product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param key_product_id path {string} true The unique identifier for the product.
+// @router /system/api/v1/key-products/{key_product_id} [get]
 func (h *KeyProductRoute) getKeyProductById(ctx echo.Context) error {
 	req := &billingpb.RequestKeyProductMerchant{}
 	if err := ctx.Bind(req); err != nil {
@@ -508,6 +537,20 @@ func (h *KeyProductRoute) uploadKeys(ctx echo.Context) error {
 // @param key_product_id path {string} true The unique identifier for the key-activated product.
 // @param platform_id path {string} true The platform's name. Available values: steam, gog, uplay, origin, psn, xbox, nintendo, itch, egs.
 // @router /auth/api/v1/key-products/{key_product_id}/platforms/{platform_id}/count [get]
+
+// @summary Get the number of keys for the specified platform and product for system admin
+// @desc Get the number of keys for the specified platform and product
+// @id systemKeyProductsPlatformsCountPathGetCountOfKeys
+// @tag Product
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.GetPlatformKeyCountResponse Returns the number of keys for the specified platform and product
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 404 {object} billingpb.ResponseErrorMessage Not found
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param key_product_id path {string} true The unique identifier for the key-activated product.
+// @param platform_id path {string} true The platform's name. Available values: steam, gog, uplay, origin, psn, xbox, nintendo, itch, egs.
+// @router /system/api/v1/key-products/{key_product_id}/platforms/{platform_id}/count [get]
 func (h *KeyProductRoute) getCountOfKeys(ctx echo.Context) error {
 	req := &billingpb.GetPlatformKeyCountRequest{}
 	if err := ctx.Bind(req); err != nil {

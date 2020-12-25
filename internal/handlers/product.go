@@ -42,6 +42,7 @@ func (h *ProductRoute) Route(groups *common.Groups) {
 	groups.AuthUser.PUT(productsPricesPath, h.updateProductPrices) // TODO: Need test
 
 	groups.SystemUser.GET(productsMerchantPath, h.getProductsList)
+	groups.SystemUser.GET(productsIdPath, h.getProduct)
 }
 
 // @summary Get the list of products
@@ -104,6 +105,18 @@ func (h *ProductRoute) getProductsList(ctx echo.Context) error {
 // @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
 // @param product_id path {string} true The unique identifier for the product.
 // @router /admin/api/v1/products/{product_id} [get]
+
+// @summary Get the product for system admin
+// @desc Get the product using the product ID
+// @id systemProductsIdPathGetProduct
+// @tag Product
+// @accept application/json
+// @produce application/json
+// @success 200 {object} billingpb.GetProductResponse Returns the product data
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param product_id path {string} true The unique identifier for the product.
+// @router /system/api/v1/products/{product_id} [get]
 func (h *ProductRoute) getProduct(ctx echo.Context) error {
 
 	req := &billingpb.RequestProduct{}
