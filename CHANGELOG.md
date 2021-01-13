@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [2.9.0] - 2021-01-13
+
+### Added
+- Merchant dashboard for admin
+- Merchant products and project for admin (view only)
+
+### Changed
+- Dependencies updated
+
+***
+
 ## [2.8.0] - 2020-12-16
 
 ### Changed
