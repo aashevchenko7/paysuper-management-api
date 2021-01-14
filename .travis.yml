@@ -8,8 +8,6 @@ dist: bionic
 addons:
   sonarcloud:
     organization: paysuper
-services:
-- mongodb
 stages:
 - test
 - name: deploy
