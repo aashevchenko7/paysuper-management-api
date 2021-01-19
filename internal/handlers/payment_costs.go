@@ -63,6 +63,7 @@ func (h *PaymentCostRoute) Route(groups *common.Groups) {
 
 	groups.SystemUser.PUT(paymentCostsChannelSystemIdPath, h.setPaymentChannelCostSystem)
 	groups.SystemUser.PUT(paymentCostsChannelMerchantIdsPath, h.setPaymentChannelCostMerchant)
+	groups.SystemUser.PUT(paymentCostsChannelMerchantAllPath, h.setAllPaymentChannelCostMerchant)
 	groups.SystemUser.PUT(paymentCostsMoneyBackSystemIdPath, h.setMoneyBackCostSystem)
 	groups.SystemUser.PUT(paymentCostsMoneyBackMerchantIdsPath, h.setMoneyBackCostMerchant)
 }
@@ -496,6 +497,39 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 	}
 
 	return ctx.JSON(http.StatusOK, res.Item)
+}
+
+// @summary Update multiple costs of merchant for payments operations
+// @desc Update multiple costs of merchant for payments operations
+// @id paymentCostsChannelMerchantIdsPathSetPaymentChannelCostMerchant
+// @tag Onboarding
+// @accept application/json
+// @produce application/json
+// @body billingpb.SetAllPaymentChannelCostMerchantRequest
+// @success 200 {object} billingpb.SetAllPaymentChannelCostMerchantResponse Returns merchant costs for payments operations
+// @failure 400 {object} billingpb.ResponseErrorMessage Invalid request data
+// @failure 500 {object} billingpb.ResponseErrorMessage Internal Server Error
+// @param merchant_id path {string} true The unique identifier for the merchant.
+// @router /system/api/v1/payment_costs/channel/merchant/{merchant_id}/all [put]
+func (h *PaymentCostRoute) setAllPaymentChannelCostMerchant(ctx echo.Context) error {
+	req := &billingpb.SetAllPaymentChannelCostMerchantRequest{}
+
+	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
+		return err
+	}
+
+	res, err := h.dispatch.Services.Billing.SetAllPaymentChannelCostMerchant(ctx.Request().Context(), req)
+
+	if err != nil {
+		common.LogSrvCallFailedGRPC(h.L(), err, billingpb.ServiceName, "SetAllPaymentChannelCostMerchant", req)
+		return echo.NewHTTPError(http.StatusInternalServerError, common.ErrorInternal)
+	}
+
+	if res.Status != http.StatusOK {
+		return echo.NewHTTPError(int(res.Status), res.Message)
+	}
+
+	return ctx.JSON(http.StatusOK, res.Items)
 }
 
 // @summary Create system costs for money back operations
