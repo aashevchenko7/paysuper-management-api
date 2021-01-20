@@ -513,9 +513,22 @@ func (h *PaymentCostRoute) setPaymentChannelCostMerchant(ctx echo.Context) error
 // @router /system/api/v1/payment_costs/channel/merchant/{merchant_id}/all [put]
 func (h *PaymentCostRoute) setAllPaymentChannelCostMerchant(ctx echo.Context) error {
 	req := &billingpb.SetAllPaymentChannelCostMerchantRequest{}
+	err := ctx.Bind(req)
 
-	if err := h.dispatch.BindAndValidate(req, ctx); err != nil {
-		return err
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.ErrorRequestDataInvalid)
+	}
+
+	req.MerchantId = ctx.Param(common.RequestParameterMerchantId)
+
+	for _, cost := range req.Costs {
+		cost.MerchantId = req.MerchantId
+	}
+
+	err = h.dispatch.Validate.Struct(req)
+
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, common.GetValidationError(err))
 	}
 
 	res, err := h.dispatch.Services.Billing.SetAllPaymentChannelCostMerchant(ctx.Request().Context(), req)
