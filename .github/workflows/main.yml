@@ -1,0 +1,72 @@
+name: Build
+on:
+  push:
+    branches:
+  workflow_dispatch:
+
+env:
+  MONGOVERSION: "4.2"
+  JENKINS_AUTH_TOKEN: ${{ secrets.JENKINS_AUTH_TOKEN }}
+  JENKINS_BUILD_TOKEN: ${{ secrets.JENKINS_BUILD_TOKEN }}
+
+jobs:
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: ~/go/pkg/mod
+      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-go-
+
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.13'
+
+      - name: Tests
+        env:
+          GO111MODULE: "on"
+          AWS_ACCESS_KEY_ID_AGREEMENT: "key_id"
+          AWS_SECRET_ACCESS_KEY_AGREEMENT: "secret_key"
+          AWS_REGION_AGREEMENT: "eu-west-1"
+          AWS_BUCKET_AGREEMENT: "bucket"
+          ORDER_INLINE_FORM_URL_MASK: "https://paysupermgmt.tst.protocol.one/order"
+          AWS_CLOUDWATCH_ACCESS_KEY_ID: "aws_cloudwatch_access_key_id"
+          AWS_CLOUDWATCH_SECRET_ACCESS_KEY: "aws_cloudwatch_secret_access_key"
+          AWS_CLOUDWATCH_LOG_GROUP_BILLING_SERVER: "aws_cloudwatch_log_group_billing_server"
+          AWS_CLOUDWATCH_LOG_GROUP_MANAGEMENT_API: "aws_cloudwatch_log_group_management_api"
+          AWS_CLOUDWATCH_LOG_GROUP_WEBHOOK_NOTIFIER: "aws_cloudwatch_log_group_webhook_notifier"
+          AWS_ACCESS_KEY_ID_MERCHANTDOCS: "key_id"
+          AWS_SECRET_ACCESS_KEY_MERCHANTDOCS: "secret_key"
+          AWS_REGION_MERCHANTDOCS: "eu-west-1"
+          AWS_BUCKET_MERCHANTDOCS: "bucket"
+        run: make github-test
+  
+  deploy-tst:
+    name: deploy-tst
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    steps:
+      - name: Deploy to tst
+        run: docker run -e JENKINS_AUTH_TOKEN=$JENKINS_AUTH_TOKEN -e JENKINS_BUILD_TOKEN=$JENKINS_BUILD_TOKEN -e JENKINS_BUILD_PROJECT=$GITHUB_REPOSITORY -e JENKINS_BUILD_BRANCH=${GITHUB_REF##*/} p1hub/p1jenkinstrigger
+        #run: echo "deploy to tst"
+
+  deploy-stg-releasebranch:
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/release**' && github.event_name == 'push'
+    steps:
+      - name: Deploy release branch to stg
+        run: docker run -e JENKINS_AUTH_TOKEN=$JENKINS_AUTH_TOKEN -e JENKINS_BUILD_TOKEN=$JENKINS_BUILD_TOKEN -e JENKINS_BUILD_PROJECT=$GITHUB_REPOSITORY -e JENKINS_BUILD_BRANCH=${GITHUB_REF##*/} p1hub/p1jenkinstrigger
+        #run: echo "deploy to stg"
