@@ -28,6 +28,7 @@ backend:
     protocol: TCP
   env:
     - MICRO_REGISTRY
+    - MICRO_SELECTOR    
     - MICRO_REGISTRY_ADDRESS
     - MICRO_TRANSPORT
     - MICRO_BILLING_VERSION
