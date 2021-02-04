@@ -86,6 +86,7 @@ const (
 	RequestPayoutDocumentId                  = "payout_document_id"
 	RequestParameterRedirectSettings         = "redirect_settings"
 	RequestParameterWebhookMode              = "webhook_mode"
+	RequestParameterPlanId                   = "plan_id"
 
 	ImageCollectionImagesField  = "images"
 	ImageCollectionUseOneForAll = "use_one_for_all"

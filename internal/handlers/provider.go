@@ -92,5 +92,6 @@ func ProviderHandlers(initial config.Initial, srv common.Services, validator *va
 		NewCustomerRoute(hSet, &copyCfg),
 		NewSubscriptionsRoute(hSet, &copyCfg),
 		NewMerchantDocumentRoute(hSet, awsManagerMerchantDocs, &copyCfg),
+		NewRecurringRoute(hSet, &copyCfg),
 	}, func() {}, nil
 }
